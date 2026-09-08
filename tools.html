@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Textbooks, tools and links</title>
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/notes.js" defer></script>
+</head>
+<body>
+<header class="topbar"><div class="topbar-in">
+  <a class="brand" href="index.html">CSCI 240</a>
+  <span class="crumb">Textbooks, tools and links</span>
+  <nav class="topnav">
+    <a href="setup-logisim.html">&larr; Prev</a>
+    <a href="index.html">Contents</a>
+    <a aria-disabled="true">Next &rarr;</a>
+    <button class="iconbtn" id="themebtn" type="button" title="Light / dark">&#9686;</button>
+  </nav>
+</div></header>
+<div class="wrap">
+  <aside class="toc"><p class="toc-title">On this page</p><ol>
+    <li><a href="#books"><span class="t">B.1</span>Textbooks</a></li>
+    <li><a href="#how"><span class="t">B.2</span>How to use a converter</a></li>
+    <li><a href="#bases"><span class="t">B.3</span>Numbers and bases</a></li>
+    <li><a href="#codes"><span class="t">B.4</span>Codes and characters</a></li>
+    <li><a href="#logic"><span class="t">B.5</span>Logic and circuits</a></li>
+    <li><a href="#mips"><span class="t">B.6</span>MIPS and assembly</a></li>
+    <li><a href="#reals"><span class="t">B.7</span>Floating point</a></li>
+  </ol></aside>
+  <main>
+
+<div class="chhead">
+  <span class="chpart">Reference</span>
+  <span class="chnum">Appendix B</span>
+  <h1>Textbooks, tools and links</h1>
+  <p class="chsum">The books the course is built on &mdash; one of them a free,
+  legitimate download &mdash; followed by a short, opinionated list of web tools.
+  Every entry says what it is good for, and, where it matters, what it will quietly
+  do to your learning if you lean on it.</p>
+</div>
+
+<h2 id="books"><span class="secnum">B.1</span>Textbooks</h2>
+
+<p>Three books stand behind this course. You are not required to buy any of them
+&mdash; the lectures are self-contained &mdash; but each one covers a different half
+of the material better than any set of notes can, and one of the three is free.</p>
+
+<div class="box worked"><span class="bt">The hardware half</span>
+<p><strong>David A. Patterson and John L. Hennessy</strong>,
+<em>Computer Organization and Design: The Hardware/Software Interface</em>,
+Morgan Kaufmann. The MIPS edition.</p>
+<p>The standard text for this subject, and the one the MIPS material in every
+computer-organization course descends from. Chapters&nbsp;2 and&nbsp;3 and
+Appendix&nbsp;B are the ones that overlap our syllabus: instructions, arithmetic,
+and the logic-design appendix. Dense, but the worked examples are excellent and the
+"Fallacies and Pitfalls" section at the end of each chapter is worth reading on its
+own. The Queens College library has it, and copies of earlier editions are cheap
+and perfectly usable &mdash; nothing we cover changed between them.</p>
+</div>
+
+<div class="box worked"><span class="bt">The assembly half &mdash; free</span>
+<p><strong>Charles W. Kann</strong>,
+<em>Introduction to MIPS Assembly Language Programming</em>, Gettysburg College,
+2015. Open access.</p>
+<p>Written for exactly the course you are taking, assumes only a first programming
+course, and moves at a sane pace. If Patterson and Hennessy feels like being
+handed a reference manual, start here instead. It uses MARS throughout, which is
+the simulator we use.</p>
+<ul>
+<li><a href="https://cupola.gettysburg.edu/oer/2/">PDF from the author's college
+repository</a> &mdash; the official free copy</li>
+<li><a href="https://eng.libretexts.org/Bookshelves/Computer_Science/Programming_Languages/Introduction_To_MIPS_Assembly_Language_Programming_(Kann)">Read it online at LibreTexts</a>
+&mdash; the same book as browsable web pages, easier to search</li>
+</ul>
+</div>
+
+<div class="box worked"><span class="bt">A third opinion</span>
+<p><strong>Robert L. Britton</strong>, <em>MIPS Assembly Language Programming</em>,
+Pearson / Prentice Hall, 2004.</p>
+<p>Short, blunt and example-driven. Useful when a MIPS idea has not clicked and you
+want to see the same thing explained by someone else in three pages rather than
+thirty.</p>
+</div>
+
+<div class="box note"><span class="bt">On the software the older syllabus points at</span>
+<p>You may see the previous syllabus link to
+<a href="https://www.cburch.com/logisim/">Carl Burch's original Logisim</a> and to
+the MARS home page. MARS is unchanged and is the one we use &mdash; see
+&sect;B.6 below. Logisim is <em>not</em>: install
+<strong>Logisim-Evolution</strong> instead, following
+<a href="setup-logisim.html">Appendix&nbsp;A</a>. The original has been
+discontinued since 2014.</p></div>
+
+<h2 id="how"><span class="secnum">B.2</span>How to use a converter without hurting yourself</h2>
+
+<p>An online base converter is a wonderful thing and a terrible study aid. The exam
+is on paper. If your practice consists of typing numbers into a website, you will
+arrive at the exam able to do exactly nothing.</p>
+
+<div class="box note"><span class="bt">The rule</span>
+<p><strong>Convert first, check second.</strong> Do the problem on paper, commit to
+an answer, and only then type it into the tool. Used that way a converter is the
+best possible study partner: instant feedback, unlimited problems, no waiting for
+office hours. Used the other way round it is a very efficient way to feel productive
+while learning nothing.</p>
+<p>The random-bit generator in &sect;B.2 exists precisely so you can generate your own
+problems and check your own work &mdash; a complete practice loop with no textbook
+needed.</p></div>
+
+<h2 id="bases"><span class="secnum">B.3</span>Numbers and bases</h2>
+
+<div class="grid2">
+  <div class="card"><h3><a href="https://www.rapidtables.com/convert/number/">RapidTables number converter</a></h3>
+  <p>Converts integers between binary, octal, decimal and hexadecimal, in any
+  direction. The plainest of the converters and the one to use for checking
+  Exercise&nbsp;set&nbsp;2.</p>
+  <p><em>Note:</em> it does not do quaternary or arbitrary bases. For those, convert
+  to binary here and regroup by hand &mdash; which is the method from
+  &sect;2.4 anyway.</p></div>
+
+  <div class="card"><h3><a href="https://www.browserling.com/tools/random-bin">Random binary generator</a></h3>
+  <p>Produces strings of random bits, as many and as long as you ask for. Use it to
+  manufacture your own conversion practice: generate eight bits, convert to decimal
+  and hexadecimal on paper, then check with the converter above.</p></div>
+
+  <div class="card"><h3><a href="https://www.omnicalculator.com/math/binary-fraction">Binary fraction converter</a></h3>
+  <p>Handles the part after the radix point, in both directions. You will want this
+  when we reach fixed-point numbers &mdash; and it is the quickest way to see for
+  yourself that one tenth never terminates in binary.</p></div>
+
+  <div class="card"><h3><a href="https://www.wolframalpha.com/">WolframAlpha</a></h3>
+  <p>For the odd bases nothing else covers. Type <code>2026 in base 12</code> or
+  <code>convert 462 base 7 to decimal</code> and it answers, with the working. Useful
+  for Exercises 2.10 and 2.11.</p></div>
+</div>
+
+<h2 id="codes"><span class="secnum">B.4</span>Codes and characters</h2>
+
+<div class="grid2">
+  <div class="card"><h3><a href="https://morsecode.world/international/translator.html">Morse Code World translator</a></h3>
+  <p>Translates text to Morse and back, <em>and</em> plays it as audio at a speed you
+  set in words per minute. That second feature is the one that matters for
+  Exercise&nbsp;set&nbsp;1: set it to 20&nbsp;wpm, send a short message, time it with
+  a stopwatch, and compare against the unit count you worked out on paper.</p>
+  <p>It also offers Farnsworth timing, which stretches the gaps while keeping the
+  characters at full speed &mdash; the thing mentioned in the "Going further" box of
+  Set&nbsp;1.</p></div>
+
+  <div class="card"><h3><a href="https://www.asciitable.com/">ASCII table</a></h3>
+  <p>All 128 codes with their decimal, hexadecimal, octal and binary values side by
+  side, plus the control characters. The layout is dense but it is the one to check
+  against when you are converting a character by hand.</p>
+  <p>Worth noticing while you are there: <code>'A'</code> is
+  <span class="hex">0x41</span> and <code>'a'</code> is <span class="hex">0x61</span>,
+  differing in exactly one bit. That is not a coincidence, and we will come back to
+  it.</p></div>
+</div>
+
+<h2 id="logic"><span class="secnum">B.5</span>Logic and circuits</h2>
+
+<div class="grid2">
+  <div class="card"><h3><a href="https://github.com/logisim-evolution/logisim-evolution">Logisim-Evolution</a></h3>
+  <p>The simulator we use. Downloads are on the releases page; installation
+  instructions for every platform are in
+  <a href="setup-logisim.html">Appendix&nbsp;A</a>. The repository's wiki and
+  <code>docs</code> folder hold the reference manual.</p></div>
+
+  <div class="card"><h3><a href="http://www.32x8.com/">32x8 Karnaugh map solver</a></h3>
+  <p>Enter a truth table for up to six variables and it returns the minimal
+  sum-of-products and product-of-sums, and draws the circuit. Excellent for checking
+  a K-map you have already drawn.</p>
+  <p><em>Warning, and it is a real one:</em> K-map questions on the exam ask you to
+  <strong>show the grouping</strong>. A solver gives you an answer with no groups
+  drawn, and the answer is often written in a different but equivalent form from
+  yours. Draw the map first.</p></div>
+</div>
+
+<h2 id="mips"><span class="secnum">B.6</span>MIPS and assembly</h2>
+
+<div class="grid2">
+  <div class="card"><h3><a href="https://computerscience.missouristate.edu/mars-mips-simulator.htm">MARS &mdash; MIPS Assembler and Runtime Simulator</a></h3>
+  <p>The simulator for the second half of the course: assemble, run, single-step, and
+  watch the registers and memory change as each instruction executes. Written for
+  teaching, and it shows &mdash; the register display alone is worth the download.</p>
+  <p>MARS is a Java program, so it needs a Java runtime, the same one described in
+  &sect;A.6 of the Logisim appendix. A
+  <a href="https://dpetersanderson.github.io/MARS/">maintained build</a> is also
+  available from one of the original authors.</p></div>
+
+  <div class="card"><h3><a href="https://adoptium.net/temurin/releases/">Eclipse Temurin (Java)</a></h3>
+  <p>Where to get Java when a tool needs it. Take version 21 or newer, and the JDK
+  rather than the JRE. Needed for MARS, and for the <code>.jar</code> route to
+  Logisim-Evolution.</p></div>
+</div>
+
+<h2 id="reals"><span class="secnum">B.7</span>Floating point</h2>
+
+<p>These come into their own around the IEEE-754 material. Bookmark them now; you
+will not remember they exist when you need them.</p>
+
+<div class="grid2">
+  <div class="card"><h3><a href="https://www.h-schmidt.net/FloatConverter/IEEE754.html">IEEE-754 converter</a></h3>
+  <p>Type a decimal number and watch it decompose into sign, exponent and mantissa,
+  with every individual bit clickable. Flip a bit and the value updates. Nothing
+  explains the hidden bit and the exponent bias faster than a minute of clicking
+  here.</p></div>
+
+  <div class="card"><h3><a href="https://www.exploringbinary.com/floating-point-converter">Exploring Binary converter</a></h3>
+  <p>Shows the <em>exact</em> decimal value your float actually holds, which is
+  almost never the number you typed. This is the tool that makes the rounding-error
+  discussion concrete rather than theoretical.</p></div>
+</div>
+
+<div class="box note"><span class="bt">Found something better?</span>
+<p>If you come across a tool that helped you, send it to me and I will add it here
+with your name on it. This page is meant to grow over the semester.</p></div>
+
+    <nav class="pagenav">
+      <a class="prev" href="setup-logisim.html"><span>Previous</span>Installing Logisim-Evolution</a>
+      <a class="next" href="index.html"><span>Next</span>Back to contents</a>
+    </nav>
+    <footer class="site">
+      <em>Computer Organization and Assembly Language</em> &middot; CSCI 240 / 640,
+      Queens College CUNY. External links were checked at the start of the semester;
+      the web being what it is, tell me if one has rotted.
+    </footer>
+  </main>
+</div>
+</body>
+</html>

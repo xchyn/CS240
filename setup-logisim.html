@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Installing Logisim-Evolution</title>
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/notes.js" defer></script>
+</head>
+<body>
+<header class="topbar"><div class="topbar-in">
+  <a class="brand" href="index.html">CSCI 240</a>
+  <span class="crumb">Setup &middot; Logisim-Evolution</span>
+  <nav class="topnav">
+    <a href="ex-bases.html">&larr; Prev</a>
+    <a href="index.html">Contents</a>
+    <a href="tools.html">Next &rarr;</a>
+    <button class="iconbtn" id="themebtn" type="button" title="Light / dark">&#9686;</button>
+  </nav>
+</div></header>
+<div class="wrap">
+  <aside class="toc"><p class="toc-title">On this page</p><ol>
+    <li><a href="#which"><span class="t">A.1</span>Which program</a></li>
+    <li><a href="#download"><span class="t">A.2</span>Getting the file</a></li>
+    <li><a href="#mac"><span class="t">A.3</span>macOS</a></li>
+    <li><a href="#win"><span class="t">A.4</span>Windows</a></li>
+    <li><a href="#linux"><span class="t">A.5</span>Linux</a></li>
+    <li><a href="#jar"><span class="t">A.6</span>Anything else</a></li>
+    <li><a href="#check"><span class="t">A.7</span>Check it works</a></li>
+    <li><a href="#trouble"><span class="t">A.8</span>Troubleshooting</a></li>
+  </ol></aside>
+  <main>
+
+<div class="chhead">
+  <span class="chpart">Software setup &middot; do this before Lecture 3</span>
+  <span class="chnum">Appendix A</span>
+  <h1>Installing Logisim-Evolution</h1>
+  <p class="chsum">Logisim-Evolution is the circuit simulator we use for the whole
+  logic-design half of the course. It is free, it runs on everything, and it takes
+  about five minutes to install &mdash; four of which are spent convincing your
+  operating system to trust it.</p>
+</div>
+
+<h2 id="which"><span class="secnum">A.1</span>Which program</h2>
+
+<p>Search the web for "Logisim" and you will find two different programs. Get the
+right one.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th></th><th>Logisim (original)</th><th>Logisim-Evolution</th></tr></thead>
+<tbody>
+<tr><td>author</td><td>Carl Burch</td><td>a community fork, on GitHub</td></tr>
+<tr><td>status</td><td>discontinued in 2014</td><td>actively maintained</td></tr>
+<tr><td>use in this course</td><td><strong>no</strong></td><td><strong>yes</strong></td></tr>
+</tbody></table>
+</div>
+
+<p>The original Logisim is what most tutorials and older course pages point at. It
+still runs, but it has not been updated in over a decade, it does not always start
+on current versions of macOS, and the <code>.circ</code> files distributed for this
+course use features it does not have. <strong>Install Logisim-Evolution.</strong>
+A file saved by the original will open in Evolution; the reverse is not
+guaranteed.</p>
+
+<h2 id="download"><span class="secnum">A.2</span>Getting the file</h2>
+
+<p>Every download lives in one place, the project's GitHub releases page:</p>
+
+<p style="text-align:center;font-size:1.05rem"><a
+href="https://github.com/logisim-evolution/logisim-evolution/releases/latest">github.com/logisim-evolution/logisim-evolution/releases/latest</a></p>
+
+<p>Scroll to the <strong>Assets</strong> section of the newest release and expand it.
+You will see roughly nine files. Exactly one of them is yours; the table below says
+which. At the start of this semester the current release is <strong>4.1.0</strong>,
+published 15 February 2026, and the filenames below use that version number &mdash;
+if you find a newer release, take it, and read <code>4.1.0</code> as whatever
+version you are downloading.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>your machine</th><th>file to download</th></tr></thead>
+<tbody>
+<tr><td>Mac, Apple silicon (M1&hellip;M4)</td><td><code>logisim-evolution-4.1.0-aarch64.dmg</code></td></tr>
+<tr><td>Mac, Intel</td><td><code>logisim-evolution-4.1.0-x86_64.dmg</code></td></tr>
+<tr><td>Windows, Intel or AMD</td><td><code>logisim-evolution-4.1.0-amd64.msi</code></td></tr>
+<tr><td>Windows on ARM</td><td><code>logisim-evolution-4.1.0-aarch64.msi</code></td></tr>
+<tr><td>Debian, Ubuntu, Mint</td><td><code>logisim-evolution_4.1.0-1_amd64.deb</code></td></tr>
+<tr><td>Fedora, RHEL, CentOS</td><td><code>logisim-evolution-4.1.0-1.x86_64.rpm</code></td></tr>
+<tr><td>anything else, or no admin rights</td><td>the <code>.jar</code> file (see &sect;A.6)</td></tr>
+</tbody></table>
+</div>
+
+<div class="box note"><span class="bt">You do not need to install Java</span>
+<p>Every platform installer above ships with its own copy of Java inside it. You only
+need a separate Java installation if you take the <code>.jar</code> route in
+&sect;A.6, and that route needs <strong>Java 21 or newer</strong>.</p></div>
+
+<h2 id="mac"><span class="secnum">A.3</span>macOS</h2>
+
+<h3>Which chip do you have?</h3>
+<p>Apple menu &rarr; <strong>About This Mac</strong>. If the line says
+<em>Chip: Apple M1</em> (or M2, M3, M4) take the <code>aarch64</code> file. If it says
+<em>Processor: Intel</em>, take <code>x86_64</code>. If you are not sure, the
+<code>x86_64</code> build runs on both &mdash; Apple silicon translates it through
+Rosetta &mdash; it is just slower.</p>
+
+<h3>Install</h3>
+<ol>
+<li>Download the <code>.dmg</code> and double-click it. A window opens with the
+Logisim-Evolution application in it.</li>
+<li>Drag the application into your <strong>Applications</strong> folder.</li>
+<li>Eject the disk image (the small &#9186; beside it in the Finder sidebar).</li>
+</ol>
+
+<h3>First launch &mdash; this is the part that trips people up</h3>
+<div class="box warn"><span class="bt">macOS will refuse the first time</span>
+<p>Logisim-Evolution is not code-signed by an Apple developer account, so a plain
+double-click produces something like <em>"Logisim-Evolution cannot be opened because
+the developer cannot be verified"</em>. This is expected and it does not mean the
+file is broken.</p>
+<p><strong>Do this instead:</strong> open your Applications folder, hold
+<kbd>Control</kbd> and click (or right-click) the Logisim-Evolution icon, choose
+<strong>Open</strong> from the menu, and then click <strong>Open</strong> in the
+dialog that appears. The dialog now has an Open button that the double-click version
+did not.</p>
+<p>If that still fails on a recent macOS: go to
+<strong>System Settings &rarr; Privacy &amp; Security</strong>, scroll down to the
+Security section, find the line saying Logisim-Evolution was blocked, and click
+<strong>Open Anyway</strong>. Then launch it again.</p>
+<p>You only do this once. Every launch after the first is an ordinary
+double-click.</p></div>
+
+<h2 id="win"><span class="secnum">A.4</span>Windows</h2>
+
+<h3>Which build?</h3>
+<p>Almost certainly <code>amd64</code>. Take <code>aarch64</code> only if you have an
+ARM machine &mdash; a Snapdragon-based Surface or Copilot+ PC. To check: Settings
+&rarr; System &rarr; About, and read the <em>System type</em> line.</p>
+
+<h3>Install</h3>
+<ol>
+<li>Download the <code>.msi</code> and double-click it.</li>
+<li>Windows SmartScreen will very likely say <em>"Windows protected your PC"</em>,
+because the installer is not signed with a commercial certificate. Click
+<strong>More info</strong>, then <strong>Run anyway</strong>. There is no other
+button that will work; the dialog deliberately hides it behind that link.</li>
+<li>Accept the defaults through the installer. It will offer to create a Start menu
+entry and a desktop shortcut &mdash; take both, they make it easier to find
+later.</li>
+<li>Launch it from the Start menu.</li>
+</ol>
+
+<div class="box note"><span class="bt">If your browser blocks the download</span>
+<p>Edge and Chrome sometimes flag an <code>.msi</code> from GitHub as "not commonly
+downloaded". In the downloads list, click the <strong>&hellip;</strong> beside the
+file and choose <strong>Keep</strong>, then <strong>Keep anyway</strong>.</p></div>
+
+<h2 id="linux"><span class="secnum">A.5</span>Linux</h2>
+
+<p>Download the package for your distribution and install it from the terminal, in
+the folder you downloaded it to. The leading <code>./</code> matters: it tells the
+package manager to install a local file rather than search for that name in the
+repositories.</p>
+
+<pre>
+# Debian, Ubuntu, Mint
+sudo apt install ./logisim-evolution_4.1.0-1_amd64.deb
+
+# Fedora, RHEL, CentOS
+sudo dnf install ./logisim-evolution-4.1.0-1.x86_64.rpm
+
+# snap-based systems
+sudo snap install --dangerous logisim-evolution-4.1.0_amd64.snap
+</pre>
+
+<p>Java comes bundled in all three packages. The
+<code>--dangerous</code> flag on the snap is only there because the file is a local
+snap rather than one from the Snap Store; it is not a warning about the program.
+After installation, Logisim-Evolution appears in your applications menu, or runs from
+the terminal as <code>logisim-evolution</code>.</p>
+
+<h2 id="jar"><span class="secnum">A.6</span>Anything else &mdash; the <code>.jar</code></h2>
+
+<p>Use this route if you are on a platform with no installer, or on a machine where
+you cannot install software (a lab computer, a locked-down laptop). The
+<code>.jar</code> is a single file that runs from wherever you put it, including a
+USB stick.</p>
+
+<ol>
+<li><strong>Get Java 21 or newer.</strong> Check what you have by opening a terminal
+or Command Prompt and running <code>java -version</code>. If the number is below 21,
+or the command is not found, download a JDK from
+<a href="https://adoptium.net/temurin/releases/">adoptium.net/temurin/releases</a>
+&mdash; pick the Temurin JDK for your operating system, version 21 or later.</li>
+<li><strong>Download the <code>.jar</code></strong> from the same Assets list on the
+release page.</li>
+<li><strong>Run it</strong> from the folder it is in:
+<pre>java -jar logisim-evolution-4.1.0-all.jar</pre>
+The exact filename is whatever the release page shows; copy it rather than typing it
+from here.</li>
+</ol>
+
+<div class="box note"><span class="bt">Chromebooks</span>
+<p>A Chromebook needs the Linux development environment turned on
+(Settings &rarr; About ChromeOS &rarr; Developers &rarr; Linux) before any of this
+works. Once it is on, treat the machine as Debian and use either the
+<code>.deb</code> from &sect;A.5 or the <code>.jar</code> above.</p></div>
+
+<h2 id="check"><span class="secnum">A.7</span>Check it works</h2>
+
+<p>Do this now, not five minutes before the first circuit is due. Two minutes:</p>
+
+<ol>
+<li>Launch Logisim-Evolution. You should get a blank canvas with a toolbar across
+the top and a component tree down the left.</li>
+<li>In the tree, open <strong>Gates</strong> and click <strong>AND Gate</strong>.
+Click once on the canvas to place it.</li>
+<li>Open <strong>Wiring</strong>, click <strong>Pin</strong>, and place two pins to
+the left of the gate. Place a third pin to the right of it and, in the properties
+panel at the bottom left, set its <strong>Output?</strong> property to
+<em>Yes</em>.</li>
+<li>Choose the arrow tool and drag from each pin to the matching gate terminal to
+wire them up.</li>
+<li>Choose the <strong>poke</strong> tool &mdash; the pointing hand &mdash; and click
+the input pins to flip them between 0 and 1. The output pin should turn green
+(1) only when both inputs are 1.</li>
+</ol>
+
+<p>If the output responds, your installation is good. Save the file somewhere you can
+find it; you will be opening and editing <code>.circ</code> files all semester.</p>
+
+<div class="box note"><span class="bt">Opening a course circuit</span>
+<p>Circuit files handed out for the course are ordinary <code>.circ</code> files.
+Download one, then use <strong>File &rarr; Open</strong> inside Logisim-Evolution
+rather than double-clicking it in your file manager &mdash; on most systems
+<code>.circ</code> is not associated with anything, and double-clicking opens a text
+editor showing raw XML.</p></div>
+
+<h2 id="trouble"><span class="secnum">A.8</span>Troubleshooting</h2>
+
+<details class="prob"><summary data-label="Problem">Nothing happens when I double-click the app on macOS. No error, no window.</summary><div class="sol">
+<p>Almost always the unsigned-app block described in &sect;A.3, failing silently.
+Control-click the app in Applications and choose <strong>Open</strong>, or go to
+System Settings &rarr; Privacy &amp; Security and click <strong>Open Anyway</strong>
+next to the message about Logisim-Evolution.</p>
+<p>If that is not it, you may have downloaded the wrong architecture. An
+<code>aarch64</code> build will not run on an Intel Mac at all. Check About This Mac
+and download the other one.</p>
+</div></details>
+
+<details class="prob"><summary data-label="Problem">Windows says the publisher is unknown, or the file is unsafe.</summary><div class="sol">
+<p>Expected: the installer is not signed with a commercial code-signing certificate,
+which costs money the volunteer project does not spend. Click
+<strong>More info &rarr; Run anyway</strong> on the SmartScreen dialog, and
+<strong>Keep &rarr; Keep anyway</strong> in the browser's download list if it
+objected too.</p>
+<p>Download only from the GitHub releases page linked in &sect;A.2. Sites offering
+"Logisim download" with their own installer are wrapping it in something you do not
+want.</p>
+</div></details>
+
+<details class="prob"><summary data-label="Problem">I get "Unsupported class file major version" or "UnsupportedClassVersionError" when running the .jar.</summary><div class="sol">
+<p>Your Java is too old. Logisim-Evolution 4.x needs <strong>Java 21 or newer</strong>.
+Run <code>java -version</code> and check the number. If you have several versions
+installed, the one on your <code>PATH</code> is the one being used &mdash; install
+Temurin 21 from <a href="https://adoptium.net/temurin/releases/">adoptium.net</a> and
+make sure it comes first, or give the full path to its <code>java</code>
+executable.</p>
+</div></details>
+
+<details class="prob"><summary data-label="Problem">The text and icons are microscopic (or enormous) on a high-resolution display.</summary><div class="sol">
+<p>There is a scaling setting inside the program: <strong>File &rarr; Preferences
+&rarr; Window</strong>, and adjust the zoom or scale factor there. Restart the
+program afterwards if the change does not take effect immediately.</p>
+</div></details>
+
+<details class="prob"><summary data-label="Problem">A .circ file opens as pages of XML instead of a circuit.</summary><div class="sol">
+<p>Your operating system opened it in a text editor because nothing is registered
+for the <code>.circ</code> extension. That is harmless &mdash; the file really is
+XML. Open Logisim-Evolution first and use <strong>File &rarr; Open</strong> from
+inside it.</p>
+<p>If you want double-clicking to work: on Windows, right-click the file &rarr;
+Open with &rarr; Choose another app &rarr; Logisim-Evolution &rarr; Always. On macOS,
+Get Info &rarr; Open with &rarr; Logisim-Evolution &rarr; Change All.</p>
+</div></details>
+
+<details class="prob"><summary data-label="Problem">My university or work laptop will not let me install anything.</summary><div class="sol">
+<p>Use the <code>.jar</code> route in &sect;A.6. Both the JDK and the jar can live in
+your own home folder or on a USB stick, and neither needs administrator rights on
+most managed machines. If <code>java</code> is blocked entirely, come and see me
+&mdash; there are lab machines with it installed.</p>
+</div></details>
+
+    <nav class="pagenav">
+      <a class="prev" href="ex-bases.html"><span>Previous</span>Set 2. Number bases and conversion</a>
+      <a class="next" href="tools.html"><span>Next</span>Web tools worth bookmarking</a>
+    </nav>
+    <footer class="site">
+      <em>Computer Organization and Assembly Language</em> &middot; CSCI 240 / 640,
+      Queens College CUNY.
+    </footer>
+  </main>
+</div>
+</body>
+</html>

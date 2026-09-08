@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Set 1 — Morse code: encoding, decoding and timing</title>
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/notes.js" defer></script>
+</head>
+<body>
+<header class="topbar"><div class="topbar-in">
+  <a class="brand" href="index.html">CSCI 240</a>
+  <span class="crumb">Set 1 &middot; Morse code</span>
+  <nav class="topnav">
+    <a href="index.html">&larr; Prev</a>
+    <a href="index.html">Contents</a>
+    <a href="ex-bases.html">Next &rarr;</a>
+    <button class="iconbtn" id="themebtn" type="button" title="Light / dark">&#9686;</button>
+  </nav>
+</div></header>
+<div class="wrap">
+  <aside class="toc"><p class="toc-title">On this page</p><ol>
+    <li><a href="#code"><span class="t">1.1</span>The code</a></li>
+    <li><a href="#timing"><span class="t">1.2</span>Timing: everything in units</a></li>
+    <li><a href="#speed"><span class="t">1.3</span>Speed: words per minute</a></li>
+    <li><a href="#worked"><span class="t">1.4</span>A message end to end</a></li>
+    <li><a href="#exercises"><span class="t">1.5</span>Exercises</a></li>
+  </ol></aside>
+  <main>
+
+<div class="chhead">
+  <span class="chpart">Exercise set 1 &middot; after Lecture 1</span>
+  <span class="chnum">Morse code</span>
+  <h1>Encoding, decoding and timing</h1>
+  <p class="chsum">Reading and writing the code; the dit&ndash;dah timing rules that
+  make it decodable; words per minute and the PARIS standard; and the question that
+  turns a code into engineering &mdash; how long does the message actually take?</p>
+</div>
+
+<p>Morse is the first <strong>variable-length code</strong> you meet in this course,
+and it is worth more attention than its age suggests. A fixed-length code &mdash;
+five bits per letter, say &mdash; is trivial to decode: chop the stream into
+five-bit pieces. Morse gives up that convenience deliberately, spends one unit on
+<span class="bin">E</span> and thirteen on <span class="bin">Q</span>, and buys back
+transmission time because English uses E far more often than Q. Everything in this
+set follows from that trade.</p>
+
+<h2 id="code"><span class="secnum">1.1</span>The code</h2>
+
+<p>The International Morse alphabet. The third column of each pair is the length of
+that character in <strong>units</strong>, counted by the rules in &sect;1.2 &mdash;
+that is the number you will need for every timing question on this page.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>char</th><th>code</th><th>units</th><th>char</th><th>code</th><th>units</th><th>char</th><th>code</th><th>units</th></tr></thead>
+<tbody>
+<tr><td><b>A</b></td><td class="bin">&middot;&minus;</td><td>5</td><td><b>M</b></td><td class="bin">&minus;&minus;</td><td>7</td><td><b>Y</b></td><td class="bin">&minus;&middot;&minus;&minus;</td><td>13</td></tr>
+<tr><td><b>B</b></td><td class="bin">&minus;&middot;&middot;&middot;</td><td>9</td><td><b>N</b></td><td class="bin">&minus;&middot;</td><td>5</td><td><b>Z</b></td><td class="bin">&minus;&minus;&middot;&middot;</td><td>11</td></tr>
+<tr><td><b>C</b></td><td class="bin">&minus;&middot;&minus;&middot;</td><td>11</td><td><b>O</b></td><td class="bin">&minus;&minus;&minus;</td><td>11</td><td><b>0</b></td><td class="bin">&minus;&minus;&minus;&minus;&minus;</td><td>19</td></tr>
+<tr><td><b>D</b></td><td class="bin">&minus;&middot;&middot;</td><td>7</td><td><b>P</b></td><td class="bin">&middot;&minus;&minus;&middot;</td><td>11</td><td><b>1</b></td><td class="bin">&middot;&minus;&minus;&minus;&minus;</td><td>17</td></tr>
+<tr><td><b>E</b></td><td class="bin">&middot;</td><td>1</td><td><b>Q</b></td><td class="bin">&minus;&minus;&middot;&minus;</td><td>13</td><td><b>2</b></td><td class="bin">&middot;&middot;&minus;&minus;&minus;</td><td>15</td></tr>
+<tr><td><b>F</b></td><td class="bin">&middot;&middot;&minus;&middot;</td><td>9</td><td><b>R</b></td><td class="bin">&middot;&minus;&middot;</td><td>7</td><td><b>3</b></td><td class="bin">&middot;&middot;&middot;&minus;&minus;</td><td>13</td></tr>
+<tr><td><b>G</b></td><td class="bin">&minus;&minus;&middot;</td><td>9</td><td><b>S</b></td><td class="bin">&middot;&middot;&middot;</td><td>5</td><td><b>4</b></td><td class="bin">&middot;&middot;&middot;&middot;&minus;</td><td>11</td></tr>
+<tr><td><b>H</b></td><td class="bin">&middot;&middot;&middot;&middot;</td><td>7</td><td><b>T</b></td><td class="bin">&minus;</td><td>3</td><td><b>5</b></td><td class="bin">&middot;&middot;&middot;&middot;&middot;</td><td>9</td></tr>
+<tr><td><b>I</b></td><td class="bin">&middot;&middot;</td><td>3</td><td><b>U</b></td><td class="bin">&middot;&middot;&minus;</td><td>7</td><td><b>6</b></td><td class="bin">&minus;&middot;&middot;&middot;&middot;</td><td>11</td></tr>
+<tr><td><b>J</b></td><td class="bin">&middot;&minus;&minus;&minus;</td><td>13</td><td><b>V</b></td><td class="bin">&middot;&middot;&middot;&minus;</td><td>9</td><td><b>7</b></td><td class="bin">&minus;&minus;&middot;&middot;&middot;</td><td>13</td></tr>
+<tr><td><b>K</b></td><td class="bin">&minus;&middot;&minus;</td><td>9</td><td><b>W</b></td><td class="bin">&middot;&minus;&minus;</td><td>9</td><td><b>8</b></td><td class="bin">&minus;&minus;&minus;&middot;&middot;</td><td>15</td></tr>
+<tr><td><b>L</b></td><td class="bin">&middot;&minus;&middot;&middot;</td><td>9</td><td><b>X</b></td><td class="bin">&minus;&middot;&middot;&minus;</td><td>11</td><td><b>9</b></td><td class="bin">&minus;&minus;&minus;&minus;&middot;</td><td>17</td></tr>
+</tbody></table>
+</div>
+
+<div class="box note"><span class="bt">Reading the table</span>
+<p>A <strong>dit</strong> (<span class="bin">&middot;</span>) is the short element,
+a <strong>dah</strong> (<span class="bin">&minus;</span>) the long one. Say them
+aloud as <em>di</em> and <em>dah</em> and the rhythm sticks faster than the picture
+does: C is <em>dah-di-dah-dit</em>, and you will never write it as
+<span class="bin">&minus;&middot;&middot;&minus;</span> by mistake again.</p></div>
+
+<p>Four punctuation marks come up often enough to be worth knowing: period
+<span class="bin">&middot;&minus;&middot;&minus;&middot;&minus;</span>, comma
+<span class="bin">&minus;&minus;&middot;&middot;&minus;&minus;</span>, question mark
+<span class="bin">&middot;&middot;&minus;&minus;&middot;&middot;</span> and slash
+<span class="bin">&minus;&middot;&middot;&minus;&middot;</span>. None of them appear
+in the exercises below.</p>
+
+<h2 id="timing"><span class="secnum">1.2</span>Timing: everything in units</h2>
+
+<p>Morse has exactly two symbols but <em>five</em> durations, and the three silent
+ones do the real work. Without them the stream would be ambiguous:
+<span class="bin">&middot;&middot;&middot;</span> is S, but it is also EEE, and EI,
+and IE. The gaps are what separate them.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>piece</th><th>key</th><th>duration</th></tr></thead>
+<tbody>
+<tr><td>dit</td><td>down</td><td><strong>1</strong> unit</td></tr>
+<tr><td>dah</td><td>down</td><td><strong>3</strong> units</td></tr>
+<tr><td>gap between elements <em>inside</em> a character</td><td>up</td><td><strong>1</strong> unit</td></tr>
+<tr><td>gap between characters <em>inside</em> a word</td><td>up</td><td><strong>3</strong> units</td></tr>
+<tr><td>gap between words</td><td>up</td><td><strong>7</strong> units</td></tr>
+</tbody></table>
+</div>
+
+<p>So the length of a single character is the sum of its element durations plus one
+unit for each internal gap. C is
+<span class="bin">&minus;&middot;&minus;&middot;</span>: durations 3&nbsp;+&nbsp;1&nbsp;+&nbsp;3&nbsp;+&nbsp;1&nbsp;=&nbsp;8,
+plus three internal gaps, giving <strong>11</strong> units. That is the number in the
+table above.</p>
+
+<div class="box worked"><span class="bt">SOS, unit by unit</span>
+<div class="tablewrap">
+<table>
+<thead><tr><th>piece</th><th>pattern</th><th>units</th><th>running total</th></tr></thead>
+<tbody>
+<tr><td>S</td><td class="bin">&middot;&middot;&middot;</td><td>1+1+1+1+1 = 5</td><td>5</td></tr>
+<tr><td>character gap</td><td>silence</td><td>3</td><td>8</td></tr>
+<tr><td>O</td><td class="bin">&minus;&minus;&minus;</td><td>3+1+3+1+3 = 11</td><td>19</td></tr>
+<tr><td>character gap</td><td>silence</td><td>3</td><td>22</td></tr>
+<tr><td>S</td><td class="bin">&middot;&middot;&middot;</td><td>5</td><td><strong>27</strong></td></tr>
+</tbody></table>
+</div>
+<p>SOS is <strong>27 units</strong> long. Notice that more than a fifth of it is
+silence &mdash; and that if it were followed by another word you would add 7 more
+for the word gap, not 3.</p>
+</div>
+
+<div class="box warn"><span class="bt">The mistake everyone makes once</span>
+<p>Do not count the gap <em>after</em> the last character of a message. The gaps sit
+<em>between</em> things: a word of <var>n</var> characters has <var>n</var>&nbsp;&minus;&nbsp;1
+character gaps, and a message of <var>m</var> words has <var>m</var>&nbsp;&minus;&nbsp;1
+word gaps. The one place a trailing gap <em>is</em> counted is the PARIS standard in
+&sect;1.3, and it says so explicitly.</p></div>
+
+<h2 id="speed"><span class="secnum">1.3</span>Speed: words per minute</h2>
+
+<p>A unit is a relative duration, not a time. To turn units into seconds you need one
+number: how long a unit lasts. Operators do not quote that number in milliseconds;
+they quote a speed in <strong>words per minute</strong>. To make "word" mean something
+exact, the convention picks a reference word:</p>
+
+<div class="box worked"><span class="bt">The PARIS standard</span>
+<p>The word <span class="term">PARIS</span> plus the word gap that follows it is
+exactly <strong>50 units</strong>:</p>
+<div class="tablewrap">
+<table>
+<thead><tr><th>P</th><th>A</th><th>R</th><th>I</th><th>S</th><th>4 character gaps</th><th>1 word gap</th><th>total</th></tr></thead>
+<tbody>
+<tr><td>11</td><td>5</td><td>7</td><td>3</td><td>5</td><td>4&times;3 = 12</td><td>7</td><td><strong>50</strong></td></tr>
+</tbody></table>
+</div>
+<p>So at <var>W</var> words per minute the key sends 50<var>W</var> units per minute,
+and one unit lasts</p>
+<p style="text-align:center;font-size:1.1rem">
+<strong>unit = 60&nbsp;/&nbsp;(50<var>W</var>) second = 1200&nbsp;/&nbsp;<var>W</var> milliseconds</strong></p>
+</div>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>speed</th><th>unit</th><th>dit</th><th>dah</th><th>character gap</th><th>word gap</th></tr></thead>
+<tbody>
+<tr><td>5 wpm</td><td>240 ms</td><td>240 ms</td><td>720 ms</td><td>720 ms</td><td>1680 ms</td></tr>
+<tr><td>10 wpm</td><td>120 ms</td><td>120 ms</td><td>360 ms</td><td>360 ms</td><td>840 ms</td></tr>
+<tr><td>15 wpm</td><td>80 ms</td><td>80 ms</td><td>240 ms</td><td>240 ms</td><td>560 ms</td></tr>
+<tr><td>20 wpm</td><td>60 ms</td><td>60 ms</td><td>180 ms</td><td>180 ms</td><td>420 ms</td></tr>
+<tr><td>25 wpm</td><td>48 ms</td><td>48 ms</td><td>144 ms</td><td>144 ms</td><td>336 ms</td></tr>
+</tbody></table>
+</div>
+
+<p>Every timing question on this page is now two steps: <strong>count the units</strong>,
+then <strong>multiply by 1200&nbsp;/&nbsp;<var>W</var> milliseconds</strong>. Keep those
+two steps separate in your working; almost every wrong answer comes from mixing them.</p>
+
+<h2 id="worked"><span class="secnum">1.4</span>A message end to end</h2>
+
+<div class="box worked"><span class="bt">How long does MORSE CODE take at 20 wpm?</span>
+<p><strong>Step 1 &mdash; encode.</strong></p>
+<p class="morseline">&minus;&minus; &minus;&minus;&minus; &middot;&minus;&middot; &middot;&middot;&middot; &middot; / &minus;&middot;&minus;&middot; &minus;&minus;&minus; &minus;&middot;&middot; &middot;</p>
+<p><strong>Step 2 &mdash; count units.</strong> Characters first, from the table in
+&sect;1.1:</p>
+<div class="tablewrap">
+<table>
+<thead><tr><th>word</th><th>characters</th><th>character units</th><th>gaps</th><th>subtotal</th></tr></thead>
+<tbody>
+<tr><td>MORSE</td><td>7, 11, 7, 5, 1</td><td>31</td><td>4&times;3 = 12</td><td>43</td></tr>
+<tr><td>CODE</td><td>11, 11, 7, 1</td><td>30</td><td>3&times;3 = 9</td><td>39</td></tr>
+<tr><td>word gap</td><td>&mdash;</td><td>&mdash;</td><td>7</td><td>7</td></tr>
+<tr><td colspan="4"><strong>total</strong></td><td><strong>89 units</strong></td></tr>
+</tbody></table>
+</div>
+<p><strong>Step 3 &mdash; convert.</strong> At 20 wpm a unit is
+1200&nbsp;/&nbsp;20&nbsp;=&nbsp;60&nbsp;ms, so</p>
+<p style="text-align:center;font-size:1.05rem">89 &times; 60 ms = 5340 ms =
+<strong>5.34 seconds</strong></p>
+<p>Ten characters in five and a third seconds. That is roughly 112 characters per
+minute, which is about what a 20&nbsp;wpm operator sustains &mdash; and it is why
+telegraph companies charged by the word.</p>
+</div>
+
+<h2 id="exercises"><span class="secnum">1.5</span>Exercises</h2>
+
+<p>Exercises 1&ndash;4 are warm-ups on the code itself, 5&ndash;12 are timing,
+13&ndash;15 ask you to think about why the code is shaped the way it is. Assume
+International Morse and the standard timing throughout.</p>
+
+<h3>Reading and writing the code</h3>
+
+<details class="prob"><summary data-label="Exercise 1.1">Decode this message. Wider gaps separate characters; the slash is a word gap.
+<br><span class="bin">&middot;&middot;&middot;&middot;&nbsp;&nbsp;&middot;&nbsp;&nbsp;&minus;&middot;&middot;&minus;</span>
+</summary><div class="sol">
+<p><span class="bin">&middot;&middot;&middot;&middot;</span> is <strong>H</strong>,
+<span class="bin">&middot;</span> is <strong>E</strong>,
+<span class="bin">&minus;&middot;&middot;&minus;</span> is <strong>X</strong>.
+The message is <strong>HEX</strong>.</p>
+<p>If you read the last character as <span class="bin">&minus;&middot;&middot;</span>
+followed by <span class="bin">&minus;</span> you got D then T &mdash; which is exactly
+the ambiguity the character gap exists to prevent. Count the gaps, not just the
+elements.</p>
+</div></details>
+
+<details class="prob"><summary data-label="Exercise 1.2">Encode <span class="term">BIT</span> in Morse, and write out the full on/off sequence including every gap.</summary><div class="sol">
+<p>B is <span class="bin">&minus;&middot;&middot;&middot;</span>, I is
+<span class="bin">&middot;&middot;</span>, T is <span class="bin">&minus;</span>:</p>
+<p class="morseline">&minus;&middot;&middot;&middot; &middot;&middot; &minus;</p>
+<p>Written as durations, using <span class="term">on</span> for key down and
+<span class="term">off</span> for silence:</p>
+<p>on 3, off 1, on 1, off 1, on 1, off 1, on 1 &nbsp;(B, 9 units) &middot;&middot;&middot;
+off 3 &nbsp;(character gap) &middot;&middot;&middot;
+on 1, off 1, on 1 &nbsp;(I, 3 units) &middot;&middot;&middot;
+off 3 &nbsp;(character gap) &middot;&middot;&middot;
+on 3 &nbsp;(T, 3 units)</p>
+<p>Total: 9 + 3 + 3 + 3 + 3 = <strong>21 units</strong>.</p>
+</div></details>
+
+<details class="prob"><summary data-label="Exercise 1.3">Which letter is shortest, and which letters are longest? Do the digits follow the same pattern?</summary><div class="sol">
+<p>The shortest is <strong>E</strong> at 1 unit &mdash; a single dit &mdash; followed by
+<strong>T</strong> at 3. The longest letters are <strong>J</strong>
+(<span class="bin">&middot;&minus;&minus;&minus;</span>), <strong>Q</strong>
+(<span class="bin">&minus;&minus;&middot;&minus;</span>) and <strong>Y</strong>
+(<span class="bin">&minus;&middot;&minus;&minus;</span>), all 13 units.</p>
+<p>The digits do <em>not</em> follow the pattern: every digit is exactly five elements,
+so they range from <strong>9</strong> units (5, five dits) to <strong>19</strong> units
+(0, five dahs). They are a fixed-length code embedded inside a variable-length one.
+That is a design decision, not an accident &mdash; digits carry no frequency advantage
+worth exploiting, and a uniform five-element block is easier to recognise in a
+call sign or a number group.</p>
+</div></details>
+
+<details class="prob"><summary data-label="Exercise 1.4">Encode <span class="term">CUNY</span> and count its length in units.</summary><div class="sol">
+<p class="morseline">&minus;&middot;&minus;&middot; &middot;&middot;&minus; &minus;&middot; &minus;&middot;&minus;&minus;</p>
+<p>C = 11, U = 7, N = 5, Y = 13, so the characters total 36 units. It is one word of
+four characters, so there are three character gaps: 3 &times; 3 = 9.</p>
+<p style="text-align:center;font-size:1.05rem">36 + 9 = <strong>45 units</strong></p>
+</div></details>
+
+<h3>Timing</h3>
+
+<details class="prob"><summary data-label="Exercise 1.5">At 20 words per minute, how long is a unit, a dit, a dah, a character gap and a word gap?</summary><div class="sol">
+<p>unit = 1200 / 20 = <strong>60 ms</strong>. Everything else is a multiple of it:</p>
+<div class="tablewrap"><table>
+<thead><tr><th>piece</th><th>units</th><th>time</th></tr></thead>
+<tbody>
+<tr><td>dit</td><td>1</td><td>60 ms</td></tr>
+<tr><td>dah</td><td>3</td><td>180 ms</td></tr>
+<tr><td>element gap</td><td>1</td><td>60 ms</td></tr>
+<tr><td>character gap</td><td>3</td><td>180 ms</td></tr>
+<tr><td>word gap</td><td>7</td><td>420 ms</td></tr>
+</tbody></table></div>
+</div></details>
+
+<details class="prob"><summary data-label="Exercise 1.6">Verify the PARIS standard yourself: show that <span class="term">PARIS</span> plus its trailing word gap is 50 units, and derive the formula for the unit duration at <var>W</var> words per minute.</summary><div class="sol">
+<p>P = <span class="bin">&middot;&minus;&minus;&middot;</span>: 1+3+3+1 = 8 for the
+elements, plus 3 internal gaps, = 11.<br>
+A = <span class="bin">&middot;&minus;</span>: 1+3 = 4, plus 1 gap, = 5.<br>
+R = <span class="bin">&middot;&minus;&middot;</span>: 1+3+1 = 5, plus 2 gaps, = 7.<br>
+I = <span class="bin">&middot;&middot;</span>: 1+1 = 2, plus 1 gap, = 3.<br>
+S = <span class="bin">&middot;&middot;&middot;</span>: 1+1+1 = 3, plus 2 gaps, = 5.</p>
+<p>Characters: 11 + 5 + 7 + 3 + 5 = 31. Four character gaps: 12. Word gap: 7.
+Total <strong>50</strong>.</p>
+<p>If the operator sends <var>W</var> of these per minute, that is 50<var>W</var> units
+in 60 seconds, so one unit lasts 60 / (50<var>W</var>) seconds &mdash; that is
+1.2 / <var>W</var> seconds, or <strong>1200 / <var>W</var> milliseconds</strong>.</p>
+<p>The trailing word gap belongs in the count precisely because words come one after
+another: sending PARIS twice takes 100 units, not 93.</p>
+</div></details>
+
+<details class="prob"><summary data-label="Exercise 1.7">How long does <span class="term">SOS</span> take at 20 wpm? At 5 wpm?</summary><div class="sol">
+<p>From &sect;1.2 the message is 27 units.</p>
+<p>At 20 wpm the unit is 60 ms: 27 &times; 60 = 1620 ms = <strong>1.62 s</strong>.</p>
+<p>At 5 wpm the unit is 1200 / 5 = 240 ms: 27 &times; 240 = 6480 ms =
+<strong>6.48 s</strong>, exactly four times as long. Halving the speed doubles every
+duration; the unit count never changes.</p>
+</div></details>
+
+<details class="prob"><summary data-label="Exercise 1.8">How long does <span class="term">CUNY</span> take at 20 wpm?</summary><div class="sol">
+<p>45 units from Exercise 1.4, and 60 ms per unit:</p>
+<p style="text-align:center;font-size:1.05rem">45 &times; 60 ms = 2700 ms =
+<strong>2.70 s</strong></p>
+</div></details>
+
+<details class="prob"><summary data-label="Exercise 1.9">How long does <span class="term">HELLO WORLD</span> take at 15 wpm?</summary><div class="sol">
+<p><strong>Units.</strong> HELLO: H = 7, E = 1, L = 9, L = 9, O = 11, so 37 for the
+characters plus 4 &times; 3 = 12 for the gaps, giving 49.<br>
+WORLD: W = 9, O = 11, R = 7, L = 9, D = 7, so 43 plus 12, giving 55.<br>
+One word gap: 7.</p>
+<p style="text-align:center;font-size:1.05rem">49 + 55 + 7 = <strong>111 units</strong></p>
+<p><strong>Time.</strong> At 15 wpm the unit is 1200 / 15 = 80 ms, so
+111 &times; 80 = 8880 ms = <strong>8.88 s</strong>.</p>
+<p>Sanity check: 111 units is a little over two PARIS-lengths, and at 15 wpm a
+PARIS-length takes 4 seconds. Two of them is 8 seconds. Close to 8.88 &mdash; good.</p>
+</div></details>
+
+<details class="prob"><summary data-label="Exercise 1.10">A message of 123 units took 11.35 seconds to send. What speed was the operator working at, in words per minute?</summary><div class="sol">
+<p>The unit duration is the total time divided by the unit count:</p>
+<p style="text-align:center;font-size:1.05rem">11350 ms / 123 = 92.3 ms per unit</p>
+<p>and <var>W</var> = 1200 / unit-in-ms:</p>
+<p style="text-align:center;font-size:1.05rem">1200 / 92.3 = 13.0 &rarr;
+<strong>13 wpm</strong></p>
+<p>(The message was <span class="term">QUEENS COLLEGE</span>, if you want to check the
+123 for yourself.)</p>
+</div></details>
+
+<details class="prob"><summary data-label="Exercise 1.11">At 20 wpm, how many units are sent per minute, and roughly how many characters?</summary><div class="sol">
+<p>By definition of the standard, 20 wpm means 20 &times; 50 =
+<strong>1000 units per minute</strong> &mdash; which is another way of saying the unit
+is 60 ms.</p>
+<p>For characters, PARIS is counted as a five-character word, so the nominal rate is
+20 &times; 5 = <strong>100 characters per minute</strong>. Real text differs: from
+&sect;1.4, MORSE CODE is 89 units for 10 characters, or 8.9 units each, against PARIS's
+50 / 5 = 10 units each. That text would run at about 1000 / 8.9 &asymp; 112 characters
+per minute. Average English text sits close to the PARIS figure, which is why the
+standard was chosen.</p>
+</div></details>
+
+<details class="prob"><summary data-label="Exercise 1.12">Your instructor sends <span class="term">CS240</span> at 10 wpm. How long does it take, and why is it so much slower than a five-letter word?</summary><div class="sol">
+<p><strong>Units.</strong> C = 11, S = 5, 2 = 15, 4 = 11, 0 = 19. Characters total 61,
+plus 4 &times; 3 = 12 for the gaps:</p>
+<p style="text-align:center;font-size:1.05rem"><strong>73 units</strong></p>
+<p><strong>Time.</strong> At 10 wpm the unit is 120 ms, so 73 &times; 120 = 8760 ms =
+<strong>8.76 s</strong>.</p>
+<p><strong>Why.</strong> PARIS is 43 units without its trailing gap; CS240 is 73. The
+three digits cost 45 units between them, because every digit is five elements
+regardless of how common it is. Digits are expensive in Morse, and that is the
+price of the fixed-length block described in Exercise 1.3.</p>
+</div></details>
+
+<h3>Why the code looks like this</h3>
+
+<details class="prob"><summary data-label="Exercise 1.13">Compare the five most common letters in English (E, T, A, O, I) with five of the rarest (J, Q, X, Z, V). Add up the units in each group. What does the comparison tell you about how Morse was designed?</summary><div class="sol">
+<p>Common: E = 1, T = 3, A = 5, O = 11, I = 3 &rarr; <strong>23 units</strong>.<br>
+Rare: J = 13, Q = 13, X = 11, Z = 11, V = 9 &rarr; <strong>57 units</strong>.</p>
+<p>The rare group costs about <strong>2.5&times;</strong> as much as the common one.
+That is the whole idea: Samuel Morse and Alfred Vail are said to have set the code
+lengths by counting the type in a printer's case, which is a rough survey of English
+letter frequency. Assign the cheap codes to the letters you send most and the average
+message gets shorter, even though the worst case gets longer.</p>
+<p>This is the same idea you will meet later as <strong>Huffman coding</strong>, done
+by hand a century early. Morse is not quite optimal &mdash; O at 11 units is expensive
+for a common letter &mdash; but it is close, and it was built without any theory of
+information to justify it.</p>
+</div></details>
+
+<details class="prob"><summary data-label="Exercise 1.14">Suppose you replaced Morse with a fixed-length code: 5 bits per character, one bit sent per unit of time. How many units would <span class="term">HELLO WORLD</span> take, and how does that compare with Morse? If the fixed-length code wins, why was Morse used?</summary><div class="sol">
+<p>Five bits gives 2<sup>5</sup> = 32 codes, enough for 26 letters plus a space and a
+few controls. HELLO WORLD is 11 characters counting the space, so
+11 &times; 5 = <strong>55 units</strong> &mdash; against Morse's 111 from
+Exercise 1.9. The fixed-length code is about <strong>twice as fast</strong>.</p>
+<p>So why Morse? Three reasons, and they are all about the receiver rather than the
+code:</p>
+<ul>
+<li><strong>No clock.</strong> Decoding a fixed-length stream requires both ends to
+agree on where each 5-bit block begins and to stay in step for the whole message.
+Morse re-synchronises at every gap, so a human ear &mdash; or a sloppy operator
+&mdash; never loses the thread.</li>
+<li><strong>No equipment.</strong> Morse is decoded by a person listening. A
+fixed-length binary code needs a machine at the far end, which in 1844 did not
+exist.</li>
+<li><strong>Error tolerance.</strong> Miscount one bit in the fixed-length stream and
+every character after it is garbage. Mishear one dit in Morse and you lose one
+letter.</li>
+</ul>
+<p>The comparison is a genuinely modern one: it is the same trade-off between raw
+rate and self-synchronisation that shows up in every serial protocol you will meet
+later.</p>
+</div></details>
+
+<details class="prob"><summary data-label="Exercise 1.15">Challenge. An operator sends three dits with no gaps at all between them &mdash; just <span class="bin">&middot;&middot;&middot;</span> as a continuous run. How many different messages could that be? Now do the same for four dits.</summary><div class="sol">
+<p>The letters made only of dits are E (1), I (2), S (3) and H (4). Without gaps, the
+question is: in how many ways can you split a run of <var>n</var> dits into pieces of
+size 1, 2, 3 or 4?</p>
+<p>For three dits, the splits are</p>
+<div class="tablewrap"><table>
+<thead><tr><th>split</th><th>reads as</th></tr></thead>
+<tbody>
+<tr><td>3</td><td>S</td></tr>
+<tr><td>2 + 1</td><td>I E</td></tr>
+<tr><td>1 + 2</td><td>E I</td></tr>
+<tr><td>1 + 1 + 1</td><td>E E E</td></tr>
+</tbody></table></div>
+<p><strong>4 possibilities.</strong></p>
+<p>For four dits: 4 (H); 3+1 (SE); 1+3 (ES); 2+2 (II); 2+1+1 (IEE); 1+2+1 (EIE);
+1+1+2 (EEI); 1+1+1+1 (EEEE) &mdash; <strong>8 possibilities</strong>.</p>
+<p>The counts double each time, at least while <var>n</var> &le; 4: writing
+<var>f</var>(<var>n</var>) for the number of splits,
+<var>f</var>(<var>n</var>) = <var>f</var>(<var>n</var>&minus;1) + <var>f</var>(<var>n</var>&minus;2) + <var>f</var>(<var>n</var>&minus;3) + <var>f</var>(<var>n</var>&minus;4),
+because the first piece can be any of the four lengths. From
+<var>f</var>(0) = 1 that gives 1, 1, 2, 4, 8, 15, 29, 56, &hellip; &mdash; growing
+roughly geometrically.</p>
+<p>The point: <strong>Morse without its gaps is not a decodable code at all.</strong>
+No prefix of the dit-dash string tells you where a character ends, so the silence is
+not padding &mdash; it is a third symbol doing essential work. Codes that need no
+such separator, where no codeword is a prefix of another, are called
+<em>prefix-free</em>, and that is exactly what a Huffman code gives you.</p>
+</div></details>
+
+<div class="box extra"><span class="bt">Going further</span>
+<p>Two threads worth pulling if this interested you. First, <strong>Farnsworth
+timing</strong>: when teaching Morse the characters are sent at full speed but the
+gaps are stretched, so a beginner hears the correct rhythm of each letter while
+still getting time to think. The unit count no longer predicts the duration, because
+there are now two different unit lengths in one message. Second, the question of how
+good Morse actually is: weight each letter by its English frequency, compute the
+average units per letter, and compare with what a Huffman code built from the same
+frequencies would achieve. Morse comes out within a few percent &mdash; not bad for
+a code designed by weighing type in a print shop.</p></div>
+
+    <nav class="pagenav">
+      <a class="prev" href="index.html"><span>Previous</span>Practice and resources</a>
+      <a class="next" href="ex-bases.html"><span>Next</span>Set 2. Number bases and conversion</a>
+    </nav>
+    <footer class="site">
+      <em>Computer Organization and Assembly Language</em> &middot; CSCI 240 / 640,
+      Queens College CUNY.
+    </footer>
+  </main>
+</div>
+</body>
+</html>
