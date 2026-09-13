@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Set 3 &mdash; Gates, circuit diagrams and truth tables</title>
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/notes.js" defer></script>
+</head>
+<body>
+<header class="topbar"><div class="topbar-in">
+  <a class="brand" href="index.html">CSCI 240</a>
+  <span class="crumb">Set 3 &middot; Gates and circuits</span>
+  <nav class="topnav">
+    <a href="ex-bases.html">&larr; Prev</a>
+    <a href="index.html">Contents</a>
+    <a href="setup-logisim.html">Next &rarr;</a>
+    <button class="iconbtn" id="themebtn" type="button" title="Light / dark">&#9686;</button>
+  </nav>
+</div></header>
+<div class="wrap">
+  <aside class="toc"><p class="toc-title">On this page</p><ol>
+    <li><a href="#gates"><span class="t">3.1</span>The three gates</a></li>
+    <li><a href="#draw"><span class="t">3.2</span>Expression to circuit</a></li>
+    <li><a href="#read"><span class="t">3.3</span>Circuit to expression</a></li>
+    <li><a href="#tables"><span class="t">3.4</span>Building a truth table</a></li>
+    <li><a href="#ref"><span class="t">3.5</span>Conventions and reference</a></li>
+    <li><a href="#exercises"><span class="t">3.6</span>Exercises</a></li>
+  </ol></aside>
+  <main>
+
+<svg class="gdefs" aria-hidden="true" focusable="false"><defs>
+<symbol id="g-and" viewBox="0 0 48 30">
+  <path style="fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round" d="M0 8H10M0 22H10M39 15H48"/>
+  <path style="fill:var(--panel);stroke:currentColor;stroke-width:1.9;stroke-linejoin:round" d="M8 2H26A13 13 0 0 1 26 28H8Z"/>
+</symbol>
+<symbol id="g-or" viewBox="0 0 48 30">
+  <path style="fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round" d="M0 8H13M0 22H13M39 15H48"/>
+  <path style="fill:var(--panel);stroke:currentColor;stroke-width:1.9;stroke-linejoin:round" d="M8 28Q16 15 8 2C22 2 33 8 39 15C33 22 22 28 8 28Z"/>
+</symbol>
+<symbol id="g-not" viewBox="0 0 48 30">
+  <path style="fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round" d="M0 15H11M40 15H48"/>
+  <path style="fill:var(--panel);stroke:currentColor;stroke-width:1.9;stroke-linejoin:round" d="M10 3L32 15L10 27Z"/>
+  <circle style="fill:var(--panel);stroke:currentColor;stroke-width:1.9;stroke-linejoin:round" cx="36" cy="15" r="4"/>
+</symbol>
+</defs></svg>
+
+<div class="chhead">
+  <span class="chpart">Exercise set 3 &middot; after the gates lecture</span>
+  <span class="chnum">Gates and circuits</span>
+  <h1>Drawing circuits, filling tables</h1>
+  <p class="chsum">The three gates AND, OR and NOT; turning a Boolean expression into
+  a gate diagram and a gate diagram back into an expression; and building the truth
+  table of a circuit one column at a time.</p>
+</div>
+
+<p>A gate is a little device that controls the flow of binary information. That is the
+whole idea, and everything in this set follows from it. Three gates are enough to
+build any digital circuit whatsoever &mdash; every adder, every register, every
+processor in the building &mdash; so it is worth being completely fluent with them
+before we add anything else. Fluency here means three separate skills, and this set
+drills all three: reading a gate, drawing a circuit from an expression, and deciding
+what a circuit actually computes by tabulating it.</p>
+
+<div class="box note"><span class="bt">Notation</span>
+<p>Three notations for the same three operations appear in the course, the textbook
+and the exercises below, and you need to recognise all of them.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>operation</th><th>algebraic</th><th>also written</th><th>in words</th></tr></thead>
+<tbody>
+<tr><td>AND</td><td>A &middot; B</td><td>AB, A &and; B</td><td>both</td></tr>
+<tr><td>OR</td><td>A + B</td><td>A &or; B</td><td>either, or both</td></tr>
+<tr><td>NOT</td><td>A&prime;</td><td>&Amacr;, &not;A</td><td>the opposite</td></tr>
+</tbody></table></div>
+<p>The AND dot is usually dropped, exactly as the multiplication sign is dropped in
+ordinary algebra: <em>AB</em> means A&nbsp;&middot;&nbsp;B. This page keeps the dot in
+the statements of the exercises so that nothing is ambiguous, and drops it in the
+solutions once you are used to it.</p></div>
+
+<h2 id="gates"><span class="secnum">3.1</span>The three gates</h2>
+
+<p>Each gate has one or more input wires and one output wire. A wire carries a 0 or a
+1 &mdash; physically, the absence or the presence of a voltage, or a switch open or
+closed &mdash; and the gate decides its output from its inputs. There is no memory
+and no timing here: change the inputs and the output follows immediately. That is what
+makes these circuits <em>combinational</em>.</p>
+
+<div class="grid3">
+  <div class="symcard"><figure class="fig" style="--figmax:9.5rem">
+<svg viewBox="0 0 100 48" role="img" aria-label="AND">
+<use href="#g-and" x="34" y="9" width="48" height="30"/>
+<path class="wire" d="M12 17L34 17"/>
+<path class="wire" d="M12 31L34 31"/>
+<text class="lbl" x="10" y="21" text-anchor="end">A</text>
+<text class="lbl" x="10" y="35" text-anchor="end">B</text>
+<path class="wire" d="M82 24L96 24"/>
+</svg>
+<figcaption>AND</figcaption></figure><p><strong>AND</strong> &mdash; A&nbsp;&middot;&nbsp;B<br>
+  1 only when <em>both</em> inputs are 1.</p></div>
+  <div class="symcard"><figure class="fig" style="--figmax:9.5rem">
+<svg viewBox="0 0 100 48" role="img" aria-label="OR">
+<use href="#g-or" x="34" y="9" width="48" height="30"/>
+<path class="wire" d="M12 17L34 17"/>
+<path class="wire" d="M12 31L34 31"/>
+<text class="lbl" x="10" y="21" text-anchor="end">A</text>
+<text class="lbl" x="10" y="35" text-anchor="end">B</text>
+<path class="wire" d="M82 24L96 24"/>
+</svg>
+<figcaption>OR</figcaption></figure><p><strong>OR</strong> &mdash; A&nbsp;+&nbsp;B<br>
+  1 when <em>at least one</em> input is 1.</p></div>
+  <div class="symcard"><figure class="fig" style="--figmax:9.5rem">
+<svg viewBox="0 0 100 48" role="img" aria-label="NOT">
+<use href="#g-not" x="34" y="9" width="48" height="30"/>
+<path class="wire" d="M12 24L34 24"/>
+<text class="lbl" x="10" y="28" text-anchor="end">A</text>
+<path class="wire" d="M82 24L96 24"/>
+</svg>
+<figcaption>NOT</figcaption></figure><p><strong>NOT</strong> &mdash; A&prime;<br>
+  flips its single input. The little circle is the inversion.</p></div>
+</div>
+
+<p>Committed to memory, the three gates are three short tables:</p>
+
+<div class="ttrow"><div class="tablewrap"><table class="ttab">
+<thead><tr><th>A</th><th>B</th><th>A &middot; B</th><th>A + B</th></tr></thead>
+<tbody><tr><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td></tr><tr><td class="bin">0</td><td class="bin">1</td><td class="bin">0</td><td class="bin">1</td></tr><tr><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin">1</td></tr><tr><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td></tr></tbody></table></div><div class="tablewrap"><table class="ttab">
+<thead><tr><th>A</th><th>A&prime;</th></tr></thead>
+<tbody><tr><td class="bin">0</td><td class="bin">1</td></tr><tr><td class="bin">1</td><td class="bin">0</td></tr></tbody></table></div></div>
+
+<p>Two shapes worth learning by sight, because you will read them off a diagram
+hundreds of times this semester. The AND gate has a <em>flat</em> back and a round
+nose, like a capital D. The OR gate has a <em>curved</em> back and comes to a point.
+Students who confuse the two lose marks on every exam question in this unit, and the
+fix is entirely mechanical: flat back, AND.</p>
+
+<div class="box warn"><span class="bt">The circle is the whole NOT</span>
+<p>Inversion is drawn as a small circle, and the circle can sit on the output of any
+gate rather than on a triangle of its own. A small circle on an AND output therefore
+means "AND, then invert" &mdash; not "invert, then AND". Those are different
+functions, as Exercise 3.12 makes painfully clear, so read the position of the circle
+carefully.</p></div>
+
+<h2 id="draw"><span class="secnum">3.2</span>From an expression to a circuit</h2>
+
+<p>Drawing a circuit is not a creative act. There is a procedure, it always works, and
+following it slowly beats guessing at a layout.</p>
+
+<ol>
+<li><strong>Find the last operation.</strong> Which operation would you perform last if
+you were evaluating the expression by hand? That gate is the output gate, and it goes
+on the right.</li>
+<li><strong>Work backwards.</strong> Each operand of that operation is itself an
+expression; draw a gate for each one to its left. Repeat until every branch ends at a
+plain input variable.</li>
+<li><strong>Draw a NOT for every prime.</strong> A primed variable is a NOT gate fed
+by that variable. Nothing more.</li>
+<li><strong>Fan out where a variable is reused.</strong> A variable that appears in two
+places is <em>one</em> input wire that splits. Mark the split with a solid dot so a
+reader can tell a junction from two wires that merely cross.</li>
+</ol>
+
+<p>The order of operations is the same as in ordinary algebra, with AND playing the
+role of multiplication: NOT binds tightest, then AND, then OR. So
+A&nbsp;+&nbsp;B&nbsp;&middot;&nbsp;C means A&nbsp;+&nbsp;(B&nbsp;&middot;&nbsp;C), and
+if you want the other grouping you must write the parentheses.</p>
+
+<div class="box worked"><span class="bt">Worked example</span>
+<p>Draw F = (A&nbsp;+&nbsp;B&prime;)&nbsp;&middot;&nbsp;C.</p>
+<p>The outermost operation is the AND between the bracket and C, so an AND gate is the
+output gate. Its first operand is A&nbsp;+&nbsp;B&prime;, which needs an OR gate; the
+OR gate's second operand is B&prime;, which needs a NOT. Its other operand, A, is a
+plain input, and so is C. Three gates, drawn right to left, then the wires filled in
+left to right:</p>
+<figure class="fig" style="--figmax:34rem">
+<svg viewBox="0 0 440 178" role="img" aria-label="F = (A + B&prime;) &middot; C">
+<use href="#g-not" x="100" y="71" width="48" height="30"/>
+<use href="#g-or" x="200" y="41" width="48" height="30"/>
+<use href="#g-and" x="320" y="86" width="48" height="30"/>
+<text class="lbl" x="22" y="31" text-anchor="end">A</text>
+<path class="wire" d="M30 26L170 26"/>
+<text class="lbl" x="22" y="91" text-anchor="end">B</text>
+<path class="wire" d="M30 86L100 86"/>
+<text class="lbl" x="22" y="151" text-anchor="end">C</text>
+<path class="wire" d="M30 146L280 146"/>
+<path class="wire" d="M170 26L170 26L170 49L200 49"/>
+<path class="wire" d="M148 86L172 86L172 63L200 63"/>
+<path class="wire" d="M248 56L290 56L290 94L320 94"/>
+<path class="wire" d="M280 146L280 146L280 108L320 108"/>
+<path class="wire" d="M368 101L400 101"/>
+<text class="lbl" x="408" y="106" text-anchor="start">F</text>
+</svg>
+<figcaption>F = (A + B&prime;) &middot; C</figcaption></figure>
+<p>Notice that the three inputs enter on the left in a fixed order and the single
+output leaves on the right. Keeping to that habit makes your diagrams readable and,
+more practically, makes them easy to check against a truth table.</p></div>
+
+<details class="qc"><summary data-label="Check 3.1">Without drawing anything: how many gates does F = A&nbsp;&middot;&nbsp;B&prime;&nbsp;&middot;&nbsp;C&prime; need, if every gate has at most two inputs?</summary><div class="sol">
+<p>Four. Two NOT gates, for B&prime; and C&prime;, and two AND gates, because a
+two-input AND can only combine two things at a time: first
+A&nbsp;&middot;&nbsp;B&prime;, then that result with C&prime;. Exercise 3.8 is about
+exactly this chaining.</p></div></details>
+
+<h2 id="read"><span class="secnum">3.3</span>From a circuit to an expression</h2>
+
+<p>The reverse direction is easier, and it is the better way to check a drawing.
+Label the output of every gate with the expression it produces, starting from the
+inputs and moving right. Each label is built from the labels feeding into it. When you
+reach the last gate, its label is the expression for the circuit.</p>
+
+<p>One warning, and it is the single most common error in this unit:</p>
+
+<details class="qc"><summary data-label="Check 3.2">This circuit ANDs A and B and then inverts. Is its output A&prime;&nbsp;&middot;&nbsp;B&prime;?</summary><div class="sol">
+<figure class="fig" style="--figmax:21rem">
+<svg viewBox="0 0 320 82" role="img" aria-label="F = (A &middot; B)&prime;">
+<use href="#g-and" x="100" y="25" width="48" height="30"/>
+<use href="#g-not" x="200" y="25" width="48" height="30"/>
+<text class="lbl" x="22" y="38" text-anchor="end">A</text>
+<path class="wire" d="M30 33L100 33"/>
+<text class="lbl" x="22" y="52" text-anchor="end">B</text>
+<path class="wire" d="M30 47L100 47"/>
+<path class="wire" d="M148 40L200 40"/>
+<path class="wire" d="M248 40L276 40"/>
+<text class="lbl" x="284" y="45" text-anchor="start">F</text>
+</svg>
+<figcaption>F = (A &middot; B)&prime;</figcaption></figure>
+<p><strong>No.</strong> Following the labels: the AND gate produces
+A&nbsp;&middot;&nbsp;B, and the NOT gate inverts <em>that</em>, so the output is
+(A&nbsp;&middot;&nbsp;B)&prime;. That is a different function from
+A&prime;&nbsp;&middot;&nbsp;B&prime;, and one line of the truth table proves it: with
+A&nbsp;=&nbsp;1, B&nbsp;=&nbsp;0 the circuit gives (1&middot;0)&prime;&nbsp;=&nbsp;1,
+while A&prime;&middot;B&prime; gives 0&middot;1&nbsp;=&nbsp;0.</p>
+<p>The correct rewriting of (A&nbsp;&middot;&nbsp;B)&prime; is
+A&prime;&nbsp;+&nbsp;B&prime; &mdash; the AND becomes an OR when the inversion moves
+inward. That is De Morgan's law, and Exercise 3.12 asks you to discover it from a
+table rather than take it on trust.</p></div></details>
+
+<h2 id="tables"><span class="secnum">3.4</span>Building a truth table</h2>
+
+<p>A truth table is the complete specification of a combinational circuit: one row per
+possible input combination, and the output for each. With <var>n</var> inputs there are
+2<sup><var>n</var></sup> rows &mdash; 4 for two inputs, 8 for three, 16 for four. The
+rows are always listed in counting order, reading the input columns as a binary number,
+so that two people's tables for the same circuit can be compared line by line.</p>
+
+<p>Do not try to evaluate the whole expression in your head, row by row. Give every
+intermediate signal its own column and fill the table <em>column by column</em>, left
+to right. Each column depends only on columns already written, so each one is a
+single-gate decision, and when an answer comes out wrong you can see which column
+went wrong.</p>
+
+<div class="box worked"><span class="bt">Worked example</span>
+<p>Tabulate the worked circuit above, F = (A&nbsp;+&nbsp;B&prime;)&nbsp;&middot;&nbsp;C.
+Three inputs, so eight rows; two intermediate columns, one per gate.</p>
+<div class="tablewrap"><table class="ttab">
+<thead><tr><th>A</th><th>B</th><th>C</th><th>B&prime;</th><th>A + B&prime;</th><th>F</th></tr></thead>
+<tbody><tr><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin">1</td><td class="bin">1</td><td class="bin hilite">0</td></tr><tr><td class="bin">0</td><td class="bin">0</td><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td><td class="bin hilite">1</td></tr><tr><td class="bin">0</td><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin hilite">0</td></tr><tr><td class="bin">0</td><td class="bin">1</td><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin hilite">0</td></tr><tr><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin">1</td><td class="bin">1</td><td class="bin hilite">0</td></tr><tr><td class="bin">1</td><td class="bin">0</td><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td><td class="bin hilite">1</td></tr><tr><td class="bin">1</td><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin">1</td><td class="bin hilite">0</td></tr><tr><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td><td class="bin">0</td><td class="bin">1</td><td class="bin hilite">1</td></tr></tbody></table></div>
+<p>Read the shaded column from the top: 01000101. That eight-bit string
+<em>is</em> the function &mdash; two circuits are the same circuit, however differently
+they are drawn, exactly when their output columns match.</p>
+<p>One sanity check before you trust a table: an AND output column can only have a 1
+where <em>both</em> of its input columns have a 1, and an OR output column can only
+have a 0 where <em>both</em> have 0. Scan for a violation and you will catch most
+arithmetic slips in a few seconds.</p></div>
+
+<h2 id="ref"><span class="secnum">3.5</span>Conventions and reference</h2>
+
+<ul>
+<li>Inputs enter on the left, in alphabetical order, top to bottom. The output leaves
+on the right.</li>
+<li>A <strong>solid dot</strong> is a junction &mdash; one signal going two places.
+No dot means the wires merely cross and are unrelated. Nothing about a diagram is
+sloppier, or more likely to cost you marks, than an ambiguous crossing.</li>
+<li>Every gate output goes somewhere. A gate whose output is not used is not part of
+the circuit.</li>
+<li>Fan-out is free on paper: one variable can feed as many gates as you like.
+Fan-<em>in</em> is not &mdash; unless a question says otherwise, assume AND and OR
+gates take exactly two inputs, and chain them when you need more.</li>
+</ul>
+
+<div class="box note"><span class="bt">Checking your own work</span>
+<p>Drawing and tabulating are two independent skills, which means each can check the
+other. After drawing a circuit, label every gate output and read the expression back
+out; you should recover what you started from. After tabulating, test one or two rows
+by substituting the values into the original expression directly. Two independent
+routes to the same answer is as close to certainty as you get without a simulator
+&mdash; and from next week Logisim will be the simulator.</p></div>
+
+<h2 id="exercises"><span class="secnum">3.6</span>Exercises</h2>
+
+<p>Pencil, paper and a ruler. The circuit diagrams here are drawn by machine, but the
+ones you draw by hand only need to be clear: straight wires, unambiguous junctions,
+and every gate the right shape.</p>
+
+<h3>Reading the gates</h3>
+
+<details class="prob"><summary data-label="Exercise 3.1">Give the output of each gate for each input combination: an AND gate, an OR gate, and an AND gate whose second input has been inverted first (that is, A&nbsp;&middot;&nbsp;B&prime;). Inputs AB = 00, 01, 10, 11.</summary><div class="sol">
+<div class="tablewrap"><table class="ttab">
+<thead><tr><th>A</th><th>B</th><th>A &middot; B</th><th>A + B</th><th>A &middot; B&prime;</th></tr></thead>
+<tbody><tr><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td></tr><tr><td class="bin">0</td><td class="bin">1</td><td class="bin">0</td><td class="bin">1</td><td class="bin">0</td></tr><tr><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin">1</td><td class="bin">1</td></tr><tr><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td><td class="bin">0</td></tr></tbody></table></div>
+<p>The last column is the interesting one. Inverting an input before it reaches an
+AND gate produces a gate that is 1 in exactly one case &mdash;
+A&nbsp;=&nbsp;1, B&nbsp;=&nbsp;0 &mdash; and that "exactly one row" behaviour is how
+every circuit later in the course is built: one AND gate per row of the table you
+want, then an OR gate to collect them.</p>
+<p>Compare the OR column with the last one and notice they share no pattern at all.
+An inverter placed on an input changes <em>which</em> combination the gate responds
+to; it does not change the gate.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 3.2">A single variable A is wired to both inputs of an AND gate, but one of the two connections passes through a NOT gate first. Draw the circuit and give its output for A&nbsp;=&nbsp;0 and A&nbsp;=&nbsp;1. Then answer the same question with the AND replaced by an OR.</summary><div class="sol">
+<figure class="fig" style="--figmax:24rem">
+<svg viewBox="0 0 380 135" role="img" aria-label="F = A &middot; A&prime;">
+<use href="#g-not" x="120" y="85" width="48" height="30"/>
+<use href="#g-and" x="250" y="22" width="48" height="30"/>
+<text class="lbl" x="22" y="35" text-anchor="end">A</text>
+<path class="wire" d="M30 30L250 30"/>
+<path class="wire" d="M60 30L60 100L120 100"/>
+<circle class="dot" cx="60" cy="30" r="3.2"/>
+<path class="wire" d="M168 100L212 100L212 44L250 44"/>
+<path class="wire" d="M298 37L326 37"/>
+<text class="lbl" x="334" y="42" text-anchor="start">F</text>
+</svg>
+<figcaption>F = A &middot; A&prime;</figcaption></figure>
+<p>With the AND gate, the output is A&nbsp;&middot;&nbsp;A&prime;. When
+A&nbsp;=&nbsp;0 the inputs are 0 and 1, so the AND gives <strong>0</strong>; when
+A&nbsp;=&nbsp;1 they are 1 and 0, so the AND gives <strong>0</strong> again. The output
+is <strong>constantly 0</strong>, whatever A does. A and A&prime; can never both be 1,
+so an AND can never fire.</p>
+<p>With an OR gate the output is A&nbsp;+&nbsp;A&prime;, and by the same reasoning one
+of the two inputs is always 1, so the output is <strong>constantly 1</strong>.</p>
+<p>These are the complement laws, A&nbsp;&middot;&nbsp;A&prime;&nbsp;=&nbsp;0 and
+A&nbsp;+&nbsp;A&prime;&nbsp;=&nbsp;1. They are worth recognising on sight, because a
+circuit that contains one has gates in it doing no work at all &mdash; and stripping
+those gates out is the beginning of simplification.</p>
+<p>Note the dot on the A wire. Without it the drawing claims A enters the AND gate and
+some unrelated signal enters the NOT, which is a different circuit.</p></div></details>
+
+<h3>Drawing circuits from expressions</h3>
+
+<details class="prob"><summary data-label="Exercise 3.3">Draw the circuit for F = X&nbsp;&middot;&nbsp;Y&prime;&nbsp;+&nbsp;Z.</summary><div class="sol">
+<p>Last operation: the OR. Its operands are X&nbsp;&middot;&nbsp;Y&prime;, which needs
+an AND, and Z, which is a plain input. The AND's second operand Y&prime; needs a NOT.
+Three gates.</p>
+<figure class="fig" style="--figmax:34rem">
+<svg viewBox="0 0 450 188" role="img" aria-label="F = X &middot; Y&prime; + Z">
+<use href="#g-not" x="95" y="81" width="48" height="30"/>
+<use href="#g-and" x="210" y="34" width="48" height="30"/>
+<use href="#g-or" x="330" y="89" width="48" height="30"/>
+<text class="lbl" x="22" y="31" text-anchor="end">X</text>
+<path class="wire" d="M30 26L170 26"/>
+<text class="lbl" x="22" y="101" text-anchor="end">Y</text>
+<path class="wire" d="M30 96L95 96"/>
+<text class="lbl" x="22" y="161" text-anchor="end">Z</text>
+<path class="wire" d="M30 156L285 156"/>
+<path class="wire" d="M170 26L170 26L170 42L210 42"/>
+<path class="wire" d="M143 96L185 96L185 56L210 56"/>
+<path class="wire" d="M258 49L295 49L295 97L330 97"/>
+<path class="wire" d="M285 156L285 156L285 111L330 111"/>
+<path class="wire" d="M378 104L406 104"/>
+<text class="lbl" x="414" y="109" text-anchor="start">F</text>
+</svg>
+<figcaption>F = X &middot; Y&prime; + Z</figcaption></figure>
+<p>Read it back to check: the NOT gives Y&prime;, the AND gives
+X&nbsp;&middot;&nbsp;Y&prime;, the OR gives X&nbsp;&middot;&nbsp;Y&prime;&nbsp;+&nbsp;Z.
+That is what was asked for.</p>
+<p>The commonest wrong answer puts the NOT gate on the <em>output</em> of the AND,
+which draws (X&nbsp;&middot;&nbsp;Y)&prime;&nbsp;+&nbsp;Z instead. The prime in the
+expression is attached to Y alone, so the inverter belongs on the Y wire, before the
+AND gate.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 3.4">Draw the circuit for F = (P&nbsp;+&nbsp;Q)&nbsp;&middot;&nbsp;R&prime;. Then say what changes if the parentheses are removed.</summary><div class="sol">
+<p>The parentheses force the OR to happen first, so the AND is the output gate.</p>
+<figure class="fig" style="--figmax:26rem">
+<svg viewBox="0 0 375 168" role="img" aria-label="F = (P + Q) &middot; R&prime;">
+<use href="#g-or" x="95" y="25" width="48" height="30"/>
+<use href="#g-not" x="95" y="115" width="48" height="30"/>
+<use href="#g-and" x="250" y="70" width="48" height="30"/>
+<text class="lbl" x="22" y="38" text-anchor="end">P</text>
+<path class="wire" d="M30 33L95 33"/>
+<text class="lbl" x="22" y="52" text-anchor="end">Q</text>
+<path class="wire" d="M30 47L95 47"/>
+<text class="lbl" x="22" y="135" text-anchor="end">R</text>
+<path class="wire" d="M30 130L95 130"/>
+<path class="wire" d="M143 40L205 40L205 78L250 78"/>
+<path class="wire" d="M143 130L215 130L215 92L250 92"/>
+<path class="wire" d="M298 85L326 85"/>
+<text class="lbl" x="334" y="90" text-anchor="start">F</text>
+</svg>
+<figcaption>F = (P + Q) &middot; R&prime;</figcaption></figure>
+<p>Without the parentheses,
+P&nbsp;+&nbsp;Q&nbsp;&middot;&nbsp;R&prime; means
+P&nbsp;+&nbsp;(Q&nbsp;&middot;&nbsp;R&prime;), because AND binds tighter than OR.
+The <em>same three gates</em> appear, but the AND and OR swap places: the AND now
+combines Q with R&prime; and the OR collects P with the AND's output. The two circuits
+are genuinely different functions &mdash; with P&nbsp;=&nbsp;1, R&nbsp;=&nbsp;1 the
+first gives (1+Q)&middot;0&nbsp;=&nbsp;0 and the second gives
+1&nbsp;+&nbsp;(Q&middot;0)&nbsp;=&nbsp;1.</p>
+<p>Where a drawing is ambiguous the parentheses are the thing to check first.</p>
+</div></details>
+
+<details class="prob"><summary data-label="Exercise 3.5">Draw two circuits: F = A&prime;&nbsp;&middot;&nbsp;B&prime; and G = A&prime;&nbsp;+&nbsp;B&prime;. How many gates does each need, and what is the only difference between the drawings?</summary><div class="sol">
+<p>Three gates each &mdash; two inverters and one two-input gate &mdash; and the only
+difference is the shape of that last gate.</p>
+<figure class="fig" style="--figmax:20rem">
+<svg viewBox="0 0 335 128" role="img" aria-label="F = A&prime; &middot; B&prime;">
+<use href="#g-not" x="85" y="15" width="48" height="30"/>
+<use href="#g-not" x="85" y="75" width="48" height="30"/>
+<use href="#g-and" x="215" y="45" width="48" height="30"/>
+<text class="lbl" x="22" y="35" text-anchor="end">A</text>
+<path class="wire" d="M30 30L85 30"/>
+<text class="lbl" x="22" y="95" text-anchor="end">B</text>
+<path class="wire" d="M30 90L85 90"/>
+<path class="wire" d="M133 30L178 30L178 53L215 53"/>
+<path class="wire" d="M133 90L186 90L186 67L215 67"/>
+<path class="wire" d="M263 60L289 60"/>
+<text class="lbl" x="297" y="65" text-anchor="start">F</text>
+</svg>
+<figcaption>F = A&prime; &middot; B&prime;</figcaption></figure>
+<figure class="fig" style="--figmax:20rem">
+<svg viewBox="0 0 335 128" role="img" aria-label="G = A&prime; + B&prime;">
+<use href="#g-not" x="85" y="15" width="48" height="30"/>
+<use href="#g-not" x="85" y="75" width="48" height="30"/>
+<use href="#g-or" x="215" y="45" width="48" height="30"/>
+<text class="lbl" x="22" y="35" text-anchor="end">A</text>
+<path class="wire" d="M30 30L85 30"/>
+<text class="lbl" x="22" y="95" text-anchor="end">B</text>
+<path class="wire" d="M30 90L85 90"/>
+<path class="wire" d="M133 30L178 30L178 53L215 53"/>
+<path class="wire" d="M133 90L186 90L186 67L215 67"/>
+<path class="wire" d="M263 60L289 60"/>
+<text class="lbl" x="297" y="65" text-anchor="start">F</text>
+</svg>
+<figcaption>G = A&prime; + B&prime;</figcaption></figure>
+<p>The inverters sit on the inputs in both cases, because in both expressions the
+primes are attached to the variables individually. Neither drawing has a circle on the
+output of the final gate.</p>
+<p>These two functions look almost identical on paper and behave quite differently:
+F is 1 only when A and B are <em>both</em> 0, while G is 1 unless they are both 1.
+Exercise 3.12 pairs each of them with a circuit that inverts at the end instead, which
+is where De Morgan's laws come from.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 3.6">Draw the circuit for F = (A&nbsp;+&nbsp;B)&nbsp;&middot;&nbsp;(A&nbsp;+&nbsp;C). Mark the fan-out correctly.</summary><div class="sol">
+<p>Two OR gates feeding one AND gate. A appears in both brackets, so the A input wire
+splits &mdash; one wire, one dot, two destinations.</p>
+<figure class="fig" style="--figmax:34rem">
+<svg viewBox="0 0 420 180" role="img" aria-label="F = (A + B) &middot; (A + C)">
+<use href="#g-or" x="140" y="25" width="48" height="30"/>
+<use href="#g-or" x="140" y="105" width="48" height="30"/>
+<use href="#g-and" x="290" y="65" width="48" height="30"/>
+<text class="lbl" x="22" y="31" text-anchor="end">A</text>
+<path class="wire" d="M30 26L105 26"/>
+<text class="lbl" x="22" y="75" text-anchor="end">B</text>
+<path class="wire" d="M30 70L110 70"/>
+<text class="lbl" x="22" y="155" text-anchor="end">C</text>
+<path class="wire" d="M30 150L100 150"/>
+<path class="wire" d="M105 26L105 26L105 33L140 33"/>
+<path class="wire" d="M110 70L110 70L110 47L140 47"/>
+<path class="wire" d="M58 26L58 113L140 113"/>
+<circle class="dot" cx="58" cy="26" r="3.2"/>
+<path class="wire" d="M100 150L100 150L100 127L140 127"/>
+<path class="wire" d="M188 40L245 40L245 73L290 73"/>
+<path class="wire" d="M188 120L245 120L245 87L290 87"/>
+<path class="wire" d="M338 80L366 80"/>
+<text class="lbl" x="374" y="85" text-anchor="start">F</text>
+</svg>
+<figcaption>F = (A + B) &middot; (A + C)</figcaption></figure>
+<p>Three gates, no inverters, and three input wires of which one fans out. If your
+drawing has two separate wires both labelled A entering from the left, redraw it: a
+variable is a single signal, and the dot is how a diagram says so.</p>
+<p>This expression turns out to equal A&nbsp;+&nbsp;B&nbsp;&middot;&nbsp;C, which needs
+only two gates. Exercise 3.11 asks you to verify that with a table, and it is the
+first real instance of something the rest of the unit is about: the same function has
+many circuits, and some are cheaper than others.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 3.7">Draw the circuit for F = W&nbsp;&middot;&nbsp;X&nbsp;+&nbsp;Y&nbsp;&middot;&nbsp;Z&prime;&nbsp;+&nbsp;W&prime;. Assume every gate has at most two inputs.</summary><div class="sol">
+<p>Three terms to be ORed together, and a two-input OR gate takes only two at a time,
+so two OR gates chain: first the sum of two terms, then that result with the third.</p>
+<figure class="fig" style="--figmax:100%">
+<svg viewBox="0 0 650 262" role="img" aria-label="F = W &middot; X + Y &middot; Z&prime; + W&prime;">
+<use href="#g-and" x="150" y="25" width="48" height="30"/>
+<use href="#g-not" x="150" y="155" width="48" height="30"/>
+<use href="#g-and" x="280" y="125" width="48" height="30"/>
+<use href="#g-not" x="150" y="215" width="48" height="30"/>
+<use href="#g-or" x="400" y="55" width="48" height="30"/>
+<use href="#g-or" x="520" y="145" width="48" height="30"/>
+<text class="lbl" x="22" y="31" text-anchor="end">W</text>
+<path class="wire" d="M30 26L115 26"/>
+<text class="lbl" x="22" y="75" text-anchor="end">X</text>
+<path class="wire" d="M30 70L120 70"/>
+<text class="lbl" x="22" y="125" text-anchor="end">Y</text>
+<path class="wire" d="M30 120L245 120"/>
+<text class="lbl" x="22" y="175" text-anchor="end">Z</text>
+<path class="wire" d="M30 170L150 170"/>
+<path class="wire" d="M115 26L115 26L115 33L150 33"/>
+<path class="wire" d="M120 70L120 70L120 47L150 47"/>
+<path class="wire" d="M60 26L60 230L150 230"/>
+<circle class="dot" cx="60" cy="26" r="3.2"/>
+<path class="wire" d="M245 120L245 120L245 133L280 133"/>
+<path class="wire" d="M198 170L240 170L240 147L280 147"/>
+<path class="wire" d="M198 40L360 40L360 63L400 63"/>
+<path class="wire" d="M328 140L365 140L365 77L400 77"/>
+<path class="wire" d="M448 70L485 70L485 153L520 153"/>
+<path class="wire" d="M198 230L480 230L480 167L520 167"/>
+<path class="wire" d="M568 160L594 160"/>
+<text class="lbl" x="602" y="165" text-anchor="start">F</text>
+</svg>
+<figcaption>F = W &middot; X + Y &middot; Z&prime; + W&prime;</figcaption></figure>
+<p>Six gates in total &mdash; two ANDs for the product terms, two NOTs for Z&prime; and
+W&prime;, and two ORs to collect three terms. W is used twice, once at the first AND
+and once at its own inverter, so it fans out.</p>
+<p>Any grouping of the three terms gives the same function: OR does not care about the
+order or the bracketing, so (W&middot;X&nbsp;+&nbsp;Y&middot;Z&prime;)&nbsp;+&nbsp;W&prime;
+and W&middot;X&nbsp;+&nbsp;(Y&middot;Z&prime;&nbsp;+&nbsp;W&prime;) are the same circuit
+redrawn. Choose whichever grouping keeps your wires from crossing.</p>
+<p>A closing observation, for later: this function simplifies drastically. W&prime;
+already covers every case where W&nbsp;=&nbsp;0, and W&middot;X covers the
+W&nbsp;=&nbsp;1 cases where X&nbsp;=&nbsp;1, so the whole thing reduces to
+W&prime;&nbsp;+&nbsp;X&nbsp;+&nbsp;Y&middot;Z&prime;. Draw both and count the gates.</p>
+</div></details>
+
+<details class="prob"><summary data-label="Exercise 3.8">You have only two-input AND gates. Draw a circuit whose output is 1 exactly when A, B and C are all 1. Then generalise: how many two-input AND gates are needed for <var>n</var> inputs?</summary><div class="sol">
+<p>Chain them. AND A with B, then AND that result with C.</p>
+<figure class="fig" style="--figmax:24rem">
+<svg viewBox="0 0 375 142" role="img" aria-label="F = (A &middot; B) &middot; C">
+<use href="#g-and" x="110" y="25" width="48" height="30"/>
+<use href="#g-and" x="250" y="75" width="48" height="30"/>
+<text class="lbl" x="22" y="38" text-anchor="end">A</text>
+<path class="wire" d="M30 33L110 33"/>
+<text class="lbl" x="22" y="52" text-anchor="end">B</text>
+<path class="wire" d="M30 47L110 47"/>
+<text class="lbl" x="22" y="125" text-anchor="end">C</text>
+<path class="wire" d="M30 120L205 120"/>
+<path class="wire" d="M158 40L210 40L210 83L250 83"/>
+<path class="wire" d="M205 120L205 120L205 97L250 97"/>
+<path class="wire" d="M298 90L326 90"/>
+<text class="lbl" x="334" y="95" text-anchor="start">F</text>
+</svg>
+<figcaption>F = (A &middot; B) &middot; C</figcaption></figure>
+<p>This works because AND is associative:
+(A&nbsp;&middot;&nbsp;B)&nbsp;&middot;&nbsp;C&nbsp;=&nbsp;A&nbsp;&middot;&nbsp;(B&nbsp;&middot;&nbsp;C),
+so the bracketing is yours to choose. Either chaining, or the balanced version that
+ANDs A with B and C with D before combining, computes the same function.</p>
+<p>For <var>n</var> inputs you need <strong><var>n</var>&nbsp;&minus;&nbsp;1</strong>
+gates. Each gate consumes two signals and produces one, so it reduces the count of
+"things still to be combined" by exactly one; starting at <var>n</var> and finishing at
+1 takes <var>n</var>&nbsp;&minus;&nbsp;1 steps, whatever shape you chain them in.</p>
+<p>The shape does matter for one thing, though not for the count. A straight chain of
+<var>n</var>&nbsp;&minus;&nbsp;1 gates makes a signal pass through
+<var>n</var>&nbsp;&minus;&nbsp;1 gates in sequence; pairing them up in a balanced tree
+makes it pass through about log<sub>2</sub><var>n</var>. Gates take time, so that
+difference is the whole subject of the carry-lookahead lecture later in the
+semester.</p></div></details>
+
+<h3>Truth tables</h3>
+
+<details class="prob"><summary data-label="Exercise 3.9">Build the truth table for F = X&nbsp;&middot;&nbsp;Y&prime;&nbsp;+&nbsp;Z, the circuit you drew in Exercise 3.3. Use one column per gate.</summary><div class="sol">
+<p>Three inputs, so eight rows, and the gates give three columns: Y&prime;, then the
+AND, then the OR.</p>
+<div class="tablewrap"><table class="ttab">
+<thead><tr><th>X</th><th>Y</th><th>Z</th><th>Y&prime;</th><th>X &middot; Y&prime;</th><th>F</th></tr></thead>
+<tbody><tr><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin">1</td><td class="bin">0</td><td class="bin hilite">0</td></tr><tr><td class="bin">0</td><td class="bin">0</td><td class="bin">1</td><td class="bin">1</td><td class="bin">0</td><td class="bin hilite">1</td></tr><tr><td class="bin">0</td><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin hilite">0</td></tr><tr><td class="bin">0</td><td class="bin">1</td><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin hilite">1</td></tr><tr><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin">1</td><td class="bin">1</td><td class="bin hilite">1</td></tr><tr><td class="bin">1</td><td class="bin">0</td><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td><td class="bin hilite">1</td></tr><tr><td class="bin">1</td><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin hilite">0</td></tr><tr><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin hilite">1</td></tr></tbody></table></div>
+<p>F is 0 in only three rows &mdash; XYZ&nbsp;=&nbsp;000, 010 and 110 &mdash; and in each
+of them Z&nbsp;=&nbsp;0 and the AND term is 0 as well. That is worth stating as a
+habit: once one term of an OR is 1 the output is 1,
+so when you are checking a row, look for a 1 and stop.</p>
+<p>Spot-check a row against the original expression rather than the table. Row
+XYZ&nbsp;=&nbsp;100: X&middot;Y&prime;&nbsp;=&nbsp;1&middot;1&nbsp;=&nbsp;1, plus
+Z&nbsp;=&nbsp;0, gives 1. The table agrees.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 3.10">Build the truth table for F = (P&nbsp;+&nbsp;Q)&nbsp;&middot;&nbsp;R&prime; and, in the same table, a column for P&nbsp;+&nbsp;Q&nbsp;&middot;&nbsp;R&prime; &mdash; the version without parentheses. In how many rows do they differ?</summary><div class="sol">
+<div class="tablewrap"><table class="ttab">
+<thead><tr><th>P</th><th>Q</th><th>R</th><th>P + Q</th><th>R&prime;</th><th>(P+Q) &middot; R&prime;</th><th>P + Q &middot; R&prime;</th></tr></thead>
+<tbody><tr><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td></tr><tr><td class="bin">0</td><td class="bin">0</td><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td></tr><tr><td class="bin">0</td><td class="bin">1</td><td class="bin">0</td><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td></tr><tr><td class="bin">0</td><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td></tr><tr><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td></tr><tr><td class="bin">1</td><td class="bin">0</td><td class="bin">1</td><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin">1</td></tr><tr><td class="bin">1</td><td class="bin">1</td><td class="bin">0</td><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td></tr><tr><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin">1</td></tr></tbody></table></div>
+<p>Read the last two columns down: 00101010 against 00101111. They differ in
+<strong>two</strong> rows, PQR&nbsp;=&nbsp;101 and PQR&nbsp;=&nbsp;111 &mdash; the two
+rows where P&nbsp;=&nbsp;1 and R&nbsp;=&nbsp;1.</p>
+<p>The reason is structural, not arithmetic. In the bracketed version R&prime; gates
+<em>everything</em>: if R&nbsp;=&nbsp;1 then R&prime;&nbsp;=&nbsp;0 and the final AND
+forces F to 0 no matter what P and Q do. In the unbracketed version P reaches the
+output directly through the OR, so P&nbsp;=&nbsp;1 forces the output to 1 regardless of
+R. Same three gates, opposite behaviour.</p>
+<p>This is the exercise to remember when you are tempted to leave out a pair of
+parentheses.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 3.11">Tabulate F = (A&nbsp;+&nbsp;B)&nbsp;&middot;&nbsp;(A&nbsp;+&nbsp;C) and G = A&nbsp;+&nbsp;B&nbsp;&middot;&nbsp;C in one table. Are they the same function? Which circuit would you build?</summary><div class="sol">
+<div class="tablewrap"><table class="ttab">
+<thead><tr><th>A</th><th>B</th><th>C</th><th>A + B</th><th>A + C</th><th>F</th><th>B &middot; C</th><th>G</th></tr></thead>
+<tbody><tr><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td></tr><tr><td class="bin">0</td><td class="bin">0</td><td class="bin">1</td><td class="bin">0</td><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td></tr><tr><td class="bin">0</td><td class="bin">1</td><td class="bin">0</td><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td></tr><tr><td class="bin">0</td><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td></tr><tr><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td><td class="bin">0</td><td class="bin">1</td></tr><tr><td class="bin">1</td><td class="bin">0</td><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td><td class="bin">0</td><td class="bin">1</td></tr><tr><td class="bin">1</td><td class="bin">1</td><td class="bin">0</td><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td><td class="bin">0</td><td class="bin">1</td></tr><tr><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td></tr></tbody></table></div>
+<p>The two output columns are identical, 00011111, so <strong>yes</strong> &mdash; the
+same function, computed two ways. This is the distributive law of Boolean algebra,
+A&nbsp;+&nbsp;B&middot;C&nbsp;=&nbsp;(A&nbsp;+&nbsp;B)&middot;(A&nbsp;+&nbsp;C), and it
+is the one law that has no analogue in ordinary arithmetic: 2&nbsp;+&nbsp;3&times;4 is
+not (2+3)&times;(2+4).</p>
+<p>Build G. Both use three gates as drawn, but G's are two gates if you count only
+what is needed &mdash; one AND and one OR &mdash; against three for F, and G's longest
+path from an input to the output runs through two gates rather than two ORs plus an
+AND. Fewer gates is less silicon, less power and less delay.</p>
+<p>Notice also what the shared column tells you: F is 1 whenever A is 1, and otherwise
+only when B and C are both 1. That sentence is a complete description of the function
+and it is much easier to hold in your head than either expression.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 3.12">In one table, put columns for A&prime;&nbsp;&middot;&nbsp;B&prime;, (A&nbsp;+&nbsp;B)&prime;, A&prime;&nbsp;+&nbsp;B&prime; and (A&nbsp;&middot;&nbsp;B)&prime;. Which pairs are equal? State the rule you have found.</summary><div class="sol">
+<div class="tablewrap"><table class="ttab">
+<thead><tr><th>A</th><th>B</th><th>A&prime; &middot; B&prime;</th><th>(A + B)&prime;</th><th>A&prime; + B&prime;</th><th>(A &middot; B)&prime;</th></tr></thead>
+<tbody><tr><td class="bin">0</td><td class="bin">0</td><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td></tr><tr><td class="bin">0</td><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin">1</td><td class="bin">1</td></tr><tr><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin">1</td><td class="bin">1</td></tr><tr><td class="bin">1</td><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td></tr></tbody></table></div>
+<p>Two pairs match, and they are not the pairs the notation suggests:</p>
+<p style="text-align:center;font-size:1.05rem">
+A&prime;&nbsp;&middot;&nbsp;B&prime; = (A&nbsp;+&nbsp;B)&prime; &nbsp;&nbsp;and&nbsp;&nbsp;
+A&prime;&nbsp;+&nbsp;B&prime; = (A&nbsp;&middot;&nbsp;B)&prime;</p>
+<p>These are <strong>De Morgan's laws</strong>. In words: moving an inversion through a
+gate flips the gate. Invert the output of an OR and you get the AND of the inverted
+inputs; invert the output of an AND and you get the OR of the inverted inputs.</p>
+<p>What is <em>not</em> true is the tempting distribution,
+(A&nbsp;+&nbsp;B)&prime;&nbsp;=&nbsp;A&prime;&nbsp;+&nbsp;B&prime;. The table refutes it
+in the rows AB&nbsp;=&nbsp;01 and 10, where the left side is 0 and the right side is 1.
+Priming is not multiplication and does not distribute over anything.</p>
+<p>In circuit terms: a circle can be dragged from the output of a gate back onto both
+of its inputs, provided you change the gate's shape at the same time. That single
+move is what makes NAND and NOR gates so powerful, and it is where the
+functional-completeness lecture starts.</p></div></details>
+
+<h3>Reading circuits</h3>
+
+<details class="prob"><summary data-label="Exercise 3.13">Write down the Boolean expression computed by this circuit. How many gates would a two-input-only implementation of your expression need?</summary><div class="sol">
+<figure class="fig" style="--figmax:100%">
+<svg viewBox="0 0 630 248" role="img" aria-label="Circuit for Exercise 3.13">
+<use href="#g-and" x="140" y="25" width="48" height="30"/>
+<use href="#g-not" x="140" y="115" width="48" height="30"/>
+<use href="#g-or" x="270" y="105" width="48" height="30"/>
+<use href="#g-not" x="140" y="195" width="48" height="30"/>
+<use href="#g-and" x="390" y="155" width="48" height="30"/>
+<use href="#g-or" x="500" y="75" width="48" height="30"/>
+<text class="lbl" x="22" y="31" text-anchor="end">A</text>
+<path class="wire" d="M30 26L105 26"/>
+<text class="lbl" x="22" y="75" text-anchor="end">B</text>
+<path class="wire" d="M30 70L112 70"/>
+<text class="lbl" x="22" y="215" text-anchor="end">C</text>
+<path class="wire" d="M30 210L140 210"/>
+<path class="wire" d="M105 26L105 26L105 33L140 33"/>
+<path class="wire" d="M112 70L112 70L112 47L140 47"/>
+<path class="wire" d="M58 26L58 130L140 130"/>
+<circle class="dot" cx="58" cy="26" r="3.2"/>
+<path class="wire" d="M188 130L232 130L232 127L270 127"/>
+<path class="wire" d="M78 70L78 90L240 90L240 113L270 113"/>
+<circle class="dot" cx="78" cy="70" r="3.2"/>
+<path class="wire" d="M318 120L355 120L355 163L390 163"/>
+<path class="wire" d="M188 210L345 210L345 177L390 177"/>
+<path class="wire" d="M188 40L460 40L460 83L500 83"/>
+<path class="wire" d="M438 170L468 170L468 97L500 97"/>
+<path class="wire" d="M548 90L574 90"/>
+<text class="lbl" x="582" y="95" text-anchor="start">F</text>
+</svg>
+<figcaption>Circuit for Exercise 3.13</figcaption></figure>
+<p>Label every gate output, left to right:</p>
+<ul>
+<li>the upper AND gives A&nbsp;&middot;&nbsp;B;</li>
+<li>the inverter on A gives A&prime;, and the OR below it gives
+A&prime;&nbsp;+&nbsp;B;</li>
+<li>the inverter on C gives C&prime;;</li>
+<li>the second AND combines those two:
+(A&prime;&nbsp;+&nbsp;B)&nbsp;&middot;&nbsp;C&prime;;</li>
+<li>the output OR collects both terms.</li>
+</ul>
+<p style="text-align:center;font-size:1.05rem">
+F = A&nbsp;&middot;&nbsp;B&nbsp;+&nbsp;(A&prime;&nbsp;+&nbsp;B)&nbsp;&middot;&nbsp;C&prime;</p>
+<p>Six gates, which is exactly what the diagram shows &mdash; two inverters, two ANDs
+and two ORs &mdash; so the drawing is already a two-input implementation and nothing
+needs adding.</p>
+<p>Both A and B fan out, which is what the two dots on the left mark. Follow each dot
+with a finger before you write anything down: mistaking a junction for a crossing is
+the one error that makes an otherwise perfect reading wrong.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 3.14">Give the expression for this circuit, build its truth table, and then find the simplest circuit with the same output column.</summary><div class="sol">
+<figure class="fig" style="--figmax:27rem">
+<svg viewBox="0 0 420 132" role="img" aria-label="Circuit for Exercise 3.14">
+<use href="#g-or" x="150" y="71" width="48" height="30"/>
+<use href="#g-and" x="290" y="25" width="48" height="30"/>
+<text class="lbl" x="22" y="31" text-anchor="end">A</text>
+<path class="wire" d="M30 26L60 26"/>
+<text class="lbl" x="22" y="105" text-anchor="end">B</text>
+<path class="wire" d="M30 100L115 100"/>
+<path class="wire" d="M60 26L60 79L150 79"/>
+<circle class="dot" cx="60" cy="26" r="3.2"/>
+<path class="wire" d="M60 26L250 26L250 33L290 33"/>
+<path class="wire" d="M115 100L115 100L115 93L150 93"/>
+<path class="wire" d="M198 86L262 86L262 47L290 47"/>
+<path class="wire" d="M338 40L366 40"/>
+<text class="lbl" x="374" y="45" text-anchor="start">F</text>
+</svg>
+<figcaption>Circuit for Exercise 3.14</figcaption></figure>
+<p>The OR gate gives A&nbsp;+&nbsp;B and the AND gate combines that with A, so</p>
+<p style="text-align:center;font-size:1.05rem">
+F = A&nbsp;&middot;&nbsp;(A&nbsp;+&nbsp;B)</p>
+<div class="tablewrap"><table class="ttab">
+<thead><tr><th>A</th><th>B</th><th>A + B</th><th>F = A &middot; (A + B)</th></tr></thead>
+<tbody><tr><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin hilite">0</td></tr><tr><td class="bin">0</td><td class="bin">1</td><td class="bin">1</td><td class="bin hilite">0</td></tr><tr><td class="bin">1</td><td class="bin">0</td><td class="bin">1</td><td class="bin hilite">1</td></tr><tr><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td><td class="bin hilite">1</td></tr></tbody></table></div>
+<p>The output column is 0011 &mdash; identical to the A column. So
+A&nbsp;&middot;&nbsp;(A&nbsp;+&nbsp;B)&nbsp;=&nbsp;A, and the simplest circuit with
+this behaviour is <strong>a plain wire from A to the output</strong>. No gates at all,
+and B is not connected to anything.</p>
+<p>This is one of the absorption laws, and the intuition is worth more than the name.
+For the AND to output 1, A must be 1 &mdash; and once A is 1 the OR gate is 1 too,
+whatever B does. So B can never affect the answer. Its partner law is
+A&nbsp;+&nbsp;A&nbsp;&middot;&nbsp;B&nbsp;=&nbsp;A, by the same argument read the other
+way round.</p>
+<p>Finding an input that cannot affect the output is always worth two seconds of
+attention before you start drawing. Here it removes the entire circuit.</p>
+</div></details>
+
+<h3>Reasoning about circuits</h3>
+
+<details class="prob"><summary data-label="Exercise 3.15">Challenge. A circuit is built from AND and OR gates only &mdash; any number of them, wired any way you like, with no inverters anywhere. Show that its output must be 0 when all of its inputs are 0. What does that tell you about which functions AND and OR can build?</summary><div class="sol">
+<p>Work forward from the inputs. Set every input to 0 and consider the gates in an
+order where each gate comes after the gates feeding it &mdash; always possible in a
+combinational circuit, because there are no loops.</p>
+<p>The claim is that <em>every wire in the circuit carries 0</em>, and it follows gate
+by gate. Take any gate and suppose every wire feeding it carries 0. If it is an AND
+gate, it needs both inputs at 1 to output 1, so it outputs 0. If it is an OR gate, it
+needs at least one input at 1, so it outputs 0 as well. Either way its output wire
+carries 0, and the supposition holds for the next gate along. The input wires carry 0
+by assumption, so the property propagates from the inputs to the output, and the output
+is <strong>0</strong>.</p>
+<p>The consequence is a genuine limit, not a matter of cleverness. Any function whose
+value is 1 on the all-zeros input &mdash; the NOT of a variable, the constant 1,
+A&prime;&nbsp;&middot;&nbsp;B&prime;, (A&nbsp;+&nbsp;B)&prime; &mdash; is
+<strong>impossible</strong> to build from AND and OR gates alone, however many you use.
+Inversion is not a convenience; it is an independent capability, and that is why the
+lecture introduced three gates rather than two.</p>
+<div class="box extra"><span class="bt">One step further</span>
+<p>The same argument, run with every input at 1, shows an inverter-free circuit must
+output 1 when all inputs are 1. Between them the two facts say that such circuits are
+<em>monotone</em>: turning an input from 0 to 1 can never turn the output from 1 to 0.
+Monotone functions are a real and much-studied subclass, and the practical version of
+the statement is the one to carry forward &mdash; a circuit that must ever say "no
+because this input is on" needs an inverter somewhere upstream.</p></div>
+</div></details>
+
+<div class="box extra"><span class="bt">Where this goes next</span>
+<p>Everything here has been mechanical: an expression in, a drawing or a table out.
+The two questions that make the subject interesting come next. Given a truth table,
+what is the <em>cheapest</em> circuit that produces it &mdash; that is Boolean algebra
+and K-maps. And what is the smallest set of gate types you need at all &mdash; that is
+functional completeness, where it turns out one gate type suffices for everything,
+including the adder the lecture set out to build.</p></div>
+
+    <nav class="pagenav">
+      <a class="prev" href="ex-bases.html"><span>Previous</span>Set 2. Number bases and conversion</a>
+      <a class="next" href="setup-logisim.html"><span>Next</span>Installing Logisim-Evolution</a>
+    </nav>
+    <footer class="site">
+      <em>Computer Organization and Assembly Language</em> &middot; CSCI 240 / 640,
+      Queens College CUNY.
+    </footer>
+  </main>
+</div>
+</body>
+</html>
