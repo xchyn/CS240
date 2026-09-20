@@ -29,7 +29,7 @@
   </ol></aside>
   <main>
 
-<svg class="gdefs" aria-hidden="true" focusable="false"><defs>
+<svg class="gdefs" style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true" focusable="false"><defs>
 <symbol id="g-and" viewBox="0 0 48 30">
   <path style="fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round" d="M0 8H10M0 22H10M39 15H48"/>
   <path style="fill:var(--panel);stroke:currentColor;stroke-width:1.9;stroke-linejoin:round" d="M8 2H26A13 13 0 0 1 26 28H8Z"/>
@@ -87,33 +87,33 @@ makes these circuits <em>combinational</em>.</p>
 
 <div class="grid3">
   <div class="symcard"><figure class="fig" style="--figmax:9.5rem">
-<svg viewBox="0 0 100 48" role="img" aria-label="AND">
+<svg viewBox="0 0 100 48" width="100" height="48" role="img" aria-label="AND">
 <use href="#g-and" x="34" y="9" width="48" height="30"/>
-<path class="wire" d="M12 17L34 17"/>
-<path class="wire" d="M12 31L34 31"/>
-<text class="lbl" x="10" y="21" text-anchor="end">A</text>
-<text class="lbl" x="10" y="35" text-anchor="end">B</text>
-<path class="wire" d="M82 24L96 24"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M12 17L34 17"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M12 31L34 31"/>
+<text class="lbl" fill="currentColor" stroke="none" font-size="15" font-weight="600" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" x="10" y="21" text-anchor="end">A</text>
+<text class="lbl" fill="currentColor" stroke="none" font-size="15" font-weight="600" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" x="10" y="35" text-anchor="end">B</text>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M82 24L96 24"/>
 </svg>
 <figcaption>AND</figcaption></figure><p><strong>AND</strong> &mdash; A&nbsp;&middot;&nbsp;B<br>
   1 only when <em>both</em> inputs are 1.</p></div>
   <div class="symcard"><figure class="fig" style="--figmax:9.5rem">
-<svg viewBox="0 0 100 48" role="img" aria-label="OR">
+<svg viewBox="0 0 100 48" width="100" height="48" role="img" aria-label="OR">
 <use href="#g-or" x="34" y="9" width="48" height="30"/>
-<path class="wire" d="M12 17L34 17"/>
-<path class="wire" d="M12 31L34 31"/>
-<text class="lbl" x="10" y="21" text-anchor="end">A</text>
-<text class="lbl" x="10" y="35" text-anchor="end">B</text>
-<path class="wire" d="M82 24L96 24"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M12 17L34 17"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M12 31L34 31"/>
+<text class="lbl" fill="currentColor" stroke="none" font-size="15" font-weight="600" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" x="10" y="21" text-anchor="end">A</text>
+<text class="lbl" fill="currentColor" stroke="none" font-size="15" font-weight="600" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" x="10" y="35" text-anchor="end">B</text>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M82 24L96 24"/>
 </svg>
 <figcaption>OR</figcaption></figure><p><strong>OR</strong> &mdash; A&nbsp;+&nbsp;B<br>
   1 when <em>at least one</em> input is 1.</p></div>
   <div class="symcard"><figure class="fig" style="--figmax:9.5rem">
-<svg viewBox="0 0 100 48" role="img" aria-label="NOT">
+<svg viewBox="0 0 100 48" width="100" height="48" role="img" aria-label="NOT">
 <use href="#g-not" x="34" y="9" width="48" height="30"/>
-<path class="wire" d="M12 24L34 24"/>
-<text class="lbl" x="10" y="28" text-anchor="end">A</text>
-<path class="wire" d="M82 24L96 24"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M12 24L34 24"/>
+<text class="lbl" fill="currentColor" stroke="none" font-size="15" font-weight="600" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" x="10" y="28" text-anchor="end">A</text>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M82 24L96 24"/>
 </svg>
 <figcaption>NOT</figcaption></figure><p><strong>NOT</strong> &mdash; A&prime;<br>
   flips its single input. The little circle is the inversion.</p></div>
@@ -172,22 +172,22 @@ OR gate's second operand is B&prime;, which needs a NOT. Its other operand, A, i
 plain input, and so is C. Three gates, drawn right to left, then the wires filled in
 left to right:</p>
 <figure class="fig" style="--figmax:440px">
-<svg viewBox="0 0 440 178" role="img" aria-label="F = (A + B&prime;) &middot; C">
+<svg viewBox="0 0 440 178" width="440" height="178" role="img" aria-label="F = (A + B&prime;) &middot; C">
 <use href="#g-not" x="100" y="71" width="48" height="30"/>
 <use href="#g-or" x="200" y="41" width="48" height="30"/>
 <use href="#g-and" x="320" y="86" width="48" height="30"/>
-<text class="lbl" x="22" y="31" text-anchor="end">A</text>
-<path class="wire" d="M30 26L170 26"/>
-<text class="lbl" x="22" y="91" text-anchor="end">B</text>
-<path class="wire" d="M30 86L100 86"/>
-<text class="lbl" x="22" y="151" text-anchor="end">C</text>
-<path class="wire" d="M30 146L280 146"/>
-<path class="wire" d="M170 26L170 26L170 49L200 49"/>
-<path class="wire" d="M148 86L172 86L172 63L200 63"/>
-<path class="wire" d="M248 56L290 56L290 94L320 94"/>
-<path class="wire" d="M280 146L280 146L280 108L320 108"/>
-<path class="wire" d="M368 101L400 101"/>
-<text class="lbl" x="408" y="106" text-anchor="start">F</text>
+<text class="lbl" fill="currentColor" stroke="none" font-size="15" font-weight="600" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" x="22" y="31" text-anchor="end">A</text>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M30 26L170 26"/>
+<text class="lbl" fill="currentColor" stroke="none" font-size="15" font-weight="600" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" x="22" y="91" text-anchor="end">B</text>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M30 86L100 86"/>
+<text class="lbl" fill="currentColor" stroke="none" font-size="15" font-weight="600" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" x="22" y="151" text-anchor="end">C</text>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M30 146L280 146"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M170 26L170 26L170 49L200 49"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M148 86L172 86L172 63L200 63"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M248 56L290 56L290 94L320 94"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M280 146L280 146L280 108L320 108"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M368 101L400 101"/>
+<text class="lbl" fill="currentColor" stroke="none" font-size="15" font-weight="600" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" x="408" y="106" text-anchor="start">F</text>
 </svg>
 <figcaption>F = (A + B&prime;) &middot; C</figcaption></figure>
 <p>Notice that the three inputs enter on the left in a fixed order and the single
@@ -211,16 +211,16 @@ reach the last gate, its label is the expression for the circuit.</p>
 
 <details class="qc"><summary data-label="Check 3.2">This circuit ANDs A and B and then inverts. Is its output A&prime;&nbsp;&middot;&nbsp;B&prime;?</summary><div class="sol">
 <figure class="fig" style="--figmax:320px">
-<svg viewBox="0 0 320 82" role="img" aria-label="F = (A &middot; B)&prime;">
+<svg viewBox="0 0 320 82" width="320" height="82" role="img" aria-label="F = (A &middot; B)&prime;">
 <use href="#g-and" x="100" y="25" width="48" height="30"/>
 <use href="#g-not" x="200" y="25" width="48" height="30"/>
-<text class="lbl" x="22" y="38" text-anchor="end">A</text>
-<path class="wire" d="M30 33L100 33"/>
-<text class="lbl" x="22" y="52" text-anchor="end">B</text>
-<path class="wire" d="M30 47L100 47"/>
-<path class="wire" d="M148 40L200 40"/>
-<path class="wire" d="M248 40L276 40"/>
-<text class="lbl" x="284" y="45" text-anchor="start">F</text>
+<text class="lbl" fill="currentColor" stroke="none" font-size="15" font-weight="600" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" x="22" y="38" text-anchor="end">A</text>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M30 33L100 33"/>
+<text class="lbl" fill="currentColor" stroke="none" font-size="15" font-weight="600" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" x="22" y="52" text-anchor="end">B</text>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M30 47L100 47"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M148 40L200 40"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M248 40L276 40"/>
+<text class="lbl" fill="currentColor" stroke="none" font-size="15" font-weight="600" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" x="284" y="45" text-anchor="start">F</text>
 </svg>
 <figcaption>F = (A &middot; B)&prime;</figcaption></figure>
 <p><strong>No.</strong> Following the labels: the AND gate produces
@@ -308,16 +308,16 @@ to; it does not change the gate.</p></div></details>
 
 <details class="prob"><summary data-label="Exercise 3.2">A single variable A is wired to both inputs of an AND gate, but one of the two connections passes through a NOT gate first. Draw the circuit and give its output for A&nbsp;=&nbsp;0 and A&nbsp;=&nbsp;1. Then answer the same question with the AND replaced by an OR.</summary><div class="sol">
 <figure class="fig" style="--figmax:380px">
-<svg viewBox="0 0 380 135" role="img" aria-label="F = A &middot; A&prime;">
+<svg viewBox="0 0 380 135" width="380" height="135" role="img" aria-label="F = A &middot; A&prime;">
 <use href="#g-not" x="120" y="85" width="48" height="30"/>
 <use href="#g-and" x="250" y="22" width="48" height="30"/>
-<text class="lbl" x="22" y="35" text-anchor="end">A</text>
-<path class="wire" d="M30 30L250 30"/>
-<path class="wire" d="M60 30L60 100L120 100"/>
-<circle class="dot" cx="60" cy="30" r="3.2"/>
-<path class="wire" d="M168 100L212 100L212 44L250 44"/>
-<path class="wire" d="M298 37L326 37"/>
-<text class="lbl" x="334" y="42" text-anchor="start">F</text>
+<text class="lbl" fill="currentColor" stroke="none" font-size="15" font-weight="600" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" x="22" y="35" text-anchor="end">A</text>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M30 30L250 30"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M60 30L60 100L120 100"/>
+<circle class="dot" fill="currentColor" stroke="none" cx="60" cy="30" r="3.2"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M168 100L212 100L212 44L250 44"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M298 37L326 37"/>
+<text class="lbl" fill="currentColor" stroke="none" font-size="15" font-weight="600" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" x="334" y="42" text-anchor="start">F</text>
 </svg>
 <figcaption>F = A &middot; A&prime;</figcaption></figure>
 <p>With the AND gate, the output is A&nbsp;&middot;&nbsp;A&prime;. When
@@ -341,22 +341,22 @@ some unrelated signal enters the NOT, which is a different circuit.</p></div></d
 an AND, and Z, which is a plain input. The AND's second operand Y&prime; needs a NOT.
 Three gates.</p>
 <figure class="fig" style="--figmax:450px">
-<svg viewBox="0 0 450 188" role="img" aria-label="F = X &middot; Y&prime; + Z">
+<svg viewBox="0 0 450 188" width="450" height="188" role="img" aria-label="F = X &middot; Y&prime; + Z">
 <use href="#g-not" x="95" y="81" width="48" height="30"/>
 <use href="#g-and" x="210" y="34" width="48" height="30"/>
 <use href="#g-or" x="330" y="89" width="48" height="30"/>
-<text class="lbl" x="22" y="31" text-anchor="end">X</text>
-<path class="wire" d="M30 26L170 26"/>
-<text class="lbl" x="22" y="101" text-anchor="end">Y</text>
-<path class="wire" d="M30 96L95 96"/>
-<text class="lbl" x="22" y="161" text-anchor="end">Z</text>
-<path class="wire" d="M30 156L285 156"/>
-<path class="wire" d="M170 26L170 26L170 42L210 42"/>
-<path class="wire" d="M143 96L185 96L185 56L210 56"/>
-<path class="wire" d="M258 49L295 49L295 97L330 97"/>
-<path class="wire" d="M285 156L285 156L285 111L330 111"/>
-<path class="wire" d="M378 104L406 104"/>
-<text class="lbl" x="414" y="109" text-anchor="start">F</text>
+<text class="lbl" fill="currentColor" stroke="none" font-size="15" font-weight="600" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" x="22" y="31" text-anchor="end">X</text>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M30 26L170 26"/>
+<text class="lbl" fill="currentColor" stroke="none" font-size="15" font-weight="600" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" x="22" y="101" text-anchor="end">Y</text>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M30 96L95 96"/>
+<text class="lbl" fill="currentColor" stroke="none" font-size="15" font-weight="600" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" x="22" y="161" text-anchor="end">Z</text>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M30 156L285 156"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M170 26L170 26L170 42L210 42"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M143 96L185 96L185 56L210 56"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M258 49L295 49L295 97L330 97"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M285 156L285 156L285 111L330 111"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M378 104L406 104"/>
+<text class="lbl" fill="currentColor" stroke="none" font-size="15" font-weight="600" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" x="414" y="109" text-anchor="start">F</text>
 </svg>
 <figcaption>F = X &middot; Y&prime; + Z</figcaption></figure>
 <p>Read it back to check: the NOT gives Y&prime;, the AND gives
@@ -370,20 +370,20 @@ AND gate.</p></div></details>
 <details class="prob"><summary data-label="Exercise 3.4">Draw the circuit for F = (P&nbsp;+&nbsp;Q)&nbsp;&middot;&nbsp;R&prime;. Then say what changes if the parentheses are removed.</summary><div class="sol">
 <p>The parentheses force the OR to happen first, so the AND is the output gate.</p>
 <figure class="fig" style="--figmax:375px">
-<svg viewBox="0 0 375 168" role="img" aria-label="F = (P + Q) &middot; R&prime;">
+<svg viewBox="0 0 375 168" width="375" height="168" role="img" aria-label="F = (P + Q) &middot; R&prime;">
 <use href="#g-or" x="95" y="25" width="48" height="30"/>
 <use href="#g-not" x="95" y="115" width="48" height="30"/>
 <use href="#g-and" x="250" y="70" width="48" height="30"/>
-<text class="lbl" x="22" y="38" text-anchor="end">P</text>
-<path class="wire" d="M30 33L95 33"/>
-<text class="lbl" x="22" y="52" text-anchor="end">Q</text>
-<path class="wire" d="M30 47L95 47"/>
-<text class="lbl" x="22" y="135" text-anchor="end">R</text>
-<path class="wire" d="M30 130L95 130"/>
-<path class="wire" d="M143 40L205 40L205 78L250 78"/>
-<path class="wire" d="M143 130L215 130L215 92L250 92"/>
-<path class="wire" d="M298 85L326 85"/>
-<text class="lbl" x="334" y="90" text-anchor="start">F</text>
+<text class="lbl" fill="currentColor" stroke="none" font-size="15" font-weight="600" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" x="22" y="38" text-anchor="end">P</text>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M30 33L95 33"/>
+<text class="lbl" fill="currentColor" stroke="none" font-size="15" font-weight="600" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" x="22" y="52" text-anchor="end">Q</text>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M30 47L95 47"/>
+<text class="lbl" fill="currentColor" stroke="none" font-size="15" font-weight="600" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" x="22" y="135" text-anchor="end">R</text>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M30 130L95 130"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M143 40L205 40L205 78L250 78"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M143 130L215 130L215 92L250 92"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M298 85L326 85"/>
+<text class="lbl" fill="currentColor" stroke="none" font-size="15" font-weight="600" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" x="334" y="90" text-anchor="start">F</text>
 </svg>
 <figcaption>F = (P + Q) &middot; R&prime;</figcaption></figure>
 <p>Without the parentheses,
@@ -401,33 +401,33 @@ first gives (1+Q)&middot;0&nbsp;=&nbsp;0 and the second gives
 <p>Three gates each &mdash; two inverters and one two-input gate &mdash; and the only
 difference is the shape of that last gate.</p>
 <figure class="fig" style="--figmax:335px">
-<svg viewBox="0 0 335 128" role="img" aria-label="F = A&prime; &middot; B&prime;">
+<svg viewBox="0 0 335 128" width="335" height="128" role="img" aria-label="F = A&prime; &middot; B&prime;">
 <use href="#g-not" x="85" y="15" width="48" height="30"/>
 <use href="#g-not" x="85" y="75" width="48" height="30"/>
 <use href="#g-and" x="215" y="45" width="48" height="30"/>
-<text class="lbl" x="22" y="35" text-anchor="end">A</text>
-<path class="wire" d="M30 30L85 30"/>
-<text class="lbl" x="22" y="95" text-anchor="end">B</text>
-<path class="wire" d="M30 90L85 90"/>
-<path class="wire" d="M133 30L178 30L178 53L215 53"/>
-<path class="wire" d="M133 90L186 90L186 67L215 67"/>
-<path class="wire" d="M263 60L289 60"/>
-<text class="lbl" x="297" y="65" text-anchor="start">F</text>
+<text class="lbl" fill="currentColor" stroke="none" font-size="15" font-weight="600" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" x="22" y="35" text-anchor="end">A</text>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M30 30L85 30"/>
+<text class="lbl" fill="currentColor" stroke="none" font-size="15" font-weight="600" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" x="22" y="95" text-anchor="end">B</text>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M30 90L85 90"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M133 30L178 30L178 53L215 53"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M133 90L186 90L186 67L215 67"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M263 60L289 60"/>
+<text class="lbl" fill="currentColor" stroke="none" font-size="15" font-weight="600" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" x="297" y="65" text-anchor="start">F</text>
 </svg>
 <figcaption>F = A&prime; &middot; B&prime;</figcaption></figure>
 <figure class="fig" style="--figmax:335px">
-<svg viewBox="0 0 335 128" role="img" aria-label="G = A&prime; + B&prime;">
+<svg viewBox="0 0 335 128" width="335" height="128" role="img" aria-label="G = A&prime; + B&prime;">
 <use href="#g-not" x="85" y="15" width="48" height="30"/>
 <use href="#g-not" x="85" y="75" width="48" height="30"/>
 <use href="#g-or" x="215" y="45" width="48" height="30"/>
-<text class="lbl" x="22" y="35" text-anchor="end">A</text>
-<path class="wire" d="M30 30L85 30"/>
-<text class="lbl" x="22" y="95" text-anchor="end">B</text>
-<path class="wire" d="M30 90L85 90"/>
-<path class="wire" d="M133 30L178 30L178 53L215 53"/>
-<path class="wire" d="M133 90L186 90L186 67L215 67"/>
-<path class="wire" d="M263 60L289 60"/>
-<text class="lbl" x="297" y="65" text-anchor="start">F</text>
+<text class="lbl" fill="currentColor" stroke="none" font-size="15" font-weight="600" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" x="22" y="35" text-anchor="end">A</text>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M30 30L85 30"/>
+<text class="lbl" fill="currentColor" stroke="none" font-size="15" font-weight="600" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" x="22" y="95" text-anchor="end">B</text>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M30 90L85 90"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M133 30L178 30L178 53L215 53"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M133 90L186 90L186 67L215 67"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M263 60L289 60"/>
+<text class="lbl" fill="currentColor" stroke="none" font-size="15" font-weight="600" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" x="297" y="65" text-anchor="start">F</text>
 </svg>
 <figcaption>G = A&prime; + B&prime;</figcaption></figure>
 <p>The inverters sit on the inputs in both cases, because in both expressions the
@@ -442,25 +442,25 @@ is where De Morgan's laws come from.</p></div></details>
 <p>Two OR gates feeding one AND gate. A appears in both brackets, so the A input wire
 splits &mdash; one wire, one dot, two destinations.</p>
 <figure class="fig" style="--figmax:420px">
-<svg viewBox="0 0 420 180" role="img" aria-label="F = (A + B) &middot; (A + C)">
+<svg viewBox="0 0 420 180" width="420" height="180" role="img" aria-label="F = (A + B) &middot; (A + C)">
 <use href="#g-or" x="140" y="25" width="48" height="30"/>
 <use href="#g-or" x="140" y="105" width="48" height="30"/>
 <use href="#g-and" x="290" y="65" width="48" height="30"/>
-<text class="lbl" x="22" y="31" text-anchor="end">A</text>
-<path class="wire" d="M30 26L105 26"/>
-<text class="lbl" x="22" y="75" text-anchor="end">B</text>
-<path class="wire" d="M30 70L110 70"/>
-<text class="lbl" x="22" y="155" text-anchor="end">C</text>
-<path class="wire" d="M30 150L100 150"/>
-<path class="wire" d="M105 26L105 26L105 33L140 33"/>
-<path class="wire" d="M110 70L110 70L110 47L140 47"/>
-<path class="wire" d="M58 26L58 113L140 113"/>
-<circle class="dot" cx="58" cy="26" r="3.2"/>
-<path class="wire" d="M100 150L100 150L100 127L140 127"/>
-<path class="wire" d="M188 40L245 40L245 73L290 73"/>
-<path class="wire" d="M188 120L245 120L245 87L290 87"/>
-<path class="wire" d="M338 80L366 80"/>
-<text class="lbl" x="374" y="85" text-anchor="start">F</text>
+<text class="lbl" fill="currentColor" stroke="none" font-size="15" font-weight="600" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" x="22" y="31" text-anchor="end">A</text>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M30 26L105 26"/>
+<text class="lbl" fill="currentColor" stroke="none" font-size="15" font-weight="600" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" x="22" y="75" text-anchor="end">B</text>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M30 70L110 70"/>
+<text class="lbl" fill="currentColor" stroke="none" font-size="15" font-weight="600" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" x="22" y="155" text-anchor="end">C</text>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M30 150L100 150"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M105 26L105 26L105 33L140 33"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M110 70L110 70L110 47L140 47"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M58 26L58 113L140 113"/>
+<circle class="dot" fill="currentColor" stroke="none" cx="58" cy="26" r="3.2"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M100 150L100 150L100 127L140 127"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M188 40L245 40L245 73L290 73"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M188 120L245 120L245 87L290 87"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M338 80L366 80"/>
+<text class="lbl" fill="currentColor" stroke="none" font-size="15" font-weight="600" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" x="374" y="85" text-anchor="start">F</text>
 </svg>
 <figcaption>F = (A + B) &middot; (A + C)</figcaption></figure>
 <p>Three gates, no inverters, and three input wires of which one fans out. If your
@@ -475,33 +475,33 @@ many circuits, and some are cheaper than others.</p></div></details>
 <p>Three terms to be ORed together, and a two-input OR gate takes only two at a time,
 so two OR gates chain: first the sum of two terms, then that result with the third.</p>
 <figure class="fig" style="--figmax:650px">
-<svg viewBox="0 0 650 262" role="img" aria-label="F = W &middot; X + Y &middot; Z&prime; + W&prime;">
+<svg viewBox="0 0 650 262" width="650" height="262" role="img" aria-label="F = W &middot; X + Y &middot; Z&prime; + W&prime;">
 <use href="#g-and" x="150" y="25" width="48" height="30"/>
 <use href="#g-not" x="150" y="155" width="48" height="30"/>
 <use href="#g-and" x="280" y="125" width="48" height="30"/>
 <use href="#g-not" x="150" y="215" width="48" height="30"/>
 <use href="#g-or" x="400" y="55" width="48" height="30"/>
 <use href="#g-or" x="520" y="145" width="48" height="30"/>
-<text class="lbl" x="22" y="31" text-anchor="end">W</text>
-<path class="wire" d="M30 26L115 26"/>
-<text class="lbl" x="22" y="75" text-anchor="end">X</text>
-<path class="wire" d="M30 70L120 70"/>
-<text class="lbl" x="22" y="125" text-anchor="end">Y</text>
-<path class="wire" d="M30 120L245 120"/>
-<text class="lbl" x="22" y="175" text-anchor="end">Z</text>
-<path class="wire" d="M30 170L150 170"/>
-<path class="wire" d="M115 26L115 26L115 33L150 33"/>
-<path class="wire" d="M120 70L120 70L120 47L150 47"/>
-<path class="wire" d="M60 26L60 230L150 230"/>
-<circle class="dot" cx="60" cy="26" r="3.2"/>
-<path class="wire" d="M245 120L245 120L245 133L280 133"/>
-<path class="wire" d="M198 170L240 170L240 147L280 147"/>
-<path class="wire" d="M198 40L360 40L360 63L400 63"/>
-<path class="wire" d="M328 140L365 140L365 77L400 77"/>
-<path class="wire" d="M448 70L485 70L485 153L520 153"/>
-<path class="wire" d="M198 230L480 230L480 167L520 167"/>
-<path class="wire" d="M568 160L594 160"/>
-<text class="lbl" x="602" y="165" text-anchor="start">F</text>
+<text class="lbl" fill="currentColor" stroke="none" font-size="15" font-weight="600" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" x="22" y="31" text-anchor="end">W</text>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M30 26L115 26"/>
+<text class="lbl" fill="currentColor" stroke="none" font-size="15" font-weight="600" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" x="22" y="75" text-anchor="end">X</text>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M30 70L120 70"/>
+<text class="lbl" fill="currentColor" stroke="none" font-size="15" font-weight="600" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" x="22" y="125" text-anchor="end">Y</text>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M30 120L245 120"/>
+<text class="lbl" fill="currentColor" stroke="none" font-size="15" font-weight="600" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" x="22" y="175" text-anchor="end">Z</text>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M30 170L150 170"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M115 26L115 26L115 33L150 33"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M120 70L120 70L120 47L150 47"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M60 26L60 230L150 230"/>
+<circle class="dot" fill="currentColor" stroke="none" cx="60" cy="26" r="3.2"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M245 120L245 120L245 133L280 133"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M198 170L240 170L240 147L280 147"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M198 40L360 40L360 63L400 63"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M328 140L365 140L365 77L400 77"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M448 70L485 70L485 153L520 153"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M198 230L480 230L480 167L520 167"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M568 160L594 160"/>
+<text class="lbl" fill="currentColor" stroke="none" font-size="15" font-weight="600" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" x="602" y="165" text-anchor="start">F</text>
 </svg>
 <figcaption>F = W &middot; X + Y &middot; Z&prime; + W&prime;</figcaption></figure>
 <p>Six gates in total &mdash; two ANDs for the product terms, two NOTs for Z&prime; and
@@ -520,19 +520,19 @@ W&prime;&nbsp;+&nbsp;X&nbsp;+&nbsp;Y&middot;Z&prime;. Draw both and count the ga
 <details class="prob"><summary data-label="Exercise 3.8">You have only two-input AND gates. Draw a circuit whose output is 1 exactly when A, B and C are all 1. Then generalise: how many two-input AND gates are needed for <var>n</var> inputs?</summary><div class="sol">
 <p>Chain them. AND A with B, then AND that result with C.</p>
 <figure class="fig" style="--figmax:375px">
-<svg viewBox="0 0 375 142" role="img" aria-label="F = (A &middot; B) &middot; C">
+<svg viewBox="0 0 375 142" width="375" height="142" role="img" aria-label="F = (A &middot; B) &middot; C">
 <use href="#g-and" x="110" y="25" width="48" height="30"/>
 <use href="#g-and" x="250" y="75" width="48" height="30"/>
-<text class="lbl" x="22" y="38" text-anchor="end">A</text>
-<path class="wire" d="M30 33L110 33"/>
-<text class="lbl" x="22" y="52" text-anchor="end">B</text>
-<path class="wire" d="M30 47L110 47"/>
-<text class="lbl" x="22" y="125" text-anchor="end">C</text>
-<path class="wire" d="M30 120L205 120"/>
-<path class="wire" d="M158 40L210 40L210 83L250 83"/>
-<path class="wire" d="M205 120L205 120L205 97L250 97"/>
-<path class="wire" d="M298 90L326 90"/>
-<text class="lbl" x="334" y="95" text-anchor="start">F</text>
+<text class="lbl" fill="currentColor" stroke="none" font-size="15" font-weight="600" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" x="22" y="38" text-anchor="end">A</text>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M30 33L110 33"/>
+<text class="lbl" fill="currentColor" stroke="none" font-size="15" font-weight="600" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" x="22" y="52" text-anchor="end">B</text>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M30 47L110 47"/>
+<text class="lbl" fill="currentColor" stroke="none" font-size="15" font-weight="600" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" x="22" y="125" text-anchor="end">C</text>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M30 120L205 120"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M158 40L210 40L210 83L250 83"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M205 120L205 120L205 97L250 97"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M298 90L326 90"/>
+<text class="lbl" fill="currentColor" stroke="none" font-size="15" font-weight="600" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" x="334" y="95" text-anchor="start">F</text>
 </svg>
 <figcaption>F = (A &middot; B) &middot; C</figcaption></figure>
 <p>This works because AND is associative:
@@ -622,32 +622,32 @@ functional-completeness lecture starts.</p></div></details>
 
 <details class="prob"><summary data-label="Exercise 3.13">Write down the Boolean expression computed by this circuit. How many gates would a two-input-only implementation of your expression need?</summary><div class="sol">
 <figure class="fig" style="--figmax:630px">
-<svg viewBox="0 0 630 248" role="img" aria-label="Circuit for Exercise 3.13">
+<svg viewBox="0 0 630 248" width="630" height="248" role="img" aria-label="Circuit for Exercise 3.13">
 <use href="#g-and" x="140" y="25" width="48" height="30"/>
 <use href="#g-not" x="140" y="115" width="48" height="30"/>
 <use href="#g-or" x="270" y="105" width="48" height="30"/>
 <use href="#g-not" x="140" y="195" width="48" height="30"/>
 <use href="#g-and" x="390" y="155" width="48" height="30"/>
 <use href="#g-or" x="500" y="75" width="48" height="30"/>
-<text class="lbl" x="22" y="31" text-anchor="end">A</text>
-<path class="wire" d="M30 26L105 26"/>
-<text class="lbl" x="22" y="75" text-anchor="end">B</text>
-<path class="wire" d="M30 70L112 70"/>
-<text class="lbl" x="22" y="215" text-anchor="end">C</text>
-<path class="wire" d="M30 210L140 210"/>
-<path class="wire" d="M105 26L105 26L105 33L140 33"/>
-<path class="wire" d="M112 70L112 70L112 47L140 47"/>
-<path class="wire" d="M58 26L58 130L140 130"/>
-<circle class="dot" cx="58" cy="26" r="3.2"/>
-<path class="wire" d="M188 130L232 130L232 127L270 127"/>
-<path class="wire" d="M78 70L78 90L240 90L240 113L270 113"/>
-<circle class="dot" cx="78" cy="70" r="3.2"/>
-<path class="wire" d="M318 120L355 120L355 163L390 163"/>
-<path class="wire" d="M188 210L345 210L345 177L390 177"/>
-<path class="wire" d="M188 40L460 40L460 83L500 83"/>
-<path class="wire" d="M438 170L468 170L468 97L500 97"/>
-<path class="wire" d="M548 90L574 90"/>
-<text class="lbl" x="582" y="95" text-anchor="start">F</text>
+<text class="lbl" fill="currentColor" stroke="none" font-size="15" font-weight="600" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" x="22" y="31" text-anchor="end">A</text>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M30 26L105 26"/>
+<text class="lbl" fill="currentColor" stroke="none" font-size="15" font-weight="600" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" x="22" y="75" text-anchor="end">B</text>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M30 70L112 70"/>
+<text class="lbl" fill="currentColor" stroke="none" font-size="15" font-weight="600" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" x="22" y="215" text-anchor="end">C</text>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M30 210L140 210"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M105 26L105 26L105 33L140 33"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M112 70L112 70L112 47L140 47"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M58 26L58 130L140 130"/>
+<circle class="dot" fill="currentColor" stroke="none" cx="58" cy="26" r="3.2"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M188 130L232 130L232 127L270 127"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M78 70L78 90L240 90L240 113L270 113"/>
+<circle class="dot" fill="currentColor" stroke="none" cx="78" cy="70" r="3.2"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M318 120L355 120L355 163L390 163"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M188 210L345 210L345 177L390 177"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M188 40L460 40L460 83L500 83"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M438 170L468 170L468 97L500 97"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M548 90L574 90"/>
+<text class="lbl" fill="currentColor" stroke="none" font-size="15" font-weight="600" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" x="582" y="95" text-anchor="start">F</text>
 </svg>
 <figcaption>Circuit for Exercise 3.13</figcaption></figure>
 <p>Label every gate output, left to right:</p>
@@ -671,20 +671,20 @@ the one error that makes an otherwise perfect reading wrong.</p></div></details>
 
 <details class="prob"><summary data-label="Exercise 3.14">Give the expression for this circuit, build its truth table, and then find the simplest circuit with the same output column.</summary><div class="sol">
 <figure class="fig" style="--figmax:420px">
-<svg viewBox="0 0 420 132" role="img" aria-label="Circuit for Exercise 3.14">
+<svg viewBox="0 0 420 132" width="420" height="132" role="img" aria-label="Circuit for Exercise 3.14">
 <use href="#g-or" x="150" y="71" width="48" height="30"/>
 <use href="#g-and" x="290" y="25" width="48" height="30"/>
-<text class="lbl" x="22" y="31" text-anchor="end">A</text>
-<path class="wire" d="M30 26L60 26"/>
-<text class="lbl" x="22" y="105" text-anchor="end">B</text>
-<path class="wire" d="M30 100L115 100"/>
-<path class="wire" d="M60 26L60 79L150 79"/>
-<circle class="dot" cx="60" cy="26" r="3.2"/>
-<path class="wire" d="M60 26L250 26L250 33L290 33"/>
-<path class="wire" d="M115 100L115 100L115 93L150 93"/>
-<path class="wire" d="M198 86L262 86L262 47L290 47"/>
-<path class="wire" d="M338 40L366 40"/>
-<text class="lbl" x="374" y="45" text-anchor="start">F</text>
+<text class="lbl" fill="currentColor" stroke="none" font-size="15" font-weight="600" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" x="22" y="31" text-anchor="end">A</text>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M30 26L60 26"/>
+<text class="lbl" fill="currentColor" stroke="none" font-size="15" font-weight="600" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" x="22" y="105" text-anchor="end">B</text>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M30 100L115 100"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M60 26L60 79L150 79"/>
+<circle class="dot" fill="currentColor" stroke="none" cx="60" cy="26" r="3.2"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M60 26L250 26L250 33L290 33"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M115 100L115 100L115 93L150 93"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M198 86L262 86L262 47L290 47"/>
+<path class="wire" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M338 40L366 40"/>
+<text class="lbl" fill="currentColor" stroke="none" font-size="15" font-weight="600" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" x="374" y="45" text-anchor="start">F</text>
 </svg>
 <figcaption>Circuit for Exercise 3.14</figcaption></figure>
 <p>The OR gate gives A&nbsp;+&nbsp;B and the AND gate combines that with A, so</p>
