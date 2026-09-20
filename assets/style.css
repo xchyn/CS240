@@ -366,10 +366,49 @@ ol.plan li.exam .mtg,ol.plan li.review .mtg{color:var(--accent)}
       right for an inline 8-bit string and wrong for a line that must wrap on a
       narrow screen. */
 @media (min-width:1180px){
-  .tablewrap,pre{margin-left:0;margin-right:0}
+  figure.fig,figure.circuit,.tablewrap,pre{margin-left:0;margin-right:0}
 }
 .tablewrap>table{margin-left:auto;margin-right:auto}
 .box>.tablewrap:last-child,.sol>.tablewrap:last-child{margin-bottom:0}
 .wrap>main,.wrap>.toc{min-width:0}
 p.morseline{margin:1.1rem 0;text-align:center;font-family:var(--mono);
   font-size:.95em;letter-spacing:.02em;word-spacing:.55em;overflow-wrap:break-word}
+
+/* ------------------------------------------------- circuit figures (Set 3) */
+.gdefs{position:absolute;width:0;height:0;overflow:hidden}
+.fig{margin:1.5rem 0;text-align:center}
+.fig svg{display:block;width:100%;max-width:var(--figmax,34rem);height:auto;
+  margin:0 auto;color:var(--ink)}
+.fig figcaption{font:400 .8rem/1.45 var(--sans);color:var(--ink-3);margin-top:.45rem}
+.fig .wire{fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;
+  stroke-linejoin:round}
+.fig .dot{fill:currentColor;stroke:none}
+.fig .lbl{font:600 15px var(--sans);fill:var(--ink);stroke:none}
+.box .fig{margin:1.1rem 0}
+
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:.9rem;margin:1.3rem 0}
+@media (max-width:620px){.grid3{grid-template-columns:1fr}}
+.symcard{background:var(--panel);border:1px solid var(--rule);border-radius:.6rem;
+  padding:.9rem .7rem;box-shadow:var(--shadow);text-align:center}
+.symcard .fig{margin:.1rem 0 .2rem}
+.symcard .fig figcaption{display:none}
+.symcard p{margin:.3rem 0 0;font:400 .86rem/1.45 var(--sans);color:var(--ink-2)}
+
+.ttrow{display:flex;flex-wrap:wrap;gap:1rem;align-items:flex-start;
+  justify-content:center;margin:1.2rem 0}
+.ttrow .tablewrap{margin:0;flex:0 1 auto}
+table.ttab{font-variant-numeric:tabular-nums}
+table.ttab td{text-align:center}
+table.ttab td.hilite{background:var(--box-check);font-weight:700}
+
+/* --------------------------------- gate bodies, annotations (Sets 4-5) */
+.fig .gate{fill:var(--panel);stroke:currentColor;stroke-width:1.9;
+  stroke-linejoin:round}
+.fig .gate.open{fill:none}
+.fig .ann{font:400 12.5px var(--mono);fill:var(--ink-3);stroke:none}
+.grid2 .symcard{margin:0}
+table.lawtab{font-size:.95rem}
+table.lawtab td.lawcell{text-align:left;vertical-align:top}
+table.lawtab td.lawcell:first-child{color:var(--ink-3);
+  font:400 .84rem/1.4 var(--sans);white-space:nowrap}
+table.lawtab td.lawcell.hilite{background:var(--box-check)}
