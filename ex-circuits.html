@@ -171,7 +171,7 @@ output gate. Its first operand is A&nbsp;+&nbsp;B&prime;, which needs an OR gate
 OR gate's second operand is B&prime;, which needs a NOT. Its other operand, A, is a
 plain input, and so is C. Three gates, drawn right to left, then the wires filled in
 left to right:</p>
-<figure class="fig" style="--figmax:34rem">
+<figure class="fig" style="--figmax:440px">
 <svg viewBox="0 0 440 178" role="img" aria-label="F = (A + B&prime;) &middot; C">
 <use href="#g-not" x="100" y="71" width="48" height="30"/>
 <use href="#g-or" x="200" y="41" width="48" height="30"/>
@@ -210,7 +210,7 @@ reach the last gate, its label is the expression for the circuit.</p>
 <p>One warning, and it is the single most common error in this unit:</p>
 
 <details class="qc"><summary data-label="Check 3.2">This circuit ANDs A and B and then inverts. Is its output A&prime;&nbsp;&middot;&nbsp;B&prime;?</summary><div class="sol">
-<figure class="fig" style="--figmax:21rem">
+<figure class="fig" style="--figmax:320px">
 <svg viewBox="0 0 320 82" role="img" aria-label="F = (A &middot; B)&prime;">
 <use href="#g-and" x="100" y="25" width="48" height="30"/>
 <use href="#g-not" x="200" y="25" width="48" height="30"/>
@@ -307,7 +307,7 @@ An inverter placed on an input changes <em>which</em> combination the gate respo
 to; it does not change the gate.</p></div></details>
 
 <details class="prob"><summary data-label="Exercise 3.2">A single variable A is wired to both inputs of an AND gate, but one of the two connections passes through a NOT gate first. Draw the circuit and give its output for A&nbsp;=&nbsp;0 and A&nbsp;=&nbsp;1. Then answer the same question with the AND replaced by an OR.</summary><div class="sol">
-<figure class="fig" style="--figmax:24rem">
+<figure class="fig" style="--figmax:380px">
 <svg viewBox="0 0 380 135" role="img" aria-label="F = A &middot; A&prime;">
 <use href="#g-not" x="120" y="85" width="48" height="30"/>
 <use href="#g-and" x="250" y="22" width="48" height="30"/>
@@ -340,7 +340,7 @@ some unrelated signal enters the NOT, which is a different circuit.</p></div></d
 <p>Last operation: the OR. Its operands are X&nbsp;&middot;&nbsp;Y&prime;, which needs
 an AND, and Z, which is a plain input. The AND's second operand Y&prime; needs a NOT.
 Three gates.</p>
-<figure class="fig" style="--figmax:34rem">
+<figure class="fig" style="--figmax:450px">
 <svg viewBox="0 0 450 188" role="img" aria-label="F = X &middot; Y&prime; + Z">
 <use href="#g-not" x="95" y="81" width="48" height="30"/>
 <use href="#g-and" x="210" y="34" width="48" height="30"/>
@@ -369,7 +369,7 @@ AND gate.</p></div></details>
 
 <details class="prob"><summary data-label="Exercise 3.4">Draw the circuit for F = (P&nbsp;+&nbsp;Q)&nbsp;&middot;&nbsp;R&prime;. Then say what changes if the parentheses are removed.</summary><div class="sol">
 <p>The parentheses force the OR to happen first, so the AND is the output gate.</p>
-<figure class="fig" style="--figmax:26rem">
+<figure class="fig" style="--figmax:375px">
 <svg viewBox="0 0 375 168" role="img" aria-label="F = (P + Q) &middot; R&prime;">
 <use href="#g-or" x="95" y="25" width="48" height="30"/>
 <use href="#g-not" x="95" y="115" width="48" height="30"/>
@@ -400,7 +400,7 @@ first gives (1+Q)&middot;0&nbsp;=&nbsp;0 and the second gives
 <details class="prob"><summary data-label="Exercise 3.5">Draw two circuits: F = A&prime;&nbsp;&middot;&nbsp;B&prime; and G = A&prime;&nbsp;+&nbsp;B&prime;. How many gates does each need, and what is the only difference between the drawings?</summary><div class="sol">
 <p>Three gates each &mdash; two inverters and one two-input gate &mdash; and the only
 difference is the shape of that last gate.</p>
-<figure class="fig" style="--figmax:20rem">
+<figure class="fig" style="--figmax:335px">
 <svg viewBox="0 0 335 128" role="img" aria-label="F = A&prime; &middot; B&prime;">
 <use href="#g-not" x="85" y="15" width="48" height="30"/>
 <use href="#g-not" x="85" y="75" width="48" height="30"/>
@@ -415,7 +415,7 @@ difference is the shape of that last gate.</p>
 <text class="lbl" x="297" y="65" text-anchor="start">F</text>
 </svg>
 <figcaption>F = A&prime; &middot; B&prime;</figcaption></figure>
-<figure class="fig" style="--figmax:20rem">
+<figure class="fig" style="--figmax:335px">
 <svg viewBox="0 0 335 128" role="img" aria-label="G = A&prime; + B&prime;">
 <use href="#g-not" x="85" y="15" width="48" height="30"/>
 <use href="#g-not" x="85" y="75" width="48" height="30"/>
@@ -441,7 +441,7 @@ is where De Morgan's laws come from.</p></div></details>
 <details class="prob"><summary data-label="Exercise 3.6">Draw the circuit for F = (A&nbsp;+&nbsp;B)&nbsp;&middot;&nbsp;(A&nbsp;+&nbsp;C). Mark the fan-out correctly.</summary><div class="sol">
 <p>Two OR gates feeding one AND gate. A appears in both brackets, so the A input wire
 splits &mdash; one wire, one dot, two destinations.</p>
-<figure class="fig" style="--figmax:34rem">
+<figure class="fig" style="--figmax:420px">
 <svg viewBox="0 0 420 180" role="img" aria-label="F = (A + B) &middot; (A + C)">
 <use href="#g-or" x="140" y="25" width="48" height="30"/>
 <use href="#g-or" x="140" y="105" width="48" height="30"/>
@@ -474,7 +474,7 @@ many circuits, and some are cheaper than others.</p></div></details>
 <details class="prob"><summary data-label="Exercise 3.7">Draw the circuit for F = W&nbsp;&middot;&nbsp;X&nbsp;+&nbsp;Y&nbsp;&middot;&nbsp;Z&prime;&nbsp;+&nbsp;W&prime;. Assume every gate has at most two inputs.</summary><div class="sol">
 <p>Three terms to be ORed together, and a two-input OR gate takes only two at a time,
 so two OR gates chain: first the sum of two terms, then that result with the third.</p>
-<figure class="fig" style="--figmax:100%">
+<figure class="fig" style="--figmax:650px">
 <svg viewBox="0 0 650 262" role="img" aria-label="F = W &middot; X + Y &middot; Z&prime; + W&prime;">
 <use href="#g-and" x="150" y="25" width="48" height="30"/>
 <use href="#g-not" x="150" y="155" width="48" height="30"/>
@@ -519,7 +519,7 @@ W&prime;&nbsp;+&nbsp;X&nbsp;+&nbsp;Y&middot;Z&prime;. Draw both and count the ga
 
 <details class="prob"><summary data-label="Exercise 3.8">You have only two-input AND gates. Draw a circuit whose output is 1 exactly when A, B and C are all 1. Then generalise: how many two-input AND gates are needed for <var>n</var> inputs?</summary><div class="sol">
 <p>Chain them. AND A with B, then AND that result with C.</p>
-<figure class="fig" style="--figmax:24rem">
+<figure class="fig" style="--figmax:375px">
 <svg viewBox="0 0 375 142" role="img" aria-label="F = (A &middot; B) &middot; C">
 <use href="#g-and" x="110" y="25" width="48" height="30"/>
 <use href="#g-and" x="250" y="75" width="48" height="30"/>
@@ -621,7 +621,7 @@ functional-completeness lecture starts.</p></div></details>
 <h3>Reading circuits</h3>
 
 <details class="prob"><summary data-label="Exercise 3.13">Write down the Boolean expression computed by this circuit. How many gates would a two-input-only implementation of your expression need?</summary><div class="sol">
-<figure class="fig" style="--figmax:100%">
+<figure class="fig" style="--figmax:630px">
 <svg viewBox="0 0 630 248" role="img" aria-label="Circuit for Exercise 3.13">
 <use href="#g-and" x="140" y="25" width="48" height="30"/>
 <use href="#g-not" x="140" y="115" width="48" height="30"/>
@@ -670,7 +670,7 @@ with a finger before you write anything down: mistaking a junction for a crossin
 the one error that makes an otherwise perfect reading wrong.</p></div></details>
 
 <details class="prob"><summary data-label="Exercise 3.14">Give the expression for this circuit, build its truth table, and then find the simplest circuit with the same output column.</summary><div class="sol">
-<figure class="fig" style="--figmax:27rem">
+<figure class="fig" style="--figmax:420px">
 <svg viewBox="0 0 420 132" role="img" aria-label="Circuit for Exercise 3.14">
 <use href="#g-or" x="150" y="71" width="48" height="30"/>
 <use href="#g-and" x="290" y="25" width="48" height="30"/>
