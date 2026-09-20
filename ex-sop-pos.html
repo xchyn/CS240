@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Set 5 &mdash; SOP, POS and canonical forms</title>
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/notes.js" defer></script>
+</head>
+<body>
+<header class="topbar"><div class="topbar-in">
+  <a class="brand" href="index.html">CSCI 240</a>
+  <span class="crumb">Set 5 &middot; SOP and POS</span>
+  <nav class="topnav">
+    <a href="ex-boolean.html">&larr; Prev</a>
+    <a href="index.html">Contents</a>
+    <a href="setup-logisim.html">Next &rarr;</a>
+    <button class="iconbtn" id="themebtn" type="button" title="Light / dark">&#9686;</button>
+  </nav>
+</div></header>
+<div class="wrap">
+  <aside class="toc"><p class="toc-title">On this page</p><ol>
+    <li><a href="#terms"><span class="t">5.1</span>One row, one term</a></li>
+    <li><a href="#sop"><span class="t">5.2</span>Sum of products</a></li>
+    <li><a href="#pos"><span class="t">5.3</span>Product of sums</a></li>
+    <li><a href="#notation"><span class="t">5.4</span>&Sigma; and &Pi; notation</a></li>
+    <li><a href="#circuits"><span class="t">5.5</span>Two-level circuits</a></li>
+    <li><a href="#ref"><span class="t">5.6</span>Reference</a></li>
+    <li><a href="#exercises"><span class="t">5.7</span>Exercises</a></li>
+  </ol></aside>
+  <main>
+
+<div class="chhead">
+  <span class="chpart">Exercise set 5 &middot; after the SOP / POS lecture</span>
+  <span class="chnum">Canonical forms</span>
+  <h1>From a truth table to a circuit, mechanically</h1>
+  <p class="chsum">Minterms and maxterms; reading a sum-of-products expression off the
+  1-rows of a table and a product-of-sums off the 0-rows; the &Sigma; and &Pi;
+  shorthand; and the two-level circuits both forms turn into.</p>
+</div>
+
+<p>Set 4 asked you to make an expression smaller, which needs judgement. This set asks
+the opposite question and needs none: given a truth table &mdash; any truth table at
+all &mdash; write down an expression that produces it. There is a procedure, it never
+fails, and it answers the question Set 3 raised and left hanging. Every function you
+can specify, you can build; and you can build it in the same two-layer shape every
+time.</p>
+
+<p>Two procedures, in fact, because you can work from the rows where the output is 1 or
+from the rows where it is 0. They give different-looking expressions for the same
+function, and knowing both is the difference between a full mark and half of one on
+the quiz.</p>
+
+<h2 id="terms"><span class="secnum">5.1</span>One row, one term</h2>
+
+<p>Everything rests on a single construction. Take one row of a truth table. There is
+exactly one product of all the variables that is 1 on <em>that</em> row and 0 on every
+other row: include each variable plain where the row has a 1, and complemented where
+the row has a 0. That product is the row's <strong>minterm</strong>.</p>
+
+<p>For the row A&nbsp;=&nbsp;1, B&nbsp;=&nbsp;0, C&nbsp;=&nbsp;1 the minterm is
+AB&prime;C. Check it: substituting those values gives
+1&nbsp;&middot;&nbsp;1&nbsp;&middot;&nbsp;1&nbsp;=&nbsp;1, and any other row changes at
+least one of the three factors to 0, which kills the product. A minterm is a detector
+for one row.</p>
+
+<p>Dually, there is exactly one sum of all the variables that is 0 on that row and 1
+everywhere else: include each variable complemented where the row has a 1, and plain
+where the row has a 0. That is the row's <strong>maxterm</strong>. For the same row it
+is A&prime;&nbsp;+&nbsp;B&nbsp;+&nbsp;C&prime;, which is
+0&nbsp;+&nbsp;0&nbsp;+&nbsp;0&nbsp;=&nbsp;0 there and 1 anywhere else.</p>
+
+<div class="box warn"><span class="bt">The maxterm's polarities are backwards</span>
+<p>Read that again, because it is the one thing in this set that is genuinely easy to
+get wrong: in a minterm a 1 in the row gives a plain variable, and in a maxterm a 1 in
+the row gives a <em>complemented</em> one. Maxterms are inverted minterms &mdash;
+M<sub><var>i</var></sub>&nbsp;=&nbsp;(m<sub><var>i</var></sub>)&prime;, which is De
+Morgan and nothing more &mdash; so every literal flips and the AND becomes an OR.</p>
+<p>Row 5 of a three-variable table, ABC&nbsp;=&nbsp;101, gives
+m<sub>5</sub>&nbsp;=&nbsp;AB&prime;C and
+M<sub>5</sub>&nbsp;=&nbsp;A&prime;&nbsp;+&nbsp;B&nbsp;+&nbsp;C&prime;.</p></div>
+
+<p>Rows are numbered by reading the input columns as a binary number, most significant
+variable on the left, exactly as the rows are already ordered. So for three variables
+there are eight of each, and this is the whole table you need:</p>
+
+<div class="tablewrap"><table class="ttab">
+<thead><tr><th>#</th><th>A B C</th><th>minterm m<sub>i</sub></th><th>maxterm M<sub>i</sub></th></tr></thead>
+<tbody><tr><td class="bin">0</td><td class="bin">0 0 0</td><td class="bin">A&prime;B&prime;C&prime;</td><td class="bin">A + B + C</td></tr><tr><td class="bin">1</td><td class="bin">0 0 1</td><td class="bin">A&prime;B&prime;C</td><td class="bin">A + B + C&prime;</td></tr><tr><td class="bin">2</td><td class="bin">0 1 0</td><td class="bin">A&prime;BC&prime;</td><td class="bin">A + B&prime; + C</td></tr><tr><td class="bin">3</td><td class="bin">0 1 1</td><td class="bin">A&prime;BC</td><td class="bin">A + B&prime; + C&prime;</td></tr><tr><td class="bin">4</td><td class="bin">1 0 0</td><td class="bin">AB&prime;C&prime;</td><td class="bin">A&prime; + B + C</td></tr><tr><td class="bin">5</td><td class="bin">1 0 1</td><td class="bin">AB&prime;C</td><td class="bin">A&prime; + B + C&prime;</td></tr><tr><td class="bin">6</td><td class="bin">1 1 0</td><td class="bin">ABC&prime;</td><td class="bin">A&prime; + B&prime; + C</td></tr><tr><td class="bin">7</td><td class="bin">1 1 1</td><td class="bin">ABC</td><td class="bin">A&prime; + B&prime; + C&prime;</td></tr></tbody></table></div>
+
+<h2 id="sop"><span class="secnum">5.2</span>Sum of products</h2>
+
+<p>Now the construction. The output should be 1 on some set of rows, and a minterm is
+a detector for one row, so: <strong>OR together the minterms of every row where the
+output is 1</strong>. The result is 1 on exactly those rows and 0 on all the others,
+which is the function. That expression is the <strong>canonical sum of products</strong>.</p>
+
+<div class="box worked"><span class="bt">Worked example</span>
+<p>Take this function, which is the running example for the rest of the page:</p>
+<div class="tablewrap"><table class="ttab">
+<thead><tr><th>A</th><th>B</th><th>C</th><th>#</th><th>F</th></tr></thead>
+<tbody><tr><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin hilite">1</td></tr><tr><td class="bin">0</td><td class="bin">0</td><td class="bin">1</td><td class="bin">1</td><td class="bin hilite">0</td></tr><tr><td class="bin">0</td><td class="bin">1</td><td class="bin">0</td><td class="bin">2</td><td class="bin hilite">0</td></tr><tr><td class="bin">0</td><td class="bin">1</td><td class="bin">1</td><td class="bin">3</td><td class="bin hilite">1</td></tr><tr><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin">4</td><td class="bin hilite">0</td></tr><tr><td class="bin">1</td><td class="bin">0</td><td class="bin">1</td><td class="bin">5</td><td class="bin hilite">1</td></tr><tr><td class="bin">1</td><td class="bin">1</td><td class="bin">0</td><td class="bin">6</td><td class="bin hilite">0</td></tr><tr><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td><td class="bin">7</td><td class="bin hilite">0</td></tr></tbody></table></div>
+<p>The output is 1 on rows 0, 3 and 5. Their minterms are
+A&prime;B&prime;C&prime;, A&prime;BC and AB&prime;C, so</p>
+<p style="text-align:center;font-size:1.05rem">
+F = A&prime;B&prime;C&prime; + A&prime;BC + AB&prime;C</p>
+<p>Three product terms, one per 1-row, and no thought required beyond copying
+polarities off the table. Spot-check row 5: the third term is
+1&middot;1&middot;1&nbsp;=&nbsp;1 so F&nbsp;=&nbsp;1 &mdash; and the other two terms
+are 0 there, which is the point of minterms. Spot-check row 1: all three terms are 0,
+so F&nbsp;=&nbsp;0. The table agrees.</p></div>
+
+<p>Two things follow immediately, and both are worth saying out loud. Every Boolean
+function whatsoever can be written this way, so AND, OR and NOT really are enough to
+build anything &mdash; that is the fact the gates lecture asserted and this is the
+proof. And the canonical form is <em>unique</em>: the table determines the set of
+1-rows, the 1-rows determine the minterms, and there is no choice anywhere in the
+procedure.</p>
+
+<p>Unique does not mean minimal. The canonical form is usually bigger than it needs to
+be, and shrinking it is Set 4's business &mdash; Exercise 5.10 takes a canonical
+four-term expression down to a single letter.</p>
+
+<h2 id="pos"><span class="secnum">5.3</span>Product of sums</h2>
+
+<p>The mirror-image construction works from the other rows. A maxterm is 0 on exactly
+one row, and an AND is 0 if any factor is 0, so: <strong>AND together the maxterms of
+every row where the output is 0</strong>. The result is 0 on exactly those rows and 1
+on all the others &mdash; the same function again. That is the <strong>canonical
+product of sums</strong>.</p>
+
+<p>For the running example the 0-rows are 1, 2, 4, 6 and 7, so</p>
+
+<p style="text-align:center;font-size:1.05rem">
+F = (A + B + C&prime;)(A + B&prime; + C)(A&prime; + B + C)(A&prime; + B&prime; +
+C)(A&prime; + B&prime; + C&prime;)</p>
+
+<p>Five sum terms against the SOP's three product terms, for the same function. That
+is not a mistake: the two forms have as many terms as the table has 0s and 1s
+respectively, so whichever the table has fewer of gives the shorter expression. A
+function that is mostly 1s has a short POS and a long SOP.</p>
+
+<div class="box note"><span class="bt">Why it is worth learning both</span>
+<p>Three reasons. The quiz asks for both. The shorter of the two is a better starting
+point for simplification, and you can tell which it will be by counting 1s in the
+table before you write anything. And POS matches the hardware directly in some
+technologies &mdash; a NOR-gate implementation falls out of POS the way a NAND
+implementation falls out of SOP, which is where the functional-completeness lecture is
+going.</p></div>
+
+<h2 id="notation"><span class="secnum">5.4</span>&Sigma; and &Pi; notation</h2>
+
+<p>Writing out five maxterms is tedious and error-prone, so both forms have a
+shorthand that lists the row numbers instead. The running example is</p>
+
+<p style="text-align:center;font-size:1.05rem">
+F = &Sigma;m(0, 3, 5) = &Pi;M(1, 2, 4, 6, 7)</p>
+
+<p>&Sigma; lists the rows where the output is 1; &Pi; lists the rows where it is 0. So
+the two index sets are <strong>complementary</strong>: together they account for every
+row exactly once. Converting between the forms is therefore not algebra at all &mdash;
+it is writing down the numbers from 0 to 2<sup><var>n</var></sup>&nbsp;&minus;&nbsp;1
+that the other list left out. Exercise 5.4 is nothing but that.</p>
+
+<div class="box warn"><span class="bt">The notation is only meaningful with an ordering</span>
+<p>&Sigma;m(0,&nbsp;3,&nbsp;5) is ambiguous until you say which variables, in which
+order. With variables A, B, C row 5 is AB&prime;C; with the same variables listed as
+C, B, A row 5 would be a different product. Always write the variable list, in order,
+alongside the shorthand &mdash; F(A,&nbsp;B,&nbsp;C)&nbsp;=&nbsp;&Sigma;m(0,&nbsp;3,&nbsp;5)
+&mdash; and when a question gives you a bare index list, state the ordering you are
+assuming.</p></div>
+
+<h2 id="circuits"><span class="secnum">5.5</span>Two-level circuits</h2>
+
+<p>Both canonical forms have the same shape, and that shape maps straight onto gates.
+An SOP expression is a layer of AND gates &mdash; one per product term, each as wide
+as the term is long &mdash; feeding a single OR gate as wide as there are terms:</p>
+
+<figure class="fig" style="--figmax:100%">
+<svg viewBox="0 0 565 350" role="img" aria-label="Two-level AND&ndash;OR: F = A&prime;B&prime;C&prime; + A&prime;BC + AB&prime;C &nbsp;(inverters on the inputs not drawn)">
+<path class="wire" d="M210 40.3H220M210 55.0H220M210 69.7H220"/>
+<path class="gate" d="M218 33.0H232A22.0 22.0 0 0 1 232 77.0H218Z"/>
+<path class="wire" d="M254.0 55H263.0"/>
+<path class="wire" d="M150 40.3L210 40.3"/>
+<text class="lbl" x="146" y="45.3" text-anchor="end">A&prime;</text>
+<path class="wire" d="M150 55.0L210 55.0"/>
+<text class="lbl" x="146" y="60.0" text-anchor="end">B&prime;</text>
+<path class="wire" d="M150 69.7L210 69.7"/>
+<text class="lbl" x="146" y="74.7" text-anchor="end">C&prime;</text>
+<text class="ann" x="267.0" y="46" text-anchor="start">A&prime;B&prime;C&prime;</text>
+<path class="wire" d="M210 155.3H220M210 170.0H220M210 184.7H220"/>
+<path class="gate" d="M218 148.0H232A22.0 22.0 0 0 1 232 192.0H218Z"/>
+<path class="wire" d="M254.0 170H263.0"/>
+<path class="wire" d="M150 155.3L210 155.3"/>
+<text class="lbl" x="146" y="160.3" text-anchor="end">A&prime;</text>
+<path class="wire" d="M150 170.0L210 170.0"/>
+<text class="lbl" x="146" y="175.0" text-anchor="end">B</text>
+<path class="wire" d="M150 184.7L210 184.7"/>
+<text class="lbl" x="146" y="189.7" text-anchor="end">C</text>
+<text class="ann" x="267.0" y="161" text-anchor="start">A&prime;BC</text>
+<path class="wire" d="M210 270.3H220M210 285.0H220M210 299.7H220"/>
+<path class="gate" d="M218 263.0H232A22.0 22.0 0 0 1 232 307.0H218Z"/>
+<path class="wire" d="M254.0 285H263.0"/>
+<path class="wire" d="M150 270.3L210 270.3"/>
+<text class="lbl" x="146" y="275.3" text-anchor="end">A</text>
+<path class="wire" d="M150 285.0L210 285.0"/>
+<text class="lbl" x="146" y="290.0" text-anchor="end">B&prime;</text>
+<path class="wire" d="M150 299.7L210 299.7"/>
+<text class="lbl" x="146" y="304.7" text-anchor="end">C</text>
+<text class="ann" x="267.0" y="276" text-anchor="start">AB&prime;C</text>
+<path class="wire" d="M400 155.3H417M400 170.0H417M400 184.7H417"/>
+<path class="gate" d="M408 148.0C426 148.0 434 159.4 439 170C434 180.6 426 192.0 408 192.0Q417 170 408 148.0Z"/>
+<path class="wire" d="M439 170H448"/>
+<path class="wire" d="M263.0 55L350 55L350 155.3L400 155.3"/>
+<path class="wire" d="M263.0 170L400 170.0"/>
+<path class="wire" d="M263.0 285L350 285L350 184.7L400 184.7"/>
+<path class="wire" d="M448 170L476 170"/>
+<text class="lbl" x="484" y="175" text-anchor="start">F</text>
+</svg>
+<figcaption>Two-level AND&ndash;OR: F = A&prime;B&prime;C&prime; + A&prime;BC + AB&prime;C &nbsp;(inverters on the inputs not drawn)</figcaption></figure>
+
+<p>This is called a <strong>two-level</strong> circuit, because every signal passes
+through exactly two gates on its way from input to output (three, counting the
+inverters that produce the complemented literals; those are drawn as a separate column
+in a real schematic and are left out here so the structure is visible). Two levels
+means the propagation delay is the same for every input, and it is the smallest number
+of levels any non-trivial function can be built in.</p>
+
+<p>A POS expression is the same picture upside down: a layer of OR gates, one per sum
+term, feeding a single AND gate.</p>
+
+<figure class="fig" style="--figmax:100%">
+<svg viewBox="0 0 600 250" role="img" aria-label="Two-level OR&ndash;AND: F = (A + B + C&prime;)(A&prime; + B&prime; + C) &nbsp;(inverters not drawn)">
+<path class="wire" d="M210 45.3H227M210 60.0H227M210 74.7H227"/>
+<path class="gate" d="M218 38.0C236 38.0 244 49.4 249 60C244 70.6 236 82.0 218 82.0Q227 60 218 38.0Z"/>
+<path class="wire" d="M249 60H258"/>
+<path class="wire" d="M150 45.3L210 45.3"/>
+<text class="lbl" x="146" y="50.3" text-anchor="end">A</text>
+<path class="wire" d="M150 60.0L210 60.0"/>
+<text class="lbl" x="146" y="65.0" text-anchor="end">B</text>
+<path class="wire" d="M150 74.7L210 74.7"/>
+<text class="lbl" x="146" y="79.7" text-anchor="end">C&prime;</text>
+<text class="ann" x="262" y="51" text-anchor="start">(A + B + C&prime;)</text>
+<path class="wire" d="M210 175.3H227M210 190.0H227M210 204.7H227"/>
+<path class="gate" d="M218 168.0C236 168.0 244 179.4 249 190C244 200.6 236 212.0 218 212.0Q227 190 218 168.0Z"/>
+<path class="wire" d="M249 190H258"/>
+<path class="wire" d="M150 175.3L210 175.3"/>
+<text class="lbl" x="146" y="180.3" text-anchor="end">A&prime;</text>
+<path class="wire" d="M150 190.0L210 190.0"/>
+<text class="lbl" x="146" y="195.0" text-anchor="end">B&prime;</text>
+<path class="wire" d="M150 204.7L210 204.7"/>
+<text class="lbl" x="146" y="209.7" text-anchor="end">C</text>
+<text class="ann" x="262" y="181" text-anchor="start">(A&prime; + B&prime; + C)</text>
+<path class="wire" d="M440 117.5H450M440 132.5H450"/>
+<path class="gate" d="M448 110.0H462A15.0 15.0 0 0 1 462 140.0H448Z"/>
+<path class="wire" d="M477.0 125H486.0"/>
+<path class="wire" d="M258 60L390 60L390 117.5L440 117.5"/>
+<path class="wire" d="M258 190L396 190L396 132.5L440 132.5"/>
+<path class="wire" d="M486.0 125L514.0 125"/>
+<text class="lbl" x="522.0" y="130" text-anchor="start">F</text>
+</svg>
+<figcaption>Two-level OR&ndash;AND: F = (A + B + C&prime;)(A&prime; + B&prime; + C) &nbsp;(inverters not drawn)</figcaption></figure>
+
+<p>So the choice between SOP and POS is a choice between AND&ndash;OR and OR&ndash;AND,
+and between them you can implement any truth table in a fixed, predictable shape. That
+is the real content of this set. Exercises 5.7 and 5.8 ask you to draw and cost both
+for the same function.</p>
+
+<h2 id="ref"><span class="secnum">5.6</span>Reference</h2>
+
+<ul>
+<li><strong>Row numbering.</strong> Read the input columns as binary, first variable
+most significant. Row <var>i</var> of an <var>n</var>-variable table is the binary
+expansion of <var>i</var> in <var>n</var> bits.</li>
+<li><strong>Minterm m<sub><var>i</var></sub>.</strong> Product of all <var>n</var>
+variables; complement the ones that are 0 in row <var>i</var>. It is 1 only on row
+<var>i</var>.</li>
+<li><strong>Maxterm M<sub><var>i</var></sub>.</strong> Sum of all <var>n</var>
+variables; complement the ones that are 1 in row <var>i</var>. It is 0 only on row
+<var>i</var>. And M<sub><var>i</var></sub>&nbsp;=&nbsp;(m<sub><var>i</var></sub>)&prime;.</li>
+<li><strong>Canonical SOP.</strong> &Sigma;m over the 1-rows. AND&ndash;OR
+circuit.</li>
+<li><strong>Canonical POS.</strong> &Pi;M over the 0-rows. OR&ndash;AND circuit.</li>
+<li><strong>Complement.</strong> F&prime; swaps the two index sets: if
+F&nbsp;=&nbsp;&Sigma;m(S) then F&prime;&nbsp;=&nbsp;&Sigma;m(S&#772;) and
+F&prime;&nbsp;=&nbsp;&Pi;M(S).</li>
+<li><strong>Counting.</strong> <var>n</var> variables give
+2<sup><var>n</var></sup> rows, so 2<sup><var>n</var></sup> minterms, and
+2<sup>2<sup><var>n</var></sup></sup> distinct functions.</li>
+</ul>
+
+<h2 id="exercises"><span class="secnum">5.7</span>Exercises</h2>
+
+<p>Where a question gives a bare index list, assume the variables are in the order
+written and the first is most significant. Every answer here can be checked against
+the table it came from, and you should.</p>
+
+<h3>Single terms</h3>
+
+<details class="prob"><summary data-label="Exercise 5.1">For the row A&nbsp;=&nbsp;0, B&nbsp;=&nbsp;1, C&nbsp;=&nbsp;1, write the minterm and the maxterm, and give the row's number. Then verify that each does what it should on that row and on one other row.</summary><div class="sol">
+<p>The row reads 011 in binary, so it is <strong>row 3</strong>.</p>
+<p><strong>Minterm.</strong> A is 0 so it is complemented; B and C are 1 so they stay
+plain:</p>
+<p style="text-align:center;font-size:1.05rem">
+m<sub>3</sub> = A&prime;BC</p>
+<p>On row 3: A&prime;&nbsp;=&nbsp;1, B&nbsp;=&nbsp;1, C&nbsp;=&nbsp;1, so the product
+is 1. On row 7 (ABC&nbsp;=&nbsp;111): A&prime;&nbsp;=&nbsp;0, so the product is 0. As
+required.</p>
+<p><strong>Maxterm.</strong> Every polarity flips. A is 0 so it stays plain; B and C
+are 1 so they are complemented; and the AND becomes an OR:</p>
+<p style="text-align:center;font-size:1.05rem">
+M<sub>3</sub> = A + B&prime; + C&prime;</p>
+<p>On row 3: 0&nbsp;+&nbsp;0&nbsp;+&nbsp;0&nbsp;=&nbsp;0. On row 7:
+1&nbsp;+&nbsp;0&nbsp;+&nbsp;0&nbsp;=&nbsp;1. As required.</p>
+<p>The two are complements of each other, which is the fastest way to write the second
+once you have the first:
+(A&prime;BC)&prime;&nbsp;=&nbsp;A&nbsp;+&nbsp;B&prime;&nbsp;+&nbsp;C&prime; by De
+Morgan. If you find yourself unsure about maxterm polarities in the middle of an exam,
+write the minterm and complement it.</p></div></details>
+
+<h3>Table to expression</h3>
+
+<details class="prob"><summary data-label="Exercise 5.2">Write the canonical sum of products for this function, and its &Sigma; shorthand.</summary><div class="sol">
+<div class="tablewrap"><table class="ttab">
+<thead><tr><th>A</th><th>B</th><th>C</th><th>#</th><th>F</th></tr></thead>
+<tbody><tr><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin hilite">1</td></tr><tr><td class="bin">0</td><td class="bin">0</td><td class="bin">1</td><td class="bin">1</td><td class="bin hilite">0</td></tr><tr><td class="bin">0</td><td class="bin">1</td><td class="bin">0</td><td class="bin">2</td><td class="bin hilite">1</td></tr><tr><td class="bin">0</td><td class="bin">1</td><td class="bin">1</td><td class="bin">3</td><td class="bin hilite">1</td></tr><tr><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin">4</td><td class="bin hilite">0</td></tr><tr><td class="bin">1</td><td class="bin">0</td><td class="bin">1</td><td class="bin">5</td><td class="bin hilite">0</td></tr><tr><td class="bin">1</td><td class="bin">1</td><td class="bin">0</td><td class="bin">6</td><td class="bin hilite">1</td></tr><tr><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td><td class="bin">7</td><td class="bin hilite">0</td></tr></tbody></table></div>
+<p>The output is 1 on rows 0, 2, 3 and 6, so four minterms are ORed together:</p>
+<p style="text-align:center;font-size:1.05rem">
+F = A&prime;B&prime;C&prime; + A&prime;BC&prime; + A&prime;BC + ABC&prime;</p>
+<p style="text-align:center;font-size:1.05rem">
+F(A, B, C) = &Sigma;m(0, 2, 3, 6)</p>
+<p>Each term is read straight off its row: row 2 is 010, so B is plain and A and C are
+complemented, giving A&prime;BC&prime;.</p>
+<p>A quick check that catches transcription errors: the number of product terms must
+equal the number of 1s in the output column, and every term must contain all three
+variables exactly once. Four terms, three literals each. If a term is missing a
+variable you have skipped a column; if two terms are identical you have read the same
+row twice.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 5.3">For the same function as Exercise 5.2, write the canonical product of sums and its &Pi; shorthand. Then verify both forms agree on row 4.</summary><div class="sol">
+<p>Now work from the 0-rows, which are 1, 4, 5 and 7:</p>
+<p style="text-align:center;font-size:1.05rem">
+F = (A + B + C&prime;)(A&prime; + B + C)(A&prime; + B + C&prime;)(A&prime; + B&prime; + C&prime;)</p>
+<p style="text-align:center;font-size:1.05rem">
+F(A, B, C) = &Pi;M(1, 4, 5, 7)</p>
+<p>Row 4 is ABC&nbsp;=&nbsp;100, and the table says F&nbsp;=&nbsp;0 there.</p>
+<p><strong>In the SOP form</strong> from Exercise 5.2, every one of the four product
+terms contains a literal that is 0 on row 100 &mdash; for instance
+A&prime;B&prime;C&prime; has A&prime;&nbsp;=&nbsp;0 &mdash; so the sum is 0.</p>
+<p><strong>In the POS form</strong>, the factor
+(A&prime;&nbsp;+&nbsp;B&nbsp;+&nbsp;C) evaluates to
+0&nbsp;+&nbsp;0&nbsp;+&nbsp;0&nbsp;=&nbsp;0 on that row, so the product is 0. That
+factor is M<sub>4</sub>, which exists in the expression precisely because row 4 is a
+0-row.</p>
+<p>Both give 0. Note how much less work the POS check was: for a 0-row you look for
+the single factor that dies, whereas the SOP check needs every term. For a 1-row it is
+the other way round. Check each row in whichever form makes it a one-line
+argument.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 5.4">A three-variable function is F&nbsp;=&nbsp;&Sigma;m(1,&nbsp;4,&nbsp;5,&nbsp;7). Write its &Pi; form, and both expressions in full &mdash; without building a truth table.</summary><div class="sol">
+<p>The &Pi; list is whatever the &Sigma; list left out. With three variables the rows
+are 0 to 7, so the missing ones are 0, 2, 3 and 6:</p>
+<p style="text-align:center;font-size:1.05rem">
+F(A, B, C) = &Sigma;m(1, 4, 5, 7) = &Pi;M(0, 2, 3, 6)</p>
+<p>Four indices in each list, eight in total, none repeated &mdash; which is the check
+that you have not dropped one.</p>
+<p><strong>The SOP</strong>, one minterm per index in the &Sigma; list:</p>
+<p style="text-align:center;font-size:1.05rem">
+F = A&prime;B&prime;C + AB&prime;C&prime; + AB&prime;C + ABC</p>
+<p><strong>The POS</strong>, one maxterm per index in the &Pi; list, remembering that
+the polarities invert:</p>
+<p style="text-align:center;font-size:1.05rem">
+F = (A + B + C)(A + B&prime; + C)(A + B&prime; + C&prime;)(A&prime; + B&prime; + C)</p>
+<p>Row 3, for instance, is 011; as a maxterm that is
+A&nbsp;+&nbsp;B&prime;&nbsp;+&nbsp;C&prime;. Getting this wrong &mdash; writing
+A&prime;&nbsp;+&nbsp;B&nbsp;+&nbsp;C, the minterm's polarities &mdash; is the single
+most common error on this topic, and it produces an expression for an entirely
+different function.</p></div></details>
+
+<h3>Expression to canonical form</h3>
+
+<details class="prob"><summary data-label="Exercise 5.5">Expand F = A&nbsp;+&nbsp;B&prime;C into canonical sum-of-products form over the variables A, B, C, and give the &Sigma; shorthand.</summary><div class="sol">
+<p>Neither term mentions all three variables, and a canonical form requires that every
+product does. The fix is the complement law used as an expander: multiplying a term by
+(X&nbsp;+&nbsp;X&prime;) changes nothing, and splits it into two terms that each
+mention X.</p>
+<p><strong>The term A</strong> is missing B and C, so expand twice:</p>
+<p style="text-align:center;font-size:1.05rem">
+A = A(B + B&prime;)(C + C&prime;) = ABC + ABC&prime; + AB&prime;C + AB&prime;C&prime;</p>
+<p>which is m<sub>7</sub>, m<sub>6</sub>, m<sub>5</sub>, m<sub>4</sub>.</p>
+<p><strong>The term B&prime;C</strong> is missing A:</p>
+<p style="text-align:center;font-size:1.05rem">
+B&prime;C = (A + A&prime;)B&prime;C = AB&prime;C + A&prime;B&prime;C</p>
+<p>which is m<sub>5</sub> and m<sub>1</sub>.</p>
+<p>Collect, and drop the repeat &mdash; m<sub>5</sub> appeared in both, and
+X&nbsp;+&nbsp;X&nbsp;=&nbsp;X:</p>
+<p style="text-align:center;font-size:1.05rem">
+F = A&prime;B&prime;C + AB&prime;C&prime; + AB&prime;C + ABC&prime; + ABC</p>
+<p style="text-align:center;font-size:1.05rem">
+F(A, B, C) = &Sigma;m(1, 4, 5, 6, 7)</p>
+<p>Sanity check without a table: A alone should contribute all four rows with
+A&nbsp;=&nbsp;1, which is 4, 5, 6, 7 &mdash; and it did. B&prime;C adds the rows with
+B&nbsp;=&nbsp;0, C&nbsp;=&nbsp;1, which are 1 and 5, one of them new. Five minterms,
+so the table has five 1s and three 0s, and the POS form would be the shorter of the
+two.</p>
+<p>The overlap is worth a comment. Terms of a non-canonical SOP can cover the same row
+twice; minterms of a canonical SOP never can. That is exactly why the canonical form
+is unique and an ordinary SOP is not.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 5.6">Expand G = (A&prime;&nbsp;+&nbsp;B)(B&nbsp;+&nbsp;C&prime;) into canonical product-of-sums form, and give the &Pi; shorthand.</summary><div class="sol">
+<p>The dual method. A canonical POS needs every sum term to mention all three
+variables, and the expander is the other complement law: <em>adding</em>
+XX&prime;&nbsp;=&nbsp;0 to a sum changes nothing, and the surprising distributive law
+splits the term in two.</p>
+<p><strong>The factor A&prime;&nbsp;+&nbsp;B</strong> is missing C:</p>
+<p style="text-align:center;font-size:1.05rem">
+A&prime; + B = A&prime; + B + CC&prime; = (A&prime; + B + C)(A&prime; + B + C&prime;)</p>
+<p>which is M<sub>4</sub> and M<sub>5</sub>.</p>
+<p><strong>The factor B&nbsp;+&nbsp;C&prime;</strong> is missing A:</p>
+<p style="text-align:center;font-size:1.05rem">
+B + C&prime; = B + C&prime; + AA&prime; = (A + B + C&prime;)(A&prime; + B + C&prime;)</p>
+<p>which is M<sub>1</sub> and M<sub>5</sub>.</p>
+<p>Collect the four factors and drop the duplicate M<sub>5</sub>, since
+X&nbsp;&middot;&nbsp;X&nbsp;=&nbsp;X:</p>
+<p style="text-align:center;font-size:1.05rem">
+G = (A + B + C&prime;)(A&prime; + B + C)(A&prime; + B + C&prime;)</p>
+<p style="text-align:center;font-size:1.05rem">
+G(A, B, C) = &Pi;M(1, 4, 5)</p>
+<p>Three maxterms, so G is 0 on three rows and 1 on the other five, and
+G&nbsp;=&nbsp;&Sigma;m(0,&nbsp;2,&nbsp;3,&nbsp;6,&nbsp;7).</p>
+<p>The step that looks illegal is adding CC&prime; to a sum. It is the exact dual of
+multiplying by (C&nbsp;+&nbsp;C&prime;): one adds a 0, the other multiplies by a 1, and
+neither changes the value. Then
+X&nbsp;+&nbsp;YZ&nbsp;=&nbsp;(X&nbsp;+&nbsp;Y)(X&nbsp;+&nbsp;Z) does the splitting. If
+this ever feels shaky, expand to SOP instead, find the 1-rows, and read the POS off the
+0-rows &mdash; slower, and impossible to get wrong.</p></div></details>
+
+<h3>Circuits</h3>
+
+<details class="prob"><summary data-label="Exercise 5.7">Draw the two-level AND&ndash;OR circuit for F&nbsp;=&nbsp;&Sigma;m(0,&nbsp;3,&nbsp;5) over A, B, C. Count the gates and the total number of gate inputs, including the inverters.</summary><div class="sol">
+<p>Three minterms, so three AND gates, each with three inputs, feeding one three-input
+OR gate. The complemented literals come from three inverters on the input column.</p>
+<figure class="fig" style="--figmax:100%">
+<svg viewBox="0 0 565 350" role="img" aria-label="Two-level AND&ndash;OR: F = A&prime;B&prime;C&prime; + A&prime;BC + AB&prime;C &nbsp;(inverters on the inputs not drawn)">
+<path class="wire" d="M210 40.3H220M210 55.0H220M210 69.7H220"/>
+<path class="gate" d="M218 33.0H232A22.0 22.0 0 0 1 232 77.0H218Z"/>
+<path class="wire" d="M254.0 55H263.0"/>
+<path class="wire" d="M150 40.3L210 40.3"/>
+<text class="lbl" x="146" y="45.3" text-anchor="end">A&prime;</text>
+<path class="wire" d="M150 55.0L210 55.0"/>
+<text class="lbl" x="146" y="60.0" text-anchor="end">B&prime;</text>
+<path class="wire" d="M150 69.7L210 69.7"/>
+<text class="lbl" x="146" y="74.7" text-anchor="end">C&prime;</text>
+<text class="ann" x="267.0" y="46" text-anchor="start">A&prime;B&prime;C&prime;</text>
+<path class="wire" d="M210 155.3H220M210 170.0H220M210 184.7H220"/>
+<path class="gate" d="M218 148.0H232A22.0 22.0 0 0 1 232 192.0H218Z"/>
+<path class="wire" d="M254.0 170H263.0"/>
+<path class="wire" d="M150 155.3L210 155.3"/>
+<text class="lbl" x="146" y="160.3" text-anchor="end">A&prime;</text>
+<path class="wire" d="M150 170.0L210 170.0"/>
+<text class="lbl" x="146" y="175.0" text-anchor="end">B</text>
+<path class="wire" d="M150 184.7L210 184.7"/>
+<text class="lbl" x="146" y="189.7" text-anchor="end">C</text>
+<text class="ann" x="267.0" y="161" text-anchor="start">A&prime;BC</text>
+<path class="wire" d="M210 270.3H220M210 285.0H220M210 299.7H220"/>
+<path class="gate" d="M218 263.0H232A22.0 22.0 0 0 1 232 307.0H218Z"/>
+<path class="wire" d="M254.0 285H263.0"/>
+<path class="wire" d="M150 270.3L210 270.3"/>
+<text class="lbl" x="146" y="275.3" text-anchor="end">A</text>
+<path class="wire" d="M150 285.0L210 285.0"/>
+<text class="lbl" x="146" y="290.0" text-anchor="end">B&prime;</text>
+<path class="wire" d="M150 299.7L210 299.7"/>
+<text class="lbl" x="146" y="304.7" text-anchor="end">C</text>
+<text class="ann" x="267.0" y="276" text-anchor="start">AB&prime;C</text>
+<path class="wire" d="M400 155.3H417M400 170.0H417M400 184.7H417"/>
+<path class="gate" d="M408 148.0C426 148.0 434 159.4 439 170C434 180.6 426 192.0 408 192.0Q417 170 408 148.0Z"/>
+<path class="wire" d="M439 170H448"/>
+<path class="wire" d="M263.0 55L350 55L350 155.3L400 155.3"/>
+<path class="wire" d="M263.0 170L400 170.0"/>
+<path class="wire" d="M263.0 285L350 285L350 184.7L400 184.7"/>
+<path class="wire" d="M448 170L476 170"/>
+<text class="lbl" x="484" y="175" text-anchor="start">F</text>
+</svg>
+<figcaption>Two-level AND&ndash;OR: F = A&prime;B&prime;C&prime; + A&prime;BC + AB&prime;C &nbsp;(inverters on the inputs not drawn)</figcaption></figure>
+<p><strong>The count.</strong> Three inverters, three 3-input ANDs and one 3-input OR
+&mdash; <strong>seven gates</strong>. Gate inputs: 3&times;1 for the inverters, 3&times;3
+for the ANDs and 3 for the OR, so <strong>15 inputs</strong> in total.</p>
+<p>Gate inputs are the honest measure of cost, not gate count: a 3-input AND is
+physically bigger than a 2-input one, and a count that ignores that will tell you two
+very different circuits are equally cheap. If your ANDs and ORs are restricted to two
+inputs each, every 3-input gate becomes two 2-input gates, and the totals become 11
+gates and 19 inputs &mdash; worth doing once so the restriction never surprises
+you.</p>
+<p>Note which literals each AND gate needs: exactly the polarities of its row. Row 0
+is 000, so its gate takes A&prime;, B&prime;, C&prime;; row 5 is 101, so its gate takes
+A, B&prime;, C. Reading the polarities off the row number is the whole skill, and it
+never involves thinking about the function as a whole.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 5.8">Draw the two-level OR&ndash;AND circuit for F&nbsp;=&nbsp;&Pi;M(1,&nbsp;6) over A, B, C, and compare its cost with the SOP circuit for the same function.</summary><div class="sol">
+<p>Two maxterms, so two three-input OR gates feeding one two-input AND gate.</p>
+<figure class="fig" style="--figmax:100%">
+<svg viewBox="0 0 600 250" role="img" aria-label="Two-level OR&ndash;AND: F = (A + B + C&prime;)(A&prime; + B&prime; + C) &nbsp;(inverters not drawn)">
+<path class="wire" d="M210 45.3H227M210 60.0H227M210 74.7H227"/>
+<path class="gate" d="M218 38.0C236 38.0 244 49.4 249 60C244 70.6 236 82.0 218 82.0Q227 60 218 38.0Z"/>
+<path class="wire" d="M249 60H258"/>
+<path class="wire" d="M150 45.3L210 45.3"/>
+<text class="lbl" x="146" y="50.3" text-anchor="end">A</text>
+<path class="wire" d="M150 60.0L210 60.0"/>
+<text class="lbl" x="146" y="65.0" text-anchor="end">B</text>
+<path class="wire" d="M150 74.7L210 74.7"/>
+<text class="lbl" x="146" y="79.7" text-anchor="end">C&prime;</text>
+<text class="ann" x="262" y="51" text-anchor="start">(A + B + C&prime;)</text>
+<path class="wire" d="M210 175.3H227M210 190.0H227M210 204.7H227"/>
+<path class="gate" d="M218 168.0C236 168.0 244 179.4 249 190C244 200.6 236 212.0 218 212.0Q227 190 218 168.0Z"/>
+<path class="wire" d="M249 190H258"/>
+<path class="wire" d="M150 175.3L210 175.3"/>
+<text class="lbl" x="146" y="180.3" text-anchor="end">A&prime;</text>
+<path class="wire" d="M150 190.0L210 190.0"/>
+<text class="lbl" x="146" y="195.0" text-anchor="end">B&prime;</text>
+<path class="wire" d="M150 204.7L210 204.7"/>
+<text class="lbl" x="146" y="209.7" text-anchor="end">C</text>
+<text class="ann" x="262" y="181" text-anchor="start">(A&prime; + B&prime; + C)</text>
+<path class="wire" d="M440 117.5H450M440 132.5H450"/>
+<path class="gate" d="M448 110.0H462A15.0 15.0 0 0 1 462 140.0H448Z"/>
+<path class="wire" d="M477.0 125H486.0"/>
+<path class="wire" d="M258 60L390 60L390 117.5L440 117.5"/>
+<path class="wire" d="M258 190L396 190L396 132.5L440 132.5"/>
+<path class="wire" d="M486.0 125L514.0 125"/>
+<text class="lbl" x="522.0" y="130" text-anchor="start">F</text>
+</svg>
+<figcaption>Two-level OR&ndash;AND: F = (A + B + C&prime;)(A&prime; + B&prime; + C) &nbsp;(inverters not drawn)</figcaption></figure>
+<p><strong>The count.</strong> Three inverters, two 3-input ORs and one 2-input AND
+&mdash; six gates, and 3&nbsp;+&nbsp;6&nbsp;+&nbsp;2&nbsp;=&nbsp;11 gate inputs.</p>
+<p><strong>The comparison.</strong> &Pi;M(1,&nbsp;6) means the function is 0 on two
+rows and 1 on the other six, so its SOP form has six minterms: six 3-input AND gates
+and a 6-input OR. That is 3&nbsp;+&nbsp;6&nbsp;+&nbsp;1&nbsp;=&nbsp;10 gates and
+3&nbsp;+&nbsp;18&nbsp;+&nbsp;6&nbsp;=&nbsp;27 gate inputs, against 6 gates and 11
+inputs for the POS. The POS is dramatically cheaper here.</p>
+<p>The rule this illustrates: <strong>count the 1s and the 0s in the table first</strong>.
+Whichever is scarcer names the form you should be building. A function that is mostly
+1s wants POS; a function that is mostly 0s wants SOP; and a function that is evenly
+split makes the choice on other grounds, such as which gate type your technology
+prefers.</p>
+<p>Both counts are before any simplification. Reducing either form with the algebra of
+Set 4 usually changes the answer to which one wins, which is why the count above is a
+starting heuristic and not a conclusion.</p></div></details>
+
+<h3>Manipulating the forms</h3>
+
+<details class="prob"><summary data-label="Exercise 5.9">F(A,&nbsp;B,&nbsp;C)&nbsp;=&nbsp;&Sigma;m(0,&nbsp;1,&nbsp;4,&nbsp;6). Write F&prime; in both &Sigma; and &Pi; shorthand, and give the canonical SOP of F&prime;.</summary><div class="sol">
+<div class="tablewrap"><table class="ttab">
+<thead><tr><th>A</th><th>B</th><th>C</th><th>#</th><th>F</th><th>F&prime;</th></tr></thead>
+<tbody><tr><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin hilite">1</td><td class="bin hilite">0</td></tr><tr><td class="bin">0</td><td class="bin">0</td><td class="bin">1</td><td class="bin">1</td><td class="bin hilite">1</td><td class="bin hilite">0</td></tr><tr><td class="bin">0</td><td class="bin">1</td><td class="bin">0</td><td class="bin">2</td><td class="bin hilite">0</td><td class="bin hilite">1</td></tr><tr><td class="bin">0</td><td class="bin">1</td><td class="bin">1</td><td class="bin">3</td><td class="bin hilite">0</td><td class="bin hilite">1</td></tr><tr><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin">4</td><td class="bin hilite">1</td><td class="bin hilite">0</td></tr><tr><td class="bin">1</td><td class="bin">0</td><td class="bin">1</td><td class="bin">5</td><td class="bin hilite">0</td><td class="bin hilite">1</td></tr><tr><td class="bin">1</td><td class="bin">1</td><td class="bin">0</td><td class="bin">6</td><td class="bin hilite">1</td><td class="bin hilite">0</td></tr><tr><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td><td class="bin">7</td><td class="bin hilite">0</td><td class="bin hilite">1</td></tr></tbody></table></div>
+<p>F&prime; is 1 exactly where F is 0, so its 1-rows are the rows F left out:</p>
+<p style="text-align:center;font-size:1.05rem">
+F&prime; = &Sigma;m(2, 3, 5, 7)</p>
+<p>And F&prime; is 0 exactly where F is 1, so its &Pi; list is F's &Sigma; list,
+unchanged:</p>
+<p style="text-align:center;font-size:1.05rem">
+F&prime; = &Pi;M(0, 1, 4, 6)</p>
+<p>The canonical SOP follows from the first of those:</p>
+<p style="text-align:center;font-size:1.05rem">
+F&prime; = A&prime;BC&prime; + A&prime;BC + AB&prime;C + ABC</p>
+<p>Two rules worth keeping, in shorthand. Complementing a function <em>swaps the two
+index lists</em>: &Sigma;m(S) becomes &Pi;M(S) for the complement. Converting a
+function <em>between forms</em> complements the index list but keeps the function. Two
+operations, both of which involve the same two lists, and mixing them up is the fastest
+way to produce a confidently wrong answer.</p>
+<p>The cross-check is in the table: the two shaded columns must disagree in every
+single row. Any row where they match means a transcription slip.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 5.10">Write the canonical SOP for F&nbsp;=&nbsp;&Sigma;m(2,&nbsp;3,&nbsp;6,&nbsp;7) over A, B, C, then simplify it with algebra as far as it will go. What does the answer tell you about the circuit?</summary><div class="sol">
+<p>The four minterms:</p>
+<p style="text-align:center;font-size:1.05rem">
+F = A&prime;BC&prime; + A&prime;BC + ABC&prime; + ABC</p>
+<p>Combine them in pairs, each pair differing in exactly one variable. Terms 1 and 2
+differ only in C, and terms 3 and 4 also differ only in C:</p>
+<p style="text-align:center;font-size:1.05rem">
+A&prime;BC&prime; + A&prime;BC = A&prime;B(C&prime; + C) = A&prime;B
+&nbsp;&nbsp;&nbsp;&nbsp; ABC&prime; + ABC = AB</p>
+<p>Now A&prime;B and AB differ only in A:</p>
+<p style="text-align:center;font-size:1.05rem">
+A&prime;B + AB = B(A&prime; + A) = <strong>B</strong></p>
+<div class="tablewrap"><table class="ttab">
+<thead><tr><th>A</th><th>B</th><th>C</th><th>#</th><th>F</th></tr></thead>
+<tbody><tr><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin hilite">0</td></tr><tr><td class="bin">0</td><td class="bin">0</td><td class="bin">1</td><td class="bin">1</td><td class="bin hilite">0</td></tr><tr><td class="bin">0</td><td class="bin">1</td><td class="bin">0</td><td class="bin">2</td><td class="bin hilite">1</td></tr><tr><td class="bin">0</td><td class="bin">1</td><td class="bin">1</td><td class="bin">3</td><td class="bin hilite">1</td></tr><tr><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin">4</td><td class="bin hilite">0</td></tr><tr><td class="bin">1</td><td class="bin">0</td><td class="bin">1</td><td class="bin">5</td><td class="bin hilite">0</td></tr><tr><td class="bin">1</td><td class="bin">1</td><td class="bin">0</td><td class="bin">6</td><td class="bin hilite">1</td></tr><tr><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td><td class="bin">7</td><td class="bin hilite">1</td></tr></tbody></table></div>
+<p>The output column is identical to the B column, so F&nbsp;=&nbsp;B and
+<strong>the circuit is a wire</strong> &mdash; from the B input straight to the output.
+Twelve literals, seven gates and 15 gate inputs in the canonical form; nothing at all
+in the simplified one.</p>
+<p>This is the honest answer to why Set 4 exists. The canonical form is free to write
+down and is never wrong, and it can be arbitrarily far from the best circuit. A
+procedure that always works and a result that is any good are different things.</p>
+<p>Look at the index list again: 2, 3, 6, 7. In binary those are 010, 011, 110, 111
+&mdash; every row with B&nbsp;=&nbsp;1, and both values of A and of C. Once you can see
+that in the numbers you no longer need the algebra, and the picture that makes it
+visible for four variables at a glance is the Karnaugh map.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 5.11">A four-bit input W X Y Z carries a decimal digit in BCD, so only 0000 through 1001 are legal. Design a detector that outputs 1 for an illegal code. Give the &Sigma; form, and simplify.</summary><div class="sol">
+<p>The illegal codes are the values 10 through 15.</p>
+<div class="tablewrap"><table class="ttab">
+<thead><tr><th>W X Y Z</th><th>decimal</th><th>F</th></tr></thead>
+<tbody><tr><td class="bin">0 0 0 0</td><td class="bin">0</td><td class="bin hilite">0</td></tr><tr><td class="bin">0 0 0 1</td><td class="bin">1</td><td class="bin hilite">0</td></tr><tr><td class="bin">0 0 1 0</td><td class="bin">2</td><td class="bin hilite">0</td></tr><tr><td class="bin">0 0 1 1</td><td class="bin">3</td><td class="bin hilite">0</td></tr><tr><td class="bin">0 1 0 0</td><td class="bin">4</td><td class="bin hilite">0</td></tr><tr><td class="bin">0 1 0 1</td><td class="bin">5</td><td class="bin hilite">0</td></tr><tr><td class="bin">0 1 1 0</td><td class="bin">6</td><td class="bin hilite">0</td></tr><tr><td class="bin">0 1 1 1</td><td class="bin">7</td><td class="bin hilite">0</td></tr><tr><td class="bin">1 0 0 0</td><td class="bin">8</td><td class="bin hilite">0</td></tr><tr><td class="bin">1 0 0 1</td><td class="bin">9</td><td class="bin hilite">0</td></tr><tr><td class="bin">1 0 1 0</td><td class="bin">10</td><td class="bin hilite">1</td></tr><tr><td class="bin">1 0 1 1</td><td class="bin">11</td><td class="bin hilite">1</td></tr><tr><td class="bin">1 1 0 0</td><td class="bin">12</td><td class="bin hilite">1</td></tr><tr><td class="bin">1 1 0 1</td><td class="bin">13</td><td class="bin hilite">1</td></tr><tr><td class="bin">1 1 1 0</td><td class="bin">14</td><td class="bin hilite">1</td></tr><tr><td class="bin">1 1 1 1</td><td class="bin">15</td><td class="bin hilite">1</td></tr></tbody></table></div>
+<p style="text-align:center;font-size:1.05rem">
+F(W, X, Y, Z) = &Sigma;m(10, 11, 12, 13, 14, 15)</p>
+<p>Six minterms, so the canonical circuit is six 4-input ANDs and a 6-input OR. It
+simplifies enormously. Group the rows by what they have in common in binary:</p>
+<ul>
+<li>Rows 10 and 11 are 1010 and 1011, which is 101<var>z</var> for either Z, so
+together they are WX&prime;Y.</li>
+<li>Rows 12 to 15 are 11<var>yz</var> for any Y and Z, so together they are WX.</li>
+</ul>
+<p style="text-align:center;font-size:1.05rem">
+F = WX&prime;Y + WX = W(X&prime;Y + X) = W(X + Y) = <strong>WX + WY</strong></p>
+<p>using mixed absorption, X&nbsp;+&nbsp;X&prime;Y&nbsp;=&nbsp;X&nbsp;+&nbsp;Y, inside
+the bracket. Two AND gates and an OR, or one AND and one OR if you keep the factored
+form &mdash; down from seven gates and 30 gate inputs.</p>
+<p>In words: a BCD digit is illegal exactly when the top bit is set <em>and</em> either
+of the next two is. Read against the binary, that is obvious &mdash; anything from 1010
+upward has W set and needs at least one of X or Y to exceed 1001. Z never matters,
+which the simplified expression says by omitting it.</p>
+<p>This circuit is real. It is what a BCD-to-seven-segment decoder uses to blank the
+display on an invalid code, and the same detector, with its output fed back as a
+correction term, is the core of the BCD adder's "add 6" fix-up.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 5.12">Write both canonical forms for the function that is 1 when <em>exactly two</em> of its three inputs are 1.</summary><div class="sol">
+<p>Tabulate by counting 1s in each row.</p>
+<div class="tablewrap"><table class="ttab">
+<thead><tr><th>A</th><th>B</th><th>C</th><th>#</th><th>number of 1s</th><th>F</th></tr></thead>
+<tbody><tr><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin hilite">0</td></tr><tr><td class="bin">0</td><td class="bin">0</td><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td><td class="bin hilite">0</td></tr><tr><td class="bin">0</td><td class="bin">1</td><td class="bin">0</td><td class="bin">2</td><td class="bin">1</td><td class="bin hilite">0</td></tr><tr><td class="bin">0</td><td class="bin">1</td><td class="bin">1</td><td class="bin">3</td><td class="bin">2</td><td class="bin hilite">1</td></tr><tr><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin">4</td><td class="bin">1</td><td class="bin hilite">0</td></tr><tr><td class="bin">1</td><td class="bin">0</td><td class="bin">1</td><td class="bin">5</td><td class="bin">2</td><td class="bin hilite">1</td></tr><tr><td class="bin">1</td><td class="bin">1</td><td class="bin">0</td><td class="bin">6</td><td class="bin">2</td><td class="bin hilite">1</td></tr><tr><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td><td class="bin">7</td><td class="bin">3</td><td class="bin hilite">0</td></tr></tbody></table></div>
+<p>Three rows qualify &mdash; 011, 101 and 110 &mdash; so</p>
+<p style="text-align:center;font-size:1.05rem">
+F(A, B, C) = &Sigma;m(3, 5, 6) = A&prime;BC + AB&prime;C + ABC&prime;</p>
+<p>and the other five rows give the product of sums:</p>
+<p style="text-align:center;font-size:1.05rem">
+F(A, B, C) = &Pi;M(0, 1, 2, 4, 7) = (A + B + C)(A + B + C&prime;)(A + B&prime; + C)(A&prime; + B + C)(A&prime; + B&prime; + C&prime;)</p>
+<p>The SOP is the natural reading of the specification: "exactly two" means one of
+three cases, and each case pins down all three inputs. Each minterm is one of the three
+ways to choose which input is the 0.</p>
+<p>Nothing here combines. Any two of the three minterms differ in two variables at
+once &mdash; compare A&prime;BC with AB&prime;C, where both A and B change &mdash; and
+the combining law needs them to differ in exactly one. So the canonical SOP is already
+minimal, which is unusual and worth noticing: these "counting" functions are the
+expensive ones, and the next exercise is the same story.</p>
+<p>Note that the function is <em>not</em> A&nbsp;&oplus;&nbsp;B&nbsp;&oplus;&nbsp;C,
+though row 011 might tempt you. The parity function is also 1 on 111, where exactly
+three inputs are 1 rather than two. Exercise 4.6 made the same point from the other
+direction.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 5.13">Write both canonical forms for A&nbsp;&oplus;&nbsp;B&nbsp;&oplus;&nbsp;C. Then show that no two of its minterms can be combined, and say what that means.</summary><div class="sol">
+<p>From Exercise 4.6, the three-input XOR is the odd-parity function.</p>
+<div class="tablewrap"><table class="ttab">
+<thead><tr><th>A</th><th>B</th><th>C</th><th>#</th><th>number of 1s</th><th>A &oplus; B &oplus; C</th></tr></thead>
+<tbody><tr><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin hilite">0</td></tr><tr><td class="bin">0</td><td class="bin">0</td><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td><td class="bin hilite">1</td></tr><tr><td class="bin">0</td><td class="bin">1</td><td class="bin">0</td><td class="bin">2</td><td class="bin">1</td><td class="bin hilite">1</td></tr><tr><td class="bin">0</td><td class="bin">1</td><td class="bin">1</td><td class="bin">3</td><td class="bin">2</td><td class="bin hilite">0</td></tr><tr><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin">4</td><td class="bin">1</td><td class="bin hilite">1</td></tr><tr><td class="bin">1</td><td class="bin">0</td><td class="bin">1</td><td class="bin">5</td><td class="bin">2</td><td class="bin hilite">0</td></tr><tr><td class="bin">1</td><td class="bin">1</td><td class="bin">0</td><td class="bin">6</td><td class="bin">2</td><td class="bin hilite">0</td></tr><tr><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td><td class="bin">7</td><td class="bin">3</td><td class="bin hilite">1</td></tr></tbody></table></div>
+<p style="text-align:center;font-size:1.05rem">
+F(A, B, C) = &Sigma;m(1, 2, 4, 7) = A&prime;B&prime;C + A&prime;BC&prime; + AB&prime;C&prime; + ABC</p>
+<p style="text-align:center;font-size:1.05rem">
+F(A, B, C) = &Pi;M(0, 3, 5, 6) = (A + B + C)(A + B&prime; + C&prime;)(A&prime; + B + C&prime;)(A&prime; + B&prime; + C)</p>
+<p>Four 1-rows and four 0-rows, so the two forms are the same size &mdash; a rare
+symmetry, and a consequence of parity being exactly half of the rows.</p>
+<p><strong>Nothing combines.</strong> Two minterms merge only if their rows differ in
+exactly one bit. The 1-rows are 001, 010, 100 and 111, each with an odd number of 1s;
+changing a single bit changes the count by one and therefore makes it even. So any two
+of these rows differ in at least two bits, and the combining law never applies.</p>
+<p><strong>What it means.</strong> The canonical SOP is the minimal SOP: four 3-input
+AND gates and a 4-input OR, and no algebra will reduce it. Parity is the standard
+example of a function that two-level minimisation cannot help, and on a Karnaugh map
+its 1s appear as a checkerboard with no two adjacent &mdash; the visual form of the
+same argument.</p>
+<p>Which is the case for the gate. Built from XORs the function is two gates; built as
+a minimal SOP it is five gates and 16 gate inputs. That gap, not novelty, is why XOR
+was given a symbol of its own &mdash; and it is also why a minimal <em>two-level</em>
+circuit is not always a minimal circuit. Allowing more levels, XOR wins easily.</p>
+</div></details>
+
+<details class="prob"><summary data-label="Exercise 5.14">Convert F = (A&nbsp;+&nbsp;B&prime;)(A&prime;&nbsp;+&nbsp;C) to sum-of-products form, simplify it, and give the canonical &Sigma; form.</summary><div class="sol">
+<p>Multiply out, taking each term of the first factor against each of the second:</p>
+<p style="text-align:center;font-size:1.05rem">
+(A + B&prime;)(A&prime; + C) = AA&prime; + AC + A&prime;B&prime; + B&prime;C</p>
+<p>The first product dies by the complement law, leaving three terms:</p>
+<p style="text-align:center;font-size:1.05rem">
+F = AC + A&prime;B&prime; + B&prime;C</p>
+<p>Now look at the shape. A appears in both polarities in the first two terms, and the
+third is made of exactly the leftovers, C and B&prime; &mdash; the consensus pattern
+from Exercise 4.12. So B&prime;C is redundant:</p>
+<p style="text-align:center;font-size:1.05rem">
+F = <strong>AC + A&prime;B&prime;</strong></p>
+<p><strong>The canonical form.</strong> Expand each term to mention all three
+variables. AC is missing B, so
+AC&nbsp;=&nbsp;ABC&nbsp;+&nbsp;AB&prime;C, which is m<sub>7</sub> and m<sub>5</sub>.
+A&prime;B&prime; is missing C, so
+A&prime;B&prime;&nbsp;=&nbsp;A&prime;B&prime;C&nbsp;+&nbsp;A&prime;B&prime;C&prime;,
+which is m<sub>1</sub> and m<sub>0</sub>.</p>
+<p style="text-align:center;font-size:1.05rem">
+F(A, B, C) = &Sigma;m(0, 1, 5, 7) = A&prime;B&prime;C&prime; + A&prime;B&prime;C + AB&prime;C + ABC</p>
+<p>Check the discarded term against this: B&prime;C expands to
+A&prime;B&prime;C&nbsp;+&nbsp;AB&prime;C, which is m<sub>1</sub> and m<sub>5</sub>
+&mdash; both already in the list. That is what redundancy looks like at the level of
+minterms, and it is a good way to confirm a consensus step you are not sure about.</p>
+<p>Four minterms out of eight, so the POS form has four maxterms too and neither is
+obviously the cheaper route. The simplified SOP, at two terms, beats both.</p>
+</div></details>
+
+<h3>Counting</h3>
+
+<details class="prob"><summary data-label="Exercise 5.15">Challenge. How many distinct Boolean functions of three variables are there? How many of them have exactly three minterms? And explain why every function has exactly one canonical SOP, when it has many ordinary SOPs.</summary><div class="sol">
+<p><strong>How many functions.</strong> A three-variable function is completely
+determined by its output column, which is 8 bits long, and every one of the
+2<sup>8</sup> possible columns is a legitimate function. So there are
+<strong>256</strong>. In general <var>n</var> variables give
+2<sup><var>n</var></sup> rows and</p>
+<p style="text-align:center;font-size:1.05rem">
+2<sup>2<sup><var>n</var></sup></sup> functions</p>
+<p>which grows appallingly fast: 16 functions of two variables, 256 of three, 65,536 of
+four, and about 1.8&nbsp;&times;&nbsp;10<sup>19</sup> of six. Any thought of tabulating
+all circuits of six inputs to find the best one dies right there, which is why
+minimisation needs technique rather than search.</p>
+<p><strong>How many with exactly three minterms.</strong> Choosing a function with
+three minterms is choosing which 3 of the 8 rows are the 1-rows:</p>
+<p style="text-align:center;font-size:1.05rem">
+C(8, 3) = 8! / (3! &middot; 5!) = <strong>56</strong></p>
+<p>And as a check on the first answer, summing over every possible number of minterms
+gives C(8,0)&nbsp;+&nbsp;C(8,1)&nbsp;+&nbsp;&hellip;&nbsp;+&nbsp;C(8,8)&nbsp;=&nbsp;2<sup>8</sup>
+= 256, which is the binomial identity and the same count arrived at a second way.</p>
+<p><strong>Why the canonical form is unique.</strong> Two directions.</p>
+<p><em>It exists and is determined by the function.</em> The procedure of &sect;5.2
+reads the set of 1-rows off the table and writes one minterm for each. Nothing in that
+involves a choice, so the function fixes the expression.</p>
+<p><em>No other canonical SOP gives the same function.</em> Suppose two different sets
+of minterms were ORed to give the same function. The sets differ, so some
+m<sub><var>i</var></sub> is in one and not the other. On row <var>i</var>,
+m<sub><var>i</var></sub> is 1 and every other minterm is 0 &mdash; that is the defining
+property. So the first expression is 1 on row <var>i</var> and the second is 0, and
+they are not the same function after all. Contradiction.</p>
+<p>The reason ordinary SOPs are not unique is that their terms are <em>not</em> minterms
+and so do not have that one-row property. AB&prime; is 1 on two rows, A on four, and
+terms like these can overlap, so a row can be covered once, twice, or in several
+different ways &mdash; and each way of covering it is a different expression for the
+same function. Exercise 5.5 saw one overlap directly. Uniqueness is bought precisely by
+insisting every term name every variable.</p>
+<div class="box extra"><span class="bt">A useful consequence</span>
+<p>Because canonical forms are unique, they settle equality questions outright: two
+expressions denote the same function if and only if their canonical forms are
+identical. That is a decision procedure &mdash; expand both, compare the index lists,
+done &mdash; and it is what you fall back on when an algebraic manipulation is
+disputed and neither side can find the error.</p></div>
+</div></details>
+
+<div class="box extra"><span class="bt">Where this goes next</span>
+<p>Two loose ends, and the next two lectures are each one of them. The canonical form
+is mechanical but wasteful, and simplifying it by algebra means spotting patterns in a
+list of terms &mdash; a Karnaugh map redraws the table so that combinable terms sit
+next to each other and the patterns become shapes. And the two-level circuits here need
+AND, OR and NOT, where real chips are built from one repeated gate; the universality
+lecture shows that NAND alone suffices, with the SOP form of this set as its starting
+point.</p></div>
+
+    <nav class="pagenav">
+      <a class="prev" href="ex-boolean.html"><span>Previous</span>Set 4. XOR and simplifying by algebra</a>
+      <a class="next" href="setup-logisim.html"><span>Next</span>Installing Logisim-Evolution</a>
+    </nav>
+    <footer class="site">
+      <em>Computer Organization and Assembly Language</em> &middot; CSCI 240 / 640,
+      Queens College CUNY.
+    </footer>
+  </main>
+</div>
+</body>
+</html>

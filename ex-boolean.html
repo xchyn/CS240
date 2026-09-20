@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Set 4 &mdash; XOR and simplifying by algebra</title>
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/notes.js" defer></script>
+</head>
+<body>
+<header class="topbar"><div class="topbar-in">
+  <a class="brand" href="index.html">CSCI 240</a>
+  <span class="crumb">Set 4 &middot; XOR and Boolean algebra</span>
+  <nav class="topnav">
+    <a href="ex-circuits.html">&larr; Prev</a>
+    <a href="index.html">Contents</a>
+    <a href="ex-sop-pos.html">Next &rarr;</a>
+    <button class="iconbtn" id="themebtn" type="button" title="Light / dark">&#9686;</button>
+  </nav>
+</div></header>
+<div class="wrap">
+  <aside class="toc"><p class="toc-title">On this page</p><ol>
+    <li><a href="#xor"><span class="t">4.1</span>The XOR gate</a></li>
+    <li><a href="#parity"><span class="t">4.2</span>XOR identities and parity</a></li>
+    <li><a href="#laws"><span class="t">4.3</span>The laws</a></li>
+    <li><a href="#method"><span class="t">4.4</span>A method that works</a></li>
+    <li><a href="#check"><span class="t">4.5</span>Checking your answer</a></li>
+    <li><a href="#exercises"><span class="t">4.6</span>Exercises</a></li>
+  </ol></aside>
+  <main>
+
+<div class="chhead">
+  <span class="chpart">Exercise set 4 &middot; after the Boolean algebra lecture</span>
+  <span class="chnum">XOR and algebra</span>
+  <h1>One more gate, and the rules for shrinking</h1>
+  <p class="chsum">The exclusive-OR gate and the identities that make it useful;
+  the laws of Boolean algebra as a working toolkit; and a procedure for simplifying
+  an expression by hand &mdash; no Karnaugh maps, no truth tables.</p>
+</div>
+
+<p>Set 3 left you able to draw any expression and tabulate any circuit. Neither
+skill tells you whether the circuit you drew is <em>bigger than it needs to be</em>,
+and it usually is. This set is about the other direction: taking an expression apart
+with algebra until nothing more will come off. The pay-off is physical &mdash; fewer
+gates is less silicon, less power and less delay &mdash; and the technique is the same
+one you will use on every exam question in this unit.</p>
+
+<p>Along the way, a fourth gate. XOR is not strictly necessary &mdash; Set 3's three
+gates can build it, and Exercise 4.1 does &mdash; but it appears so often in adders,
+comparators and parity circuits that it gets its own symbol and its own algebra.</p>
+
+<h2 id="xor"><span class="secnum">4.1</span>The XOR gate</h2>
+
+<p>Exclusive-OR outputs 1 when its inputs are <strong>different</strong>. That is the
+sentence to memorise; every identity below is a consequence of it. The operator is
+written &oplus;, and the gate is an OR gate with a second curved line across its
+back:</p>
+
+<div class="grid2" style="grid-template-columns:minmax(0,19rem);justify-content:center">
+  <div class="symcard"><figure class="fig" style="--figmax:9.5rem">
+<svg viewBox="0 0 104 52" role="img" aria-label="XOR">
+<path class="wire" d="M34 18.5H51M34 33.5H51"/>
+<path class="gate open" d="M36 41.0Q45 26 36 11.0"/>
+<path class="gate" d="M42 11.0C60 11.0 68 18.8 73 26C68 33.2 60 41.0 42 41.0Q51 26 42 11.0Z"/>
+<path class="wire" d="M73 26H82"/>
+<path class="wire" d="M12 18.5L34 18.5"/>
+<text class="lbl" x="10" y="22.5" text-anchor="end">A</text>
+<path class="wire" d="M12 33.5L34 33.5"/>
+<text class="lbl" x="10" y="37.5" text-anchor="end">B</text>
+<path class="wire" d="M82 26L92 26"/>
+</svg>
+<figcaption>XOR</figcaption></figure><p><strong>XOR</strong> &mdash; A&nbsp;&oplus;&nbsp;B<br>
+  1 when the inputs <em>differ</em>. Also called the inequality gate.</p></div>
+</div>
+
+<div class="tablewrap"><table class="ttab">
+<thead><tr><th>A</th><th>B</th><th>A &oplus; B</th></tr></thead>
+<tbody><tr><td class="bin">0</td><td class="bin">0</td><td class="bin hilite">0</td></tr><tr><td class="bin">0</td><td class="bin">1</td><td class="bin hilite">1</td></tr><tr><td class="bin">1</td><td class="bin">0</td><td class="bin hilite">1</td></tr><tr><td class="bin">1</td><td class="bin">1</td><td class="bin hilite">0</td></tr></tbody></table></div>
+
+<p>"Different" is the same as "either one but not both", which is what the name says:
+OR, exclusive of the case where both are true. In the algebra of Set 3,</p>
+
+<p style="text-align:center;font-size:1.05rem">
+A&nbsp;&oplus;&nbsp;B = A&prime;B&nbsp;+&nbsp;AB&prime;</p>
+
+<p>and there are several other ways to write it, two of which are Exercises 4.1 and
+4.5. XOR is commutative and associative, so a chain
+A&nbsp;&oplus;&nbsp;B&nbsp;&oplus;&nbsp;C needs no brackets &mdash; but be careful
+about what a chain means, because it is <em>not</em> "exactly one input is 1". That is
+Exercise 4.6, and it is the single most common misconception about this gate.</p>
+
+<h2 id="parity"><span class="secnum">4.2</span>Identities and parity</h2>
+
+<p>Four identities do most of the work. Each one is two lines of a truth table, and
+each is worth knowing by sight rather than deriving on the spot:</p>
+
+<div class="tablewrap"><table class="lawtab">
+<thead><tr><th>identity</th><th>why</th></tr></thead>
+<tbody>
+<tr><td>A &oplus; 0 = A</td><td>differs from 0 exactly when A is 1</td></tr>
+<tr><td>A &oplus; 1 = A&prime;</td><td>differs from 1 exactly when A is 0</td></tr>
+<tr><td>A &oplus; A = 0</td><td>nothing differs from itself</td></tr>
+<tr><td>A &oplus; A&prime; = 1</td><td>a value always differs from its complement</td></tr>
+</tbody></table></div>
+
+<p>The first two together are the reason XOR is everywhere in real hardware. Feed one
+input a data bit D and the other a control bit S, and the gate is a
+<strong>controlled inverter</strong>: with S&nbsp;=&nbsp;0 the output is D untouched,
+and with S&nbsp;=&nbsp;1 it is D&prime;. One gate, two behaviours, selected by a
+wire.</p>
+
+<figure class="fig" style="--figmax:13rem">
+<svg viewBox="0 0 200 82" role="img" aria-label="S = 0 passes D through; S = 1 inverts it">
+<path class="wire" d="M95 37.5H112M95 52.5H112"/>
+<path class="gate open" d="M97 60.0Q106 45 97 30.0"/>
+<path class="gate" d="M103 30.0C121 30.0 129 37.8 134 45C129 52.2 121 60.0 103 60.0Q112 45 103 30.0Z"/>
+<path class="wire" d="M134 45H143"/>
+<text class="lbl" x="22" y="42.5" text-anchor="end">D</text>
+<path class="wire" d="M40 37.5L95 37.5"/>
+<text class="lbl" x="22" y="57.5" text-anchor="end">S</text>
+<path class="wire" d="M40 52.5L95 52.5"/>
+<path class="wire" d="M143 45L165 45"/>
+<text class="lbl" x="173" y="50" text-anchor="start">Y</text>
+</svg>
+<figcaption>S = 0 passes D through; S = 1 inverts it</figcaption></figure>
+
+<div class="box note"><span class="bt">Parity</span>
+<p>Chain any number of XORs together and the output is 1 exactly when an
+<strong>odd number</strong> of the inputs are 1. The reason is the third identity: 1s
+cancel in pairs, so only the leftover one matters. So
+1&nbsp;&oplus;&nbsp;1&nbsp;&oplus;&nbsp;1 = 1, not 0, and a four-input chain with
+three 1s gives 1 as well.</p>
+<p>That property is exactly what a parity bit is built from, which is why XOR turns up
+in memory error detection, in RAID, and in the checksum on the end of a serial
+frame. Exercise 4.15 proves the rule properly.</p></div>
+
+<h2 id="laws"><span class="secnum">4.3</span>The laws</h2>
+
+<p>Boolean algebra looks like ordinary algebra and mostly behaves like it, which is
+both a help and a trap. These are the single-variable theorems, where AND behaves like
+multiplication and OR like addition:</p>
+
+<div class="tablewrap"><table class="lawtab">
+<thead><tr><th>law</th><th>AND form</th><th>OR form</th></tr></thead>
+<tbody><tr><td class="lawcell">identity</td><td class="lawcell">X &middot; 1 = X</td><td class="lawcell">X + 0 = X</td></tr><tr><td class="lawcell">null</td><td class="lawcell">X &middot; 0 = 0</td><td class="lawcell">X + 1 = 1</td></tr><tr><td class="lawcell">idempotence</td><td class="lawcell">X &middot; X = X</td><td class="lawcell">X + X = X</td></tr><tr><td class="lawcell">complement</td><td class="lawcell">X &middot; X&prime; = 0</td><td class="lawcell">X + X&prime; = 1</td></tr><tr><td class="lawcell">involution</td><td class="lawcell">(X&prime;)&prime; = X</td><td class="lawcell">&mdash;</td></tr></tbody></table></div>
+
+<p>And these are the ones involving two or three variables. Every simplification you
+will do this semester is some sequence of these:</p>
+
+<div class="tablewrap"><table class="lawtab">
+<thead><tr><th>law</th><th>statement</th></tr></thead>
+<tbody><tr><td class="lawcell">commutative</td><td class="lawcell">XY = YX &nbsp;&nbsp; X + Y = Y + X</td></tr><tr><td class="lawcell">associative</td><td class="lawcell">(XY)Z = X(YZ) &nbsp;&nbsp; (X+Y)+Z = X+(Y+Z)</td></tr><tr><td class="lawcell">distributive (the familiar one)</td><td class="lawcell">X(Y + Z) = XY + XZ</td></tr><tr><td class="lawcell">distributive (the surprising one)</td><td class="lawcell">X + YZ = (X + Y)(X + Z)</td></tr><tr><td class="lawcell">combining</td><td class="lawcell">XY + XY&prime; = X &nbsp;&nbsp; (X+Y)(X+Y&prime;) = X</td></tr><tr><td class="lawcell">absorption</td><td class="lawcell">X + XY = X &nbsp;&nbsp; X(X + Y) = X</td></tr><tr><td class="lawcell">absorption (mixed)</td><td class="lawcell">X + X&prime;Y = X + Y &nbsp;&nbsp; X(X&prime; + Y) = XY</td></tr><tr><td class="lawcell">consensus</td><td class="lawcell">XY + X&prime;Z + YZ = XY + X&prime;Z</td></tr><tr><td class="lawcell">De Morgan</td><td class="lawcell">(X + Y)&prime; = X&prime;Y&prime; &nbsp;&nbsp; (XY)&prime; = X&prime; + Y&prime;</td></tr></tbody></table></div>
+
+<div class="box warn"><span class="bt">The two that catch everyone</span>
+<p><strong>X&nbsp;+&nbsp;YZ&nbsp;=&nbsp;(X&nbsp;+&nbsp;Y)(X&nbsp;+&nbsp;Z)</strong> has
+no counterpart in ordinary arithmetic: 2&nbsp;+&nbsp;3&times;4 is not
+(2+3)&times;(2+4). OR distributes over AND in Boolean algebra. Both directions of that
+law are useful, and Exercise 4.8 uses it right to left.</p>
+<p><strong>De Morgan does not distribute.</strong>
+(X&nbsp;+&nbsp;Y)&prime; is <em>not</em> X&prime;&nbsp;+&nbsp;Y&prime;. The gate
+changes when the inversion moves: a complemented sum is a product, and a complemented
+product is a sum. If you take one thing from this page, take that.</p></div>
+
+<div class="box extra"><span class="bt">Duality</span>
+<p>Notice that the laws come in pairs, and that the second of each pair is the first
+with every AND swapped for an OR and every 0 swapped for a 1. That is not a
+coincidence: every true statement of Boolean algebra stays true under that swap. So
+the table above is really half as long as it looks, and a law you half-remember can be
+recovered from its partner.</p></div>
+
+<h2 id="method"><span class="secnum">4.4</span>A method that works</h2>
+
+<p>Simplification feels like guesswork until you have an order to do it in. This one
+is reliable:</p>
+
+<ol>
+<li><strong>Push every complement inward.</strong> Apply De Morgan until the only
+primes left are on single variables, and cancel double primes as they appear. A bar
+over a bracket is something you cannot see patterns through.</li>
+<li><strong>Multiply out to a sum of products.</strong> Most patterns are only visible
+in that shape.</li>
+<li><strong>Hunt for four patterns.</strong> Combining
+(XY&nbsp;+&nbsp;XY&prime;&nbsp;=&nbsp;X), absorption
+(X&nbsp;+&nbsp;XY&nbsp;=&nbsp;X), mixed absorption
+(X&nbsp;+&nbsp;X&prime;Y&nbsp;=&nbsp;X&nbsp;+&nbsp;Y) and consensus
+(XY&nbsp;+&nbsp;X&prime;Z&nbsp;+&nbsp;YZ&nbsp;=&nbsp;XY&nbsp;+&nbsp;X&prime;Z). In
+each, X may itself be a product &mdash; that is what makes them hard to spot.</li>
+<li><strong>Factor when nothing matches.</strong> Pulling out a common variable often
+exposes a pattern that was hidden inside two terms.</li>
+<li><strong>Duplicate a term if you are stuck.</strong>
+X&nbsp;=&nbsp;X&nbsp;+&nbsp;X is a law, so a term may be used twice, combining with a
+different neighbour each time. It feels like cheating and it is completely legal.</li>
+<li><strong>Stop when no law applies</strong>, and then check.</li>
+</ol>
+
+<div class="box worked"><span class="bt">Worked example</span>
+<p>Simplify F = (A&prime;&nbsp;+&nbsp;B)&prime;&nbsp;+&nbsp;A&prime;BC.</p>
+<p><strong>Step 1, push the complement in.</strong> By De Morgan,
+(A&prime;&nbsp;+&nbsp;B)&prime; = (A&prime;)&prime;&nbsp;&middot;&nbsp;B&prime; =
+AB&prime;. So F = AB&prime;&nbsp;+&nbsp;A&prime;BC.</p>
+<p><strong>Step 2, already a sum of products.</strong> Two terms.</p>
+<p><strong>Step 3, hunt.</strong> Nothing combines: the terms share no common product,
+and they are not complements in one variable. No absorption either, since neither
+term contains the other. And consensus needs three terms.</p>
+<p><strong>Step 6, stop.</strong> F = AB&prime;&nbsp;+&nbsp;A&prime;BC is already
+minimal, and recognising that is as much a skill as simplifying. Four gates plus
+inverters, down from the seven the original expression would have needed if you drew
+it literally.</p>
+<p>The lesson is that step 1 did all the work. An expression with a bar over a bracket
+almost always shrinks the moment you push the bar inward, and almost never shrinks
+before you do.</p></div>
+
+<h2 id="check"><span class="secnum">4.5</span>Checking your answer</h2>
+
+<p>Every simplification is a claim that two expressions are the same function, and
+claims can be wrong. Two ways to check, and you should use one of them every single
+time:</p>
+
+<ul>
+<li><strong>Tabulate both.</strong> Build the truth table of the original and of your
+answer, and compare the output columns. With three variables that is eight rows and
+takes a minute. It is not elegant, and it is proof.</li>
+<li><strong>Build both in Logisim.</strong> Draw the original circuit and your
+simplified one side by side, drive them from the same input pins, and wire the two
+outputs into an XOR gate with a probe on it. If the probe ever lights, the two
+circuits disagree and your algebra is wrong &mdash; and you have just used XOR as a
+comparator, which is what Exercise 4.4 is about.</li>
+</ul>
+
+<div class="box note"><span class="bt">One row is often enough to disprove</span>
+<p>To show two expressions are <em>equal</em> you need all the rows. To show they are
+<em>unequal</em> you need one. When you suspect a step went wrong, do not rebuild the
+whole table &mdash; pick the input combination that the step you distrust depends on,
+evaluate both sides, and you will usually have your answer in ten seconds.</p></div>
+
+<h2 id="exercises"><span class="secnum">4.6</span>Exercises</h2>
+
+<p>Do the simplifications with algebra only. Karnaugh maps arrive in Set 5's successor
+and would spoil the point of these; truth tables are for checking your answer, not for
+finding it.</p>
+
+<h3>The XOR gate</h3>
+
+<details class="prob"><summary data-label="Exercise 4.1">Build A&nbsp;&oplus;&nbsp;B out of AND, OR and NOT gates. Give the truth table of your circuit alongside XOR's to show they agree, and count the gates.</summary><div class="sol">
+<p>"Different" means one of two cases: A is 0 and B is 1, or A is 1 and B is 0. Those
+are the products A&prime;B and AB&prime;, and either one will do, so they are ORed:</p>
+<p style="text-align:center;font-size:1.05rem">
+A&nbsp;&oplus;&nbsp;B = A&prime;B&nbsp;+&nbsp;AB&prime;</p>
+<figure class="fig" style="--figmax:100%">
+<svg viewBox="0 0 500 250" role="img" aria-label="A &oplus; B = A&prime;B + AB&prime;">
+<path class="wire" d="M110 150.0H121"/>
+<path class="gate" d="M118 136.0L142 150L118 164.0Z"/>
+<circle class="gate" cx="146" cy="150" r="4"/>
+<path class="wire" d="M150 150H159"/>
+<path class="wire" d="M110 215.0H121"/>
+<path class="gate" d="M118 201.0L142 215L118 229.0Z"/>
+<circle class="gate" cx="146" cy="215" r="4"/>
+<path class="wire" d="M150 215H159"/>
+<path class="wire" d="M245 52.5H255M245 67.5H255"/>
+<path class="gate" d="M253 45.0H267A15.0 15.0 0 0 1 267 75.0H253Z"/>
+<path class="wire" d="M282.0 60H291.0"/>
+<path class="wire" d="M245 162.5H255M245 177.5H255"/>
+<path class="gate" d="M253 155.0H267A15.0 15.0 0 0 1 267 185.0H253Z"/>
+<path class="wire" d="M282.0 170H291.0"/>
+<path class="wire" d="M380 107.5H397M380 122.5H397"/>
+<path class="gate" d="M388 100.0C406 100.0 414 107.8 419 115C414 122.2 406 130.0 388 130.0Q397 115 388 100.0Z"/>
+<path class="wire" d="M419 115H428"/>
+<text class="lbl" x="22" y="31" text-anchor="end">A</text>
+<path class="wire" d="M30 26L225 26"/>
+<text class="lbl" x="22" y="85" text-anchor="end">B</text>
+<path class="wire" d="M30 80L196 80"/>
+<path class="wire" d="M66 26L66 150L110 150"/>
+<circle class="dot" cx="66" cy="26" r="3.2"/>
+<path class="wire" d="M88 80L88 215L110 215"/>
+<circle class="dot" cx="88" cy="80" r="3.2"/>
+<path class="wire" d="M196 80L196 52.5L245 52.5"/>
+<path class="wire" d="M159 150L210 150L210 67.5L245 67.5"/>
+<path class="wire" d="M225 26L225 162.5L245 162.5"/>
+<path class="wire" d="M159 215L210 215L210 177.5L245 177.5"/>
+<path class="wire" d="M291.0 60L340 60L340 107.5L380 107.5"/>
+<path class="wire" d="M291.0 170L346 170L346 122.5L380 122.5"/>
+<path class="wire" d="M428 115L456 115"/>
+<text class="lbl" x="464" y="120" text-anchor="start">F</text>
+<text class="ann" x="293.0" y="51" text-anchor="start">A&prime;B</text>
+<text class="ann" x="293.0" y="189" text-anchor="start">AB&prime;</text>
+<text class="ann" x="161" y="141" text-anchor="start">A&prime;</text>
+<text class="ann" x="161" y="234" text-anchor="start">B&prime;</text>
+</svg>
+<figcaption>A &oplus; B = A&prime;B + AB&prime;</figcaption></figure>
+<p>Five gates &mdash; two inverters, two ANDs and an OR &mdash; where the XOR symbol is
+one. That is the trade the symbol represents: XOR is not a simpler thing, it is a
+common thing worth naming.</p>
+<div class="tablewrap"><table class="ttab">
+<thead><tr><th>A</th><th>B</th><th>A&prime;</th><th>B&prime;</th><th>A&prime;B</th><th>AB&prime;</th><th>A&prime;B + AB&prime;</th></tr></thead>
+<tbody><tr><td class="bin">0</td><td class="bin">0</td><td class="bin">1</td><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin hilite">0</td></tr><tr><td class="bin">0</td><td class="bin">1</td><td class="bin">1</td><td class="bin">0</td><td class="bin">1</td><td class="bin">0</td><td class="bin hilite">1</td></tr><tr><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin">1</td><td class="bin">0</td><td class="bin">1</td><td class="bin hilite">1</td></tr><tr><td class="bin">1</td><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin hilite">0</td></tr></tbody></table></div>
+<p>The last column matches XOR's, row for row.</p>
+<p>Notice how the circuit was built: one AND gate per row of the table where the
+output is 1, with the inputs inverted to match that row exactly, then one OR gate to
+collect them. That is not a trick for XOR &mdash; it is the general method, it works
+for any truth table at all, and it is what Set 5 is entirely about.</p>
+</div></details>
+
+<details class="prob"><summary data-label="Exercise 4.2">Evaluate 1&nbsp;&oplus;&nbsp;1&nbsp;&oplus;&nbsp;0&nbsp;&oplus;&nbsp;1&nbsp;&oplus;&nbsp;1 and 0&nbsp;&oplus;&nbsp;1&nbsp;&oplus;&nbsp;1&nbsp;&oplus;&nbsp;1. Then state the rule for a chain of any length, and use it to say what a chain of twenty 1s gives.</summary><div class="sol">
+<p>Left to right on the first one, using A&nbsp;&oplus;&nbsp;A&nbsp;=&nbsp;0 and
+A&nbsp;&oplus;&nbsp;0&nbsp;=&nbsp;A:</p>
+<p style="text-align:center;font-size:1.05rem">
+1&oplus;1 = 0, &nbsp; 0&oplus;0 = 0, &nbsp; 0&oplus;1 = 1, &nbsp; 1&oplus;1 =
+<strong>0</strong></p>
+<p>And the second: 0&oplus;1 = 1, 1&oplus;1 = 0, 0&oplus;1 = <strong>1</strong>.</p>
+<p><strong>The rule.</strong> A chain of XORs is 1 exactly when an <em>odd</em> number
+of its inputs are 1. Check it against both answers: the first has four 1s, even, so 0;
+the second has three, odd, so 1.</p>
+<p>Twenty 1s is an even count, so the chain gives <strong>0</strong> &mdash; no
+arithmetic required, and that is the point of having the rule. The 1s cancel in pairs
+and nothing is left over.</p>
+<p>This is why the operation is also called the <em>parity</em> function, and why
+"XOR everything together" is the standard one-line way to compute a parity bit.</p>
+</div></details>
+
+<details class="prob"><summary data-label="Exercise 4.3">Simplify A&nbsp;&oplus;&nbsp;0, A&nbsp;&oplus;&nbsp;1, A&nbsp;&oplus;&nbsp;A and A&nbsp;&oplus;&nbsp;A&prime; from the definition, without a truth table. Then explain what this means for a two-input XOR whose second input is a control wire.</summary><div class="sol">
+<p>Work from "the output is 1 when the inputs differ".</p>
+<ul>
+<li><strong>A&nbsp;&oplus;&nbsp;0 = A.</strong> A differs from 0 precisely when A is
+1.</li>
+<li><strong>A&nbsp;&oplus;&nbsp;1 = A&prime;.</strong> A differs from 1 precisely when
+A is 0.</li>
+<li><strong>A&nbsp;&oplus;&nbsp;A = 0.</strong> Nothing differs from itself, so the
+output is never 1.</li>
+<li><strong>A&nbsp;&oplus;&nbsp;A&prime; = 1.</strong> A and A&prime; are never equal,
+so the output is always 1.</li>
+</ul>
+<p><strong>The control-wire reading.</strong> Put the data bit on one input and call
+the other input S. The first two results say: when S&nbsp;=&nbsp;0 the gate passes the
+data through unchanged, and when S&nbsp;=&nbsp;1 it inverts it. A single XOR gate is a
+<em>conditional inverter</em>, and S decides.</p>
+<p>That is not a curiosity. It is how a subtractor is built out of an adder &mdash;
+complement the second operand when a control line says "subtract" &mdash; which is
+exactly the circuit this course arrives at in the ALU lecture. One XOR per bit, all
+driven by the same control wire.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 4.4">Show that A&prime;&nbsp;&oplus;&nbsp;B&prime; = A&nbsp;&oplus;&nbsp;B, but that A&nbsp;&oplus;&nbsp;B&prime; = (A&nbsp;&oplus;&nbsp;B)&prime;. Explain both in words, then say what this makes an XOR gate useful for.</summary><div class="sol">
+<div class="tablewrap"><table class="ttab">
+<thead><tr><th>A</th><th>B</th><th>A&prime;</th><th>B&prime;</th><th>A &oplus; B</th><th>A&prime; &oplus; B&prime;</th><th>A &oplus; B&prime;</th></tr></thead>
+<tbody><tr><td class="bin">0</td><td class="bin">0</td><td class="bin">1</td><td class="bin">1</td><td class="bin hilite">0</td><td class="bin hilite">0</td><td class="bin">1</td></tr><tr><td class="bin">0</td><td class="bin">1</td><td class="bin">1</td><td class="bin">0</td><td class="bin hilite">1</td><td class="bin hilite">1</td><td class="bin">0</td></tr><tr><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin">1</td><td class="bin hilite">1</td><td class="bin hilite">1</td><td class="bin">0</td></tr><tr><td class="bin">1</td><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin hilite">0</td><td class="bin hilite">0</td><td class="bin">1</td></tr></tbody></table></div>
+<p>The two shaded columns agree, so
+<strong>A&prime;&nbsp;&oplus;&nbsp;B&prime;&nbsp;=&nbsp;A&nbsp;&oplus;&nbsp;B</strong>.
+In words: inverting <em>both</em> inputs does not change whether they differ. If they
+were different they still are; if they matched they still match.</p>
+<p>The last column is the complement of A&nbsp;&oplus;&nbsp;B, so
+<strong>A&nbsp;&oplus;&nbsp;B&prime;&nbsp;=&nbsp;(A&nbsp;&oplus;&nbsp;B)&prime;</strong>.
+Inverting <em>one</em> input flips the answer every time, because it turns every
+agreement into a disagreement.</p>
+<p>So an inversion can be moved freely across an XOR gate, and inversions cancel in
+pairs &mdash; the same parity rule as Exercise 4.2, applied to the bubbles rather than
+to the inputs.</p>
+<p><strong>What it is good for.</strong> A&nbsp;&oplus;&nbsp;B answers "do these two
+bits differ?" and its complement answers "are these two bits equal?". Wire one XOR per
+bit position across two registers and OR all the outputs together, and you have an
+<em>n</em>-bit inequality comparator: the OR is 1 if the two registers differ anywhere
+at all. That is how the branch-if-equal instruction gets its answer, and it is the
+checking technique from &sect;4.5.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 4.5">Show that A&nbsp;&oplus;&nbsp;B = (A&nbsp;+&nbsp;B)&nbsp;&middot;&nbsp;(AB)&prime; and draw that circuit. Compare it with your answer to Exercise 4.1.</summary><div class="sol">
+<p>Read the right-hand side aloud and it argues for itself: "at least one of them, and
+not both of them" is precisely "exactly one of them".</p>
+<div class="tablewrap"><table class="ttab">
+<thead><tr><th>A</th><th>B</th><th>A + B</th><th>AB</th><th>(AB)&prime;</th><th>(A + B)(AB)&prime;</th></tr></thead>
+<tbody><tr><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin">1</td><td class="bin hilite">0</td></tr><tr><td class="bin">0</td><td class="bin">1</td><td class="bin">1</td><td class="bin">0</td><td class="bin">1</td><td class="bin hilite">1</td></tr><tr><td class="bin">1</td><td class="bin">0</td><td class="bin">1</td><td class="bin">0</td><td class="bin">1</td><td class="bin hilite">1</td></tr><tr><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td><td class="bin">0</td><td class="bin hilite">0</td></tr></tbody></table></div>
+<p>The last column is XOR's.</p>
+<figure class="fig" style="--figmax:100%">
+<svg viewBox="0 0 480 165" role="img" aria-label="A &oplus; B = (A + B) &middot; (AB)&prime;">
+<path class="wire" d="M130 32.5H147M130 47.5H147"/>
+<path class="gate" d="M138 25.0C156 25.0 164 32.8 169 40C164 47.2 156 55.0 138 55.0Q147 40 138 25.0Z"/>
+<path class="wire" d="M169 40H178"/>
+<path class="wire" d="M130 122.5H140M130 137.5H140"/>
+<path class="gate" d="M138 115.0H152A15.0 15.0 0 0 1 152 145.0H138Z"/>
+<path class="wire" d="M167.0 130H176.0"/>
+<path class="wire" d="M250 130.0H261"/>
+<path class="gate" d="M258 116.0L282 130L258 144.0Z"/>
+<circle class="gate" cx="286" cy="130" r="4"/>
+<path class="wire" d="M290 130H299"/>
+<path class="wire" d="M370 77.5H380M370 92.5H380"/>
+<path class="gate" d="M378 70.0H392A15.0 15.0 0 0 1 392 100.0H378Z"/>
+<path class="wire" d="M407.0 85H416.0"/>
+<text class="lbl" x="22" y="31" text-anchor="end">A</text>
+<path class="wire" d="M30 26L100 26"/>
+<text class="lbl" x="22" y="75" text-anchor="end">B</text>
+<path class="wire" d="M30 70L108 70"/>
+<path class="wire" d="M100 26L100 26L100 32.5L130 32.5"/>
+<path class="wire" d="M108 70L108 70L108 47.5L130 47.5"/>
+<path class="wire" d="M58 26L58 122.5L130 122.5"/>
+<circle class="dot" cx="58" cy="26" r="3.2"/>
+<path class="wire" d="M80 70L80 137.5L130 137.5"/>
+<circle class="dot" cx="80" cy="70" r="3.2"/>
+<path class="wire" d="M176.0 130L250 130.0"/>
+<path class="wire" d="M178 40L335 40L335 77.5L370 77.5"/>
+<path class="wire" d="M299 130L340 130L340 92.5L370 92.5"/>
+<path class="wire" d="M416.0 85L444.0 85"/>
+<text class="lbl" x="452.0" y="90" text-anchor="start">F</text>
+<text class="ann" x="180" y="32" text-anchor="start">A + B</text>
+<text class="ann" x="301" y="148" text-anchor="start">(AB)&prime;</text>
+</svg>
+<figcaption>A &oplus; B = (A + B) &middot; (AB)&prime;</figcaption></figure>
+<p>Four gates, against five in Exercise 4.1, and no inverters on the inputs &mdash;
+though both A and B now fan out to two places. Both circuits compute the same
+function; they differ in how the work is divided up.</p>
+<p>The algebraic route to the same place, starting from the definition and using De
+Morgan on the second factor:</p>
+<p style="text-align:center;font-size:1.05rem">
+(A + B)(AB)&prime; = (A + B)(A&prime; + B&prime;)
+= AA&prime; + AB&prime; + A&prime;B + BB&prime;
+= 0 + AB&prime; + A&prime;B + 0 = A&prime;B + AB&prime;</p>
+<p>which is Exercise 4.1's expression. Two of the four products vanished by the
+complement law, and that is a pattern worth remembering: multiplying out a product of
+sums usually produces terms that immediately die.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 4.6">Tabulate (A&nbsp;&oplus;&nbsp;B)&nbsp;&oplus;&nbsp;C and A&nbsp;&oplus;&nbsp;(B&nbsp;&oplus;&nbsp;C) to show XOR is associative. Then answer the question this raises: does A&nbsp;&oplus;&nbsp;B&nbsp;&oplus;&nbsp;C mean "exactly one of A, B, C is 1"?</summary><div class="sol">
+<div class="tablewrap"><table class="ttab">
+<thead><tr><th>A</th><th>B</th><th>C</th><th>A &oplus; B</th><th>(A&oplus;B) &oplus; C</th><th>B &oplus; C</th><th>A &oplus; (B&oplus;C)</th></tr></thead>
+<tbody><tr><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin hilite">0</td><td class="bin">0</td><td class="bin hilite">0</td></tr><tr><td class="bin">0</td><td class="bin">0</td><td class="bin">1</td><td class="bin">0</td><td class="bin hilite">1</td><td class="bin">1</td><td class="bin hilite">1</td></tr><tr><td class="bin">0</td><td class="bin">1</td><td class="bin">0</td><td class="bin">1</td><td class="bin hilite">1</td><td class="bin">1</td><td class="bin hilite">1</td></tr><tr><td class="bin">0</td><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td><td class="bin hilite">0</td><td class="bin">0</td><td class="bin hilite">0</td></tr><tr><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin">1</td><td class="bin hilite">1</td><td class="bin">0</td><td class="bin hilite">1</td></tr><tr><td class="bin">1</td><td class="bin">0</td><td class="bin">1</td><td class="bin">1</td><td class="bin hilite">0</td><td class="bin">1</td><td class="bin hilite">0</td></tr><tr><td class="bin">1</td><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin hilite">0</td><td class="bin">1</td><td class="bin hilite">0</td></tr><tr><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td><td class="bin">0</td><td class="bin hilite">1</td><td class="bin">0</td><td class="bin hilite">1</td></tr></tbody></table></div>
+<p>The two shaded columns are identical, so the bracketing does not matter and
+A&nbsp;&oplus;&nbsp;B&nbsp;&oplus;&nbsp;C is unambiguous. Together with commutativity,
+this means a chain of XORs can be reordered and regrouped at will &mdash; which is
+what licenses the "cancel the 1s in pairs" shortcut.</p>
+<p><strong>And no</strong>, emphatically. The chain is 1 in four rows: 001, 010, 100
+<em>and 111</em>. That last row has three 1s, not one. A three-input XOR is the
+<em>odd parity</em> function, not the "exactly one" function.</p>
+<p>"Exactly one of three" is a genuinely different function &mdash; it is 1 on 001,
+010, 100 only &mdash; and it needs more than a chain of XORs to build. The confusion
+comes from the two-input case, where "differ", "exactly one" and "odd number" all
+happen to coincide; with three inputs they come apart, and only "odd number" survives
+as the meaning of the chain.</p></div></details>
+
+<h3>Simplifying</h3>
+
+<details class="prob"><summary data-label="Exercise 4.7">Simplify X&prime;Y&nbsp;+&nbsp;X&prime;Y&prime;.</summary><div class="sol">
+<p>Factor out what the two terms share, then use the complement and identity laws:</p>
+<p style="text-align:center;font-size:1.05rem">
+X&prime;Y + X&prime;Y&prime; = X&prime;(Y + Y&prime;) = X&prime; &middot; 1 =
+<strong>X&prime;</strong></p>
+<p>This is the combining law XY&nbsp;+&nbsp;XY&prime;&nbsp;=&nbsp;X with X&prime; in
+the role of X, and it is the single most useful move in the toolkit: two terms that
+agree everywhere except one variable, where they disagree, merge into one term with
+that variable deleted.</p>
+<p>Worth reading the other way round too. Y has disappeared, which means Y never
+affected the output &mdash; both of its values were accounted for. Whenever a variable
+appears once primed and once unprimed across otherwise identical terms, it is about to
+vanish.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 4.8">Simplify (P&nbsp;+&nbsp;Q&prime;)(P&nbsp;+&nbsp;R).</summary><div class="sol">
+<p>This is the surprising distributive law, read right to left:</p>
+<p style="text-align:center;font-size:1.05rem">
+(P + Q&prime;)(P + R) = <strong>P + Q&prime;R</strong></p>
+<p>Two gates instead of three, and the long way round confirms it:</p>
+<p style="text-align:center;font-size:1.05rem">
+(P + Q&prime;)(P + R) = PP + PR + PQ&prime; + Q&prime;R
+= P + PR + PQ&prime; + Q&prime;R</p>
+<p>and now P absorbs both PR and PQ&prime; by
+X&nbsp;+&nbsp;XY&nbsp;=&nbsp;X, leaving P&nbsp;+&nbsp;Q&prime;R. Note
+PP&nbsp;=&nbsp;P by idempotence &mdash; in ordinary algebra that step would have given
+P<sup>2</sup>, and there are no squares in Boolean algebra.</p>
+<p>The pattern to recognise: two sums sharing a term multiply into that term plus the
+product of the leftovers. Spotting it directly saves the four-line expansion, and the
+expansion is there to fall back on when you do not trust the shortcut.</p>
+</div></details>
+
+<details class="prob"><summary data-label="Exercise 4.9">Simplify AB&prime;C&nbsp;+&nbsp;AB&prime;C&prime;&nbsp;+&nbsp;AB.</summary><div class="sol">
+<p>The first two terms agree except in C, so they combine:</p>
+<p style="text-align:center;font-size:1.05rem">
+AB&prime;C + AB&prime;C&prime; = AB&prime;(C + C&prime;) = AB&prime;</p>
+<p>which leaves AB&prime;&nbsp;+&nbsp;AB, and those two agree except in B:</p>
+<p style="text-align:center;font-size:1.05rem">
+AB&prime; + AB = A(B&prime; + B) = <strong>A</strong></p>
+<p>Three product terms and a nine-gate drawing collapse to a wire. Do the two
+combining steps in the other order if you like &mdash; nothing depends on which pair
+you take first.</p>
+<p>Sanity check by reading the original: every term has an A, so the output is 0
+whenever A is 0. And when A is 1, the terms cover B&prime;C, B&prime;C&prime; and B,
+which between them cover every possibility for B and C. So the output is 1 whenever A
+is 1 &mdash; exactly the claim that F&nbsp;=&nbsp;A. That style of argument is quicker
+than the algebra once you trust it, and it is the intuition a Karnaugh map turns into
+a picture.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 4.10">Simplify P&nbsp;+&nbsp;P&prime;QR.</summary><div class="sol">
+<p>Mixed absorption, X&nbsp;+&nbsp;X&prime;Y&nbsp;=&nbsp;X&nbsp;+&nbsp;Y, with
+Y&nbsp;=&nbsp;QR:</p>
+<p style="text-align:center;font-size:1.05rem">
+P + P&prime;QR = <strong>P + QR</strong></p>
+<p>The prime on P simply falls off. If you want to see why, expand with the surprising
+distributive law and then collapse:</p>
+<p style="text-align:center;font-size:1.05rem">
+P + P&prime;QR = (P + P&prime;)(P + QR) = 1 &middot; (P + QR) = P + QR</p>
+<p>In words: the term P&prime;QR only contributes when P is 0, and in that case the
+output is QR. When P is 1 the output is already 1 and nothing else matters. So the
+P&prime; is doing no work and can go &mdash; which saves an inverter and an AND
+input.</p>
+<p>The companion law is X(X&prime;&nbsp;+&nbsp;Y)&nbsp;=&nbsp;XY, where the prime falls
+off in the same way. Both are easy to misremember as
+X&nbsp;+&nbsp;X&prime;Y&nbsp;=&nbsp;X, which is the plain absorption law and is
+<em>wrong</em> here &mdash; check row P&nbsp;=&nbsp;0, Q&nbsp;=&nbsp;R&nbsp;=&nbsp;1 and
+the two differ.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 4.11">Simplify ((W&prime;&nbsp;+&nbsp;X)Z)&prime;.</summary><div class="sol">
+<p>Step 1 of the method: push the outer complement inward. The thing being
+complemented is a product of (W&prime;&nbsp;+&nbsp;X) and Z, so De Morgan turns it into
+a sum:</p>
+<p style="text-align:center;font-size:1.05rem">
+((W&prime; + X)Z)&prime; = (W&prime; + X)&prime; + Z&prime;</p>
+<p>Now the remaining complement is over a sum, so De Morgan again turns it into a
+product, and the double prime cancels:</p>
+<p style="text-align:center;font-size:1.05rem">
+(W&prime; + X)&prime; = (W&prime;)&prime; &middot; X&prime; = WX&prime;
+&nbsp;&nbsp;&rarr;&nbsp;&nbsp; <strong>WX&prime; + Z&prime;</strong></p>
+<p>Two terms, and no simplification left: they share nothing and neither contains the
+other.</p>
+<p>The two De Morgan steps alternated AND and OR, which is the shape of every such
+unwrapping &mdash; sum, product, sum &mdash; and a useful thing to expect. If your
+answer has two ANDs in a row as you unwrap, you have applied the law to the wrong
+operator.</p>
+<p>The common wrong answer here is
+(W&nbsp;+&nbsp;X&prime;)Z&prime;, which comes from complementing each piece in place
+and leaving the operators alone. One row disproves it: W&nbsp;=&nbsp;1,
+X&nbsp;=&nbsp;0, Z&nbsp;=&nbsp;1 gives 1 for the correct answer and 0 for that
+one.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 4.12">Show that XY&nbsp;+&nbsp;X&prime;Z&nbsp;+&nbsp;YZ = XY&nbsp;+&nbsp;X&prime;Z, first with a truth table and then with algebra. Say in words why the third term is redundant.</summary><div class="sol">
+<div class="tablewrap"><table class="ttab">
+<thead><tr><th>X</th><th>Y</th><th>Z</th><th>XY</th><th>X&prime;Z</th><th>YZ</th><th>XY + X&prime;Z + YZ</th><th>XY + X&prime;Z</th></tr></thead>
+<tbody><tr><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin hilite">0</td><td class="bin hilite">0</td></tr><tr><td class="bin">0</td><td class="bin">0</td><td class="bin">1</td><td class="bin">0</td><td class="bin">1</td><td class="bin">0</td><td class="bin hilite">1</td><td class="bin hilite">1</td></tr><tr><td class="bin">0</td><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin hilite">0</td><td class="bin hilite">0</td></tr><tr><td class="bin">0</td><td class="bin">1</td><td class="bin">1</td><td class="bin">0</td><td class="bin">1</td><td class="bin">1</td><td class="bin hilite">1</td><td class="bin hilite">1</td></tr><tr><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin hilite">0</td><td class="bin hilite">0</td></tr><tr><td class="bin">1</td><td class="bin">0</td><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin hilite">0</td><td class="bin hilite">0</td></tr><tr><td class="bin">1</td><td class="bin">1</td><td class="bin">0</td><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin hilite">1</td><td class="bin hilite">1</td></tr><tr><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td><td class="bin">0</td><td class="bin">1</td><td class="bin hilite">1</td><td class="bin hilite">1</td></tr></tbody></table></div>
+<p>The two shaded columns agree in all eight rows.</p>
+<p><strong>The algebra.</strong> The trick is to expand the term you want to get rid
+of, using
+1&nbsp;=&nbsp;X&nbsp;+&nbsp;X&prime;:</p>
+<p style="text-align:center;font-size:1.05rem">
+YZ = YZ &middot; 1 = YZ(X + X&prime;) = XYZ + X&prime;YZ</p>
+<p>so the whole expression becomes
+XY&nbsp;+&nbsp;X&prime;Z&nbsp;+&nbsp;XYZ&nbsp;+&nbsp;X&prime;YZ. Now XY absorbs XYZ
+and X&prime;Z absorbs X&prime;YZ, both by X&nbsp;+&nbsp;XY&nbsp;=&nbsp;X, leaving</p>
+<p style="text-align:center;font-size:1.05rem">
+<strong>XY + X&prime;Z</strong></p>
+<p><strong>Why, in words.</strong> For YZ to contribute, both Y and Z must be 1. But X
+is either 1 or 0. If X&nbsp;=&nbsp;1 then XY is already 1, since Y is 1. If
+X&nbsp;=&nbsp;0 then X&prime;Z is already 1, since Z is 1. So whenever YZ would have
+made the output 1, one of the other two terms has already done it. The term is never
+the deciding one.</p>
+<p>This is the <strong>consensus theorem</strong>, and it is the one law that removes a
+term without leaving a trace, which makes it the hardest to spot going forwards and
+the easiest to miss on an exam. The shape to look for: two terms containing a variable
+in both polarities, and a third term made of exactly the leftovers.</p>
+<div class="box extra"><span class="bt">It matters in real hardware</span>
+<p>A redundant term is not always waste. Gates take time, and a circuit switching
+between two input states can briefly produce a wrong output &mdash; a
+<em>glitch</em> &mdash; while the signals race each other. The consensus term, kept
+deliberately, can hold the output steady through exactly that transition. Minimal and
+correct are not quite the same goal, which is a distinction worth filing away for the
+timing lectures.</p></div>
+</div></details>
+
+<details class="prob"><summary data-label="Exercise 4.13">Simplify (A&nbsp;+&nbsp;B&prime;)&prime;&nbsp;+&nbsp;(A&prime;B)&prime;.</summary><div class="sol">
+<p>Two complements over brackets, so De Morgan twice. The first is a complemented
+sum, which becomes a product; the second is a complemented product, which becomes a
+sum:</p>
+<p style="text-align:center;font-size:1.05rem">
+(A + B&prime;)&prime; = A&prime;(B&prime;)&prime; = A&prime;B
+&nbsp;&nbsp;&nbsp; (A&prime;B)&prime; = (A&prime;)&prime; + B&prime; = A + B&prime;</p>
+<p>So F = A&prime;B&nbsp;+&nbsp;A&nbsp;+&nbsp;B&prime;. Mixed absorption on the first
+two, A&nbsp;+&nbsp;A&prime;B&nbsp;=&nbsp;A&nbsp;+&nbsp;B:</p>
+<p style="text-align:center;font-size:1.05rem">
+F = A + B + B&prime; = A + 1 = <strong>1</strong></p>
+<p>The function is the constant 1 &mdash; the output is 1 for every input, and the
+whole circuit can be replaced by a wire tied high.</p>
+<p>Worth knowing that this happens, because when it does, algebra is the only method
+that tells you cheaply. Four gates, nothing obviously degenerate about the expression,
+and the answer is that none of it was ever needed. If you suspect a constant, checking
+two or three rows for the same answer is a quick confirmation before you commit to the
+algebra.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 4.14">Simplify WX&prime;Y&nbsp;+&nbsp;WX&prime;Y&prime;&nbsp;+&nbsp;WXY&nbsp;+&nbsp;WXYZ.</summary><div class="sol">
+<p>Four terms, and every one contains W, which is worth noticing before anything
+else. Take them in pairs.</p>
+<p>The first two agree except in Y:</p>
+<p style="text-align:center;font-size:1.05rem">
+WX&prime;Y + WX&prime;Y&prime; = WX&prime;(Y + Y&prime;) = WX&prime;</p>
+<p>The last two are an absorption, since WXY is contained in WXYZ:</p>
+<p style="text-align:center;font-size:1.05rem">
+WXY + WXYZ = WXY(1 + Z) = WXY</p>
+<p>So F = WX&prime;&nbsp;+&nbsp;WXY. Factor out the W and use mixed absorption inside
+the bracket, X&prime;&nbsp;+&nbsp;XY&nbsp;=&nbsp;X&prime;&nbsp;+&nbsp;Y:</p>
+<p style="text-align:center;font-size:1.05rem">
+F = W(X&prime; + XY) = <strong>W(X&prime; + Y)</strong>, &nbsp;that is&nbsp;
+WX&prime; + WY</p>
+<p>From four product terms with twelve literals down to two terms with four. Z has
+vanished entirely, which the original expression gave no hint of.</p>
+<p>The step people miss is the absorption of WXYZ. A longer term that <em>contains</em>
+a shorter one is always the redundant one &mdash; adding more conditions to something
+already sufficient cannot make the output 1 in any new case. Scan for that pattern
+first, because it deletes a term outright and shortens everything that follows.</p>
+</div></details>
+
+<h3>Reasoning</h3>
+
+<details class="prob"><summary data-label="Exercise 4.15">Challenge. Prove that a chain A<sub>1</sub>&nbsp;&oplus;&nbsp;A<sub>2</sub>&nbsp;&oplus;&nbsp;&hellip;&nbsp;&oplus;&nbsp;A<sub><var>n</var></sub> outputs 1 exactly when an odd number of the inputs are 1. Then use the result: a sender appends one extra bit to seven data bits so that the total number of 1s is always even. What is that bit, as an expression, and what can the receiver detect?</summary><div class="sol">
+<p><strong>The proof, by induction on <var>n</var>.</strong></p>
+<p><em>Base case,</em> <var>n</var>&nbsp;=&nbsp;1. The chain is just A<sub>1</sub>,
+which is 1 exactly when one input is 1 &mdash; an odd count. True.</p>
+<p><em>Inductive step.</em> Suppose the claim holds for a chain of <var>k</var>
+inputs; call that chain's output P. Then the chain of
+<var>k</var>&nbsp;+&nbsp;1 inputs is P&nbsp;&oplus;&nbsp;A<sub><var>k</var>+1</sub>,
+because XOR is associative (Exercise 4.6) and so the chain can be bracketed that way.
+Two cases:</p>
+<ul>
+<li><strong>A<sub><var>k</var>+1</sub>&nbsp;=&nbsp;0.</strong> Then
+P&nbsp;&oplus;&nbsp;0&nbsp;=&nbsp;P, and the number of 1s among the
+<var>k</var>&nbsp;+&nbsp;1 inputs is the same as among the first <var>k</var>. The
+output and the parity both agree with the <var>k</var>-input case, so the claim
+survives.</li>
+<li><strong>A<sub><var>k</var>+1</sub>&nbsp;=&nbsp;1.</strong> Then
+P&nbsp;&oplus;&nbsp;1&nbsp;=&nbsp;P&prime;, and the number of 1s has gone up by one, so
+its parity has flipped too. Output flipped, parity flipped: they still match.</li>
+</ul>
+<p>In both cases the property is preserved, so by induction it holds for every
+<var>n</var>. The two identities that carried the proof are exactly
+A&nbsp;&oplus;&nbsp;0&nbsp;=&nbsp;A and A&nbsp;&oplus;&nbsp;1&nbsp;=&nbsp;A&prime;
+from &sect;4.2.</p>
+<p><strong>The parity bit.</strong> The sender wants the eight bits together to hold
+an even number of 1s. The extra bit must therefore be 1 exactly when the seven data
+bits contain an odd number of 1s &mdash; which, by the theorem just proved, is what a
+chain of XORs computes:</p>
+<p style="text-align:center;font-size:1.05rem">
+P = D<sub>1</sub> &oplus; D<sub>2</sub> &oplus; D<sub>3</sub> &oplus; D<sub>4</sub>
+&oplus; D<sub>5</sub> &oplus; D<sub>6</sub> &oplus; D<sub>7</sub></p>
+<p>Six XOR gates, and nothing else.</p>
+<p><strong>What the receiver can detect.</strong> It XORs all eight received bits
+together. The answer should be 0; if it is 1, an odd number of bits &mdash; one, three,
+five or seven &mdash; were corrupted in transit. So a single parity bit detects
+<em>any odd number of bit errors</em>, and in particular the single-bit error that is
+by far the most likely one.</p>
+<p>What it cannot do is either of the two things people assume. It cannot detect an
+<em>even</em> number of errors: flip two bits and the parity is unchanged. And it
+cannot tell you <em>which</em> bit went wrong, so it cannot correct anything. Getting
+that requires several parity bits over overlapping subsets of the data, which is the
+idea behind Hamming codes &mdash; and the reason error-correcting memory costs more
+than one extra bit per word.</p>
+<div class="box extra"><span class="bt">Where you have already met this</span>
+<p>Set 1's Morse code had no parity bit and relied on the operator's ear; ASCII, in
+Set 5's companion topic, was originally a 7-bit code precisely so that the eighth bit
+of a byte could carry P. The arithmetic here is the same arithmetic, three gates and
+four weeks later.</p></div>
+</div></details>
+
+<div class="box extra"><span class="bt">Where this goes next</span>
+<p>Everything above was algebra done by eye, and eyes miss things: there is no
+guarantee that the expression you stopped at is the smallest one. The next set turns
+the problem around &mdash; start from the truth table, and write down a circuit
+mechanically &mdash; and the set after that draws the table as a picture, the Karnaugh
+map, in which the combining law of Exercise 4.7 becomes two squares sitting next to
+each other and minimality becomes something you can see.</p></div>
+
+    <nav class="pagenav">
+      <a class="prev" href="ex-circuits.html"><span>Previous</span>Set 3. Gates, circuit diagrams and truth tables</a>
+      <a class="next" href="ex-sop-pos.html"><span>Next</span>Set 5. SOP, POS and canonical forms</a>
+    </nav>
+    <footer class="site">
+      <em>Computer Organization and Assembly Language</em> &middot; CSCI 240 / 640,
+      Queens College CUNY.
+    </footer>
+  </main>
+</div>
+</body>
+</html>
