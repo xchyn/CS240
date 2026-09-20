@@ -176,7 +176,7 @@ assuming.</p></div>
 An SOP expression is a layer of AND gates &mdash; one per product term, each as wide
 as the term is long &mdash; feeding a single OR gate as wide as there are terms:</p>
 
-<figure class="fig" style="--figmax:100%">
+<figure class="fig" style="--figmax:565px">
 <svg viewBox="0 0 565 350" role="img" aria-label="Two-level AND&ndash;OR: F = A&prime;B&prime;C&prime; + A&prime;BC + AB&prime;C &nbsp;(inverters on the inputs not drawn)">
 <path class="wire" d="M210 40.3H220M210 55.0H220M210 69.7H220"/>
 <path class="gate" d="M218 33.0H232A22.0 22.0 0 0 1 232 77.0H218Z"/>
@@ -229,7 +229,7 @@ of levels any non-trivial function can be built in.</p>
 <p>A POS expression is the same picture upside down: a layer of OR gates, one per sum
 term, feeding a single AND gate.</p>
 
-<figure class="fig" style="--figmax:100%">
+<figure class="fig" style="--figmax:600px">
 <svg viewBox="0 0 600 250" role="img" aria-label="Two-level OR&ndash;AND: F = (A + B + C&prime;)(A&prime; + B&prime; + C) &nbsp;(inverters not drawn)">
 <path class="wire" d="M210 45.3H227M210 60.0H227M210 74.7H227"/>
 <path class="gate" d="M218 38.0C236 38.0 244 49.4 249 60C244 70.6 236 82.0 218 82.0Q227 60 218 38.0Z"/>
@@ -440,7 +440,7 @@ this ever feels shaky, expand to SOP instead, find the 1-rows, and read the POS 
 <details class="prob"><summary data-label="Exercise 5.7">Draw the two-level AND&ndash;OR circuit for F&nbsp;=&nbsp;&Sigma;m(0,&nbsp;3,&nbsp;5) over A, B, C. Count the gates and the total number of gate inputs, including the inverters.</summary><div class="sol">
 <p>Three minterms, so three AND gates, each with three inputs, feeding one three-input
 OR gate. The complemented literals come from three inverters on the input column.</p>
-<figure class="fig" style="--figmax:100%">
+<figure class="fig" style="--figmax:565px">
 <svg viewBox="0 0 565 350" role="img" aria-label="Two-level AND&ndash;OR: F = A&prime;B&prime;C&prime; + A&prime;BC + AB&prime;C &nbsp;(inverters on the inputs not drawn)">
 <path class="wire" d="M210 40.3H220M210 55.0H220M210 69.7H220"/>
 <path class="gate" d="M218 33.0H232A22.0 22.0 0 0 1 232 77.0H218Z"/>
@@ -498,7 +498,7 @@ never involves thinking about the function as a whole.</p></div></details>
 
 <details class="prob"><summary data-label="Exercise 5.8">Draw the two-level OR&ndash;AND circuit for F&nbsp;=&nbsp;&Pi;M(1,&nbsp;6) over A, B, C, and compare its cost with the SOP circuit for the same function.</summary><div class="sol">
 <p>Two maxterms, so two three-input OR gates feeding one two-input AND gate.</p>
-<figure class="fig" style="--figmax:100%">
+<figure class="fig" style="--figmax:600px">
 <svg viewBox="0 0 600 250" role="img" aria-label="Two-level OR&ndash;AND: F = (A + B + C&prime;)(A&prime; + B&prime; + C) &nbsp;(inverters not drawn)">
 <path class="wire" d="M210 45.3H227M210 60.0H227M210 74.7H227"/>
 <path class="gate" d="M218 38.0C236 38.0 244 49.4 249 60C244 70.6 236 82.0 218 82.0Q227 60 218 38.0Z"/>
