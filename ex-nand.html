@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Set 7 &mdash; NAND, NOR and universality</title>
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/notes.js" defer></script>
+</head>
+<body>
+<header class="topbar"><div class="topbar-in">
+  <a class="brand" href="index.html">CSCI 240</a>
+  <span class="crumb">Set 7 &middot; NAND and NOR</span>
+  <nav class="topnav">
+    <a href="ex-kmaps.html">&larr; Prev</a>
+    <a href="index.html">Contents</a>
+    <a href="setup-logisim.html">Next &rarr;</a>
+    <button class="iconbtn" id="themebtn" type="button" title="Light / dark">&#9686;</button>
+  </nav>
+</div></header>
+<div class="wrap">
+  <aside class="toc"><p class="toc-title">On this page</p><ol>
+    <li><a href="#gates"><span class="t">7.1</span>Two more gates</a></li>
+    <li><a href="#universal"><span class="t">7.2</span>Why one gate is enough</a></li>
+    <li><a href="#toolkit"><span class="t">7.3</span>The NAND toolkit</a></li>
+    <li><a href="#bubbles"><span class="t">7.4</span>Bubbles and alternate symbols</a></li>
+    <li><a href="#convert"><span class="t">7.5</span>Converting a circuit</a></li>
+    <li><a href="#ref"><span class="t">7.6</span>Reference</a></li>
+    <li><a href="#exercises"><span class="t">7.7</span>Exercises</a></li>
+  </ol></aside>
+  <main>
+
+<div class="chhead">
+  <span class="chpart">Exercise set 7 &middot; after the universality lecture</span>
+  <span class="chnum">NAND and NOR</span>
+  <h1>One gate is all you need</h1>
+  <p class="chsum">The NAND and NOR gates; the proof that either one alone can build
+  every circuit there is; the bubble notation and De Morgan's alternate symbols; and
+  the mechanical conversion of an AND&ndash;OR circuit into pure NAND.</p>
+</div>
+
+<p>Every circuit so far has been drawn in AND, OR and NOT, and Set 5 proved that those
+three suffice for any truth table at all. Real chips are not built that way. They are
+built out of one gate type repeated billions of times, and this set is about why that
+is possible and how to get there from the circuits you already know how to draw.</p>
+
+<p>The claim is strong enough to be worth stating plainly: <strong>any combinational
+circuit whatsoever can be built out of NAND gates alone</strong>. Not most circuits,
+not with some special exceptions &mdash; all of them. The same is true of NOR. Nothing
+else in this course is quite so surprising on first hearing and quite so easy to prove
+once you see how.</p>
+
+<h2 id="gates"><span class="secnum">7.1</span>Two more gates</h2>
+
+<p>Both gates are an old gate with an inversion bolted on the output, and both symbols
+say exactly that: the familiar shape, plus the little circle that has meant "invert"
+since Set 3.</p>
+
+<div class="grid2">
+  <div class="symcard"><figure class="fig" style="--figmax:9.5rem">
+<svg viewBox="0 0 104 52" role="img" aria-label="NAND">
+<path class="wire" d="M34 18.5H44M34 33.5H44"/>
+<path class="gate" d="M42 11.0H56A15.0 15.0 0 0 1 56 41.0H42Z"/>
+<circle class="gate" cx="75.0" cy="26" r="4"/>
+<path class="wire" d="M79.0 26H88.0"/>
+<path class="wire" d="M12 18.5L34 18.5"/>
+<text class="lbl" x="10" y="22.5" text-anchor="end">A</text>
+<path class="wire" d="M12 33.5L34 33.5"/>
+<text class="lbl" x="10" y="37.5" text-anchor="end">B</text>
+<path class="wire" d="M88.0 26L98.0 26"/>
+</svg>
+<figcaption>NAND</figcaption></figure><p><strong>NAND</strong> &mdash; (AB)&prime;<br>
+  AND, then invert. 0 only when both inputs are 1.</p></div>
+  <div class="symcard"><figure class="fig" style="--figmax:9.5rem">
+<svg viewBox="0 0 104 52" role="img" aria-label="NOR">
+<path class="wire" d="M34 18.5H51M34 33.5H51"/>
+<path class="gate" d="M42 11.0C60 11.0 68 18.8 73 26C68 33.2 60 41.0 42 41.0Q51 26 42 11.0Z"/>
+<circle class="gate" cx="77" cy="26" r="4"/>
+<path class="wire" d="M81 26H90"/>
+<path class="wire" d="M12 18.5L34 18.5"/>
+<text class="lbl" x="10" y="22.5" text-anchor="end">A</text>
+<path class="wire" d="M12 33.5L34 33.5"/>
+<text class="lbl" x="10" y="37.5" text-anchor="end">B</text>
+<path class="wire" d="M90 26L100 26"/>
+</svg>
+<figcaption>NOR</figcaption></figure><p><strong>NOR</strong> &mdash; (A&nbsp;+&nbsp;B)&prime;<br>
+  OR, then invert. 1 only when both inputs are 0.</p></div>
+</div>
+
+<div class="ttrow"><div class="tablewrap"><table class="ttab">
+<thead><tr><th>A</th><th>B</th><th>AB</th><th>NAND</th><th>A + B</th><th>NOR</th></tr></thead>
+<tbody><tr><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin hilite">1</td><td class="bin">0</td><td class="bin hilite">1</td></tr><tr><td class="bin">0</td><td class="bin">1</td><td class="bin">0</td><td class="bin hilite">1</td><td class="bin">1</td><td class="bin hilite">0</td></tr><tr><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin hilite">1</td><td class="bin">1</td><td class="bin hilite">0</td></tr><tr><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td><td class="bin hilite">0</td><td class="bin">1</td><td class="bin hilite">0</td></tr></tbody></table></div></div>
+
+<p>Each is the exact complement of the gate it is named after &mdash; the NAND column
+is the AND column upside down, and the NOR column is the OR column upside down. Read
+them in words and each has a crisp description of its own: NAND is 0 only when
+<em>everything</em> is 1; NOR is 1 only when <em>everything</em> is 0.</p>
+
+<div class="box warn"><span class="bt">Where the circle sits</span>
+<p>NAND is AND followed by NOT. It is <em>not</em> NOT followed by AND, which would be
+A&prime;B&prime;, a different function &mdash; the trap from Exercise 3.12 wearing a
+new hat. The circle is on the output side of the body, and that is what tells you the
+order.</p>
+</div>
+
+<div class="box note"><span class="bt">A shorthand for these two gates</span>
+<p>Each of these gates has an operator symbol of its own, and this page uses them
+wherever writing out the brackets would bury the point being made:</p>
+<p style="text-align:center;font-size:1.05rem">
+A&nbsp;&uarr;&nbsp;B &nbsp;means&nbsp; NAND(A,&nbsp;B) = (AB)&prime;<br>
+A&nbsp;&darr;&nbsp;B &nbsp;means&nbsp; NOR(A,&nbsp;B) = (A&nbsp;+&nbsp;B)&prime;</p>
+<p>The up arrow is read aloud as "nand" &mdash; "A nand B" &mdash; and it is an
+operator, like&nbsp;+ and&nbsp;&middot;, rather than a new gate. From the table above,
+1&nbsp;&uarr;&nbsp;1&nbsp;=&nbsp;0 and 1&nbsp;&uarr;&nbsp;0&nbsp;=&nbsp;1. Its own name
+is the <em>Sheffer stroke</em>, which you will meet in a logic course and can forget
+here.</p>
+<p>An expression built from it is read left to right as a chain of gates:
+(A&nbsp;&uarr;&nbsp;B)&nbsp;&uarr;&nbsp;C means "NAND A with B, then NAND that result
+with C", which is one gate feeding another. The brackets are doing real work &mdash;
+unlike&nbsp;+ and&nbsp;&middot;, this operator is <em>not</em> associative, so
+A&nbsp;&uarr;&nbsp;(B&nbsp;&uarr;&nbsp;C) is a different circuit computing a different
+function. Exercise 7.4 is precisely that point, and until you have done it, write the
+brackets every time.</p></div>
+
+<h2 id="universal"><span class="secnum">7.2</span>Why one gate is enough</h2>
+
+<p>The argument has two steps, and neither is hard.</p>
+
+<p><strong>Step one</strong> is Set 5. Every truth table can be written as a sum of
+products, and a sum of products is built from AND, OR and NOT. So those three gate
+types can build any combinational circuit.</p>
+
+<p><strong>Step two</strong> is to build each of those three out of NAND gates alone.
+If NAND can make a NOT, an AND and an OR, then NAND can make anything those three
+could make &mdash; which, by step one, is everything. Replace each gate of an
+AND&ndash;OR&ndash;NOT circuit with its NAND equivalent and you have a pure-NAND
+circuit computing the same function.</p>
+
+<p>A set of gates that can build every function is called
+<strong>functionally complete</strong>, or universal. {AND, OR, NOT} is functionally
+complete; step two shows {NAND} is too, all by itself.</p>
+
+<div class="box note"><span class="bt">The same argument, twice</span>
+<p>Everything here has a NOR version obtained by swapping AND with OR and 0 with 1
+&mdash; the duality from Set 4. NOR is universal for exactly the same reason, and the
+three NOR constructions are the three NAND ones with the gates exchanged. Learn one
+set properly and the other costs nothing.</p></div>
+
+<h2 id="toolkit"><span class="secnum">7.3</span>The NAND toolkit</h2>
+
+<p>Three small circuits, worth being able to draw from memory.</p>
+
+<p><strong>NOT.</strong> Tie both inputs of a NAND together. Then the gate computes
+(A&nbsp;&middot;&nbsp;A)&prime;, and A&nbsp;&middot;&nbsp;A&nbsp;=&nbsp;A by
+idempotence, so the output is A&prime;.</p>
+
+<figure class="fig" style="--figmax:16rem">
+<svg viewBox="0 0 260 92" role="img" aria-label="A&prime; = NAND(A, A)">
+<path class="wire" d="M120 37.5H130M120 52.5H130"/>
+<path class="gate" d="M128 30.0H142A15.0 15.0 0 0 1 142 60.0H128Z"/>
+<circle class="gate" cx="161.0" cy="45" r="4"/>
+<path class="wire" d="M165.0 45H174.0"/>
+<text class="lbl" x="22" y="50" text-anchor="end">A</text>
+<path class="wire" d="M30 45L60 45"/>
+<circle class="dot" cx="60" cy="45" r="3.2"/>
+<path class="wire" d="M60 45L60 37.5L120 37.5"/>
+<path class="wire" d="M60 45L60 52.5L120 52.5"/>
+<path class="wire" d="M174.0 45L198.0 45"/>
+<text class="lbl" x="206.0" y="50" text-anchor="start">A&prime;</text>
+</svg>
+<figcaption>A&prime; = NAND(A, A)</figcaption></figure>
+
+<p><strong>AND.</strong> A NAND gate is an AND with an unwanted inversion on the end,
+so undo it with the NOT you have just built. Two gates.</p>
+
+<figure class="fig" style="--figmax:26rem">
+<svg viewBox="0 0 400 100" role="img" aria-label="AB = NAND(NAND(A,B), NAND(A,B))">
+<path class="wire" d="M110 42.5H120M110 57.5H120"/>
+<path class="gate" d="M118 35.0H132A15.0 15.0 0 0 1 132 65.0H118Z"/>
+<circle class="gate" cx="151.0" cy="50" r="4"/>
+<path class="wire" d="M155.0 50H164.0"/>
+<path class="wire" d="M250 42.5H260M250 57.5H260"/>
+<path class="gate" d="M258 35.0H272A15.0 15.0 0 0 1 272 65.0H258Z"/>
+<circle class="gate" cx="291.0" cy="50" r="4"/>
+<path class="wire" d="M295.0 50H304.0"/>
+<text class="lbl" x="22" y="47.5" text-anchor="end">A</text>
+<path class="wire" d="M30 42.5L110 42.5"/>
+<text class="lbl" x="22" y="62.5" text-anchor="end">B</text>
+<path class="wire" d="M30 57.5L110 57.5"/>
+<path class="wire" d="M164.0 50L200 50"/>
+<circle class="dot" cx="200" cy="50" r="3.2"/>
+<path class="wire" d="M200 50L200 42.5L250 42.5"/>
+<path class="wire" d="M200 50L200 57.5L250 57.5"/>
+<path class="wire" d="M304.0 50L328.0 50"/>
+<text class="lbl" x="336.0" y="55" text-anchor="start">AB</text>
+</svg>
+<figcaption>AB = NAND(NAND(A,B), NAND(A,B))</figcaption></figure>
+
+<p><strong>OR.</strong> This is the one that needs De Morgan. Invert both inputs first,
+then NAND them:</p>
+
+<p style="text-align:center;font-size:1.05rem">
+(A&prime; &middot; B&prime;)&prime; = (A&prime;)&prime; + (B&prime;)&prime; =
+A + B</p>
+
+<p>so three gates &mdash; two acting as inverters, one doing the work.</p>
+
+<figure class="fig" style="--figmax:27rem">
+<svg viewBox="0 0 420 175" role="img" aria-label="A + B = NAND(NAND(A,A), NAND(B,B))">
+<path class="wire" d="M120 32.5H130M120 47.5H130"/>
+<path class="gate" d="M128 25.0H142A15.0 15.0 0 0 1 142 55.0H128Z"/>
+<circle class="gate" cx="161.0" cy="40" r="4"/>
+<path class="wire" d="M165.0 40H174.0"/>
+<path class="wire" d="M120 122.5H130M120 137.5H130"/>
+<path class="gate" d="M128 115.0H142A15.0 15.0 0 0 1 142 145.0H128Z"/>
+<circle class="gate" cx="161.0" cy="130" r="4"/>
+<path class="wire" d="M165.0 130H174.0"/>
+<path class="wire" d="M270 77.5H280M270 92.5H280"/>
+<path class="gate" d="M278 70.0H292A15.0 15.0 0 0 1 292 100.0H278Z"/>
+<circle class="gate" cx="311.0" cy="85" r="4"/>
+<path class="wire" d="M315.0 85H324.0"/>
+<text class="lbl" x="22" y="45" text-anchor="end">A</text>
+<path class="wire" d="M30 40L70 40"/>
+<circle class="dot" cx="70" cy="40" r="3.2"/>
+<path class="wire" d="M70 40L70 32.5L120 32.5"/>
+<path class="wire" d="M70 40L70 47.5L120 47.5"/>
+<text class="lbl" x="22" y="135" text-anchor="end">B</text>
+<path class="wire" d="M30 130L70 130"/>
+<circle class="dot" cx="70" cy="130" r="3.2"/>
+<path class="wire" d="M70 130L70 122.5L120 122.5"/>
+<path class="wire" d="M70 130L70 137.5L120 137.5"/>
+<path class="wire" d="M174.0 40L232 40L232 77.5L270 77.5"/>
+<path class="wire" d="M174.0 130L238 130L238 92.5L270 92.5"/>
+<path class="wire" d="M324.0 85L348.0 85"/>
+<text class="lbl" x="356.0" y="90" text-anchor="start">A + B</text>
+</svg>
+<figcaption>A + B = NAND(NAND(A,A), NAND(B,B))</figcaption></figure>
+
+<p>The NOR toolkit is the mirror image: NOR(A,&nbsp;A) is NOT; a NOR followed by that
+inverter is OR; and inverting both inputs before a NOR gives AND. Exercise 7.3 asks you
+to draw all three and check them.</p>
+
+<h2 id="bubbles"><span class="secnum">7.4</span>Bubbles and alternate symbols</h2>
+
+<p>De Morgan's laws have a picture. Since
+(AB)&prime;&nbsp;=&nbsp;A&prime;&nbsp;+&nbsp;B&prime;, a NAND gate &mdash; an AND with
+a bubble on its output &mdash; computes the same function as an OR gate with bubbles on
+its <em>inputs</em>:</p>
+
+<div class="grid2">
+  <div class="symcard"><figure class="fig" style="--figmax:9.5rem">
+<svg viewBox="0 0 104 52" role="img" aria-label="NAND">
+<path class="wire" d="M34 18.5H44M34 33.5H44"/>
+<path class="gate" d="M42 11.0H56A15.0 15.0 0 0 1 56 41.0H42Z"/>
+<circle class="gate" cx="75.0" cy="26" r="4"/>
+<path class="wire" d="M79.0 26H88.0"/>
+<path class="wire" d="M12 18.5L34 18.5"/>
+<text class="lbl" x="10" y="22.5" text-anchor="end">A</text>
+<path class="wire" d="M12 33.5L34 33.5"/>
+<text class="lbl" x="10" y="37.5" text-anchor="end">B</text>
+<path class="wire" d="M88.0 26L98.0 26"/>
+</svg>
+<figcaption>NAND</figcaption></figure><p><strong>NAND</strong><br>AND, bubble on the
+  output.</p></div>
+  <div class="symcard"><figure class="fig" style="--figmax:9.5rem">
+<svg viewBox="0 0 104 52" role="img" aria-label="OR with inverted inputs">
+<path class="wire" d="M34 18.5H43M34 33.5H43"/><circle class="gate" cx="47" cy="18.5" r="4"/><circle class="gate" cx="47" cy="33.5" r="4"/>
+<path class="gate" d="M42 11.0C60 11.0 68 18.8 73 26C68 33.2 60 41.0 42 41.0Q51 26 42 11.0Z"/>
+<path class="wire" d="M73 26H82"/>
+<path class="wire" d="M12 18.5L34 18.5"/>
+<text class="lbl" x="10" y="22.5" text-anchor="end">A</text>
+<path class="wire" d="M12 33.5L34 33.5"/>
+<text class="lbl" x="10" y="37.5" text-anchor="end">B</text>
+<path class="wire" d="M82 26L92 26"/>
+</svg>
+<figcaption>OR with inverted inputs</figcaption></figure><p><strong>the same gate</strong><br>OR, bubbles on
+  the inputs.</p></div>
+</div>
+
+<p>Both symbols denote one physical gate; which you draw is a matter of what you want
+the reader to notice. And the same holds for NOR, which may be drawn as an AND gate
+with bubbles on its inputs.</p>
+
+<p>The reason this matters is the rule it licenses:</p>
+
+<p style="text-align:center;font-size:1.05rem">
+<strong>two bubbles on the same wire cancel</strong></p>
+
+<p>because inverting twice does nothing. That single fact turns circuit conversion into
+a drawing exercise: add bubbles in pairs wherever you like, slide them along wires, and
+cancel them when they meet. Adding a pair changes nothing; cancelling a pair changes
+nothing; and in between, the gates have quietly turned into NANDs.</p>
+
+<h2 id="convert"><span class="secnum">7.5</span>Converting a circuit</h2>
+
+<p>An SOP circuit is a layer of ANDs feeding an OR. To make it pure NAND:</p>
+
+<ol>
+<li>Put a bubble on the output of every AND gate, turning them into NAND gates.</li>
+<li>Put a bubble on each input of the OR gate, to cancel the ones you just added.</li>
+<li>The OR gate with bubbled inputs <em>is</em> a NAND gate, by &sect;7.4. Redraw it as
+one.</li>
+<li>Any input that arrives complemented needs its own inverter, which is a NAND with
+its inputs tied together.</li>
+</ol>
+
+<div class="box worked"><span class="bt">Worked example</span>
+<p>F = AB&nbsp;+&nbsp;CD, first in the form Set 5 would give you:</p>
+<figure class="fig" style="--figmax:27rem">
+<svg viewBox="0 0 420 175" role="img" aria-label="F = AB + CD, drawn with AND and OR">
+<path class="wire" d="M140 32.5H150M140 47.5H150"/>
+<path class="gate" d="M148 25.0H162A15.0 15.0 0 0 1 162 55.0H148Z"/>
+<path class="wire" d="M177.0 40H186.0"/>
+<path class="wire" d="M140 122.5H150M140 137.5H150"/>
+<path class="gate" d="M148 115.0H162A15.0 15.0 0 0 1 162 145.0H148Z"/>
+<path class="wire" d="M177.0 130H186.0"/>
+<path class="wire" d="M290 77.5H307M290 92.5H307"/>
+<path class="gate" d="M298 70.0C316 70.0 324 77.8 329 85C324 92.2 316 100.0 298 100.0Q307 85 298 70.0Z"/>
+<path class="wire" d="M329 85H338"/>
+<text class="lbl" x="22" y="37.5" text-anchor="end">A</text>
+<path class="wire" d="M30 32.5L140 32.5"/>
+<text class="lbl" x="22" y="52.5" text-anchor="end">B</text>
+<path class="wire" d="M30 47.5L140 47.5"/>
+<text class="lbl" x="22" y="127.5" text-anchor="end">C</text>
+<path class="wire" d="M30 122.5L140 122.5"/>
+<text class="lbl" x="22" y="142.5" text-anchor="end">D</text>
+<path class="wire" d="M30 137.5L140 137.5"/>
+<path class="wire" d="M186.0 40L250 40L250 77.5L290 77.5"/>
+<path class="wire" d="M186.0 130L256 130L256 92.5L290 92.5"/>
+<path class="wire" d="M338 85L366 85"/>
+<text class="lbl" x="374" y="90" text-anchor="start">F</text>
+</svg>
+<figcaption>F = AB + CD, drawn with AND and OR</figcaption></figure>
+<p>Bubble both AND outputs and both OR inputs &mdash; four bubbles, added in cancelling
+pairs, so the function is unchanged. The ANDs are now NANDs, and the bubbled-input OR
+is a NAND:</p>
+<figure class="fig" style="--figmax:27rem">
+<svg viewBox="0 0 430 175" role="img" aria-label="the same function in three NAND gates">
+<path class="wire" d="M140 32.5H150M140 47.5H150"/>
+<path class="gate" d="M148 25.0H162A15.0 15.0 0 0 1 162 55.0H148Z"/>
+<circle class="gate" cx="181.0" cy="40" r="4"/>
+<path class="wire" d="M185.0 40H194.0"/>
+<path class="wire" d="M140 122.5H150M140 137.5H150"/>
+<path class="gate" d="M148 115.0H162A15.0 15.0 0 0 1 162 145.0H148Z"/>
+<circle class="gate" cx="181.0" cy="130" r="4"/>
+<path class="wire" d="M185.0 130H194.0"/>
+<path class="wire" d="M290 77.5H300M290 92.5H300"/>
+<path class="gate" d="M298 70.0H312A15.0 15.0 0 0 1 312 100.0H298Z"/>
+<circle class="gate" cx="331.0" cy="85" r="4"/>
+<path class="wire" d="M335.0 85H344.0"/>
+<text class="lbl" x="22" y="37.5" text-anchor="end">A</text>
+<path class="wire" d="M30 32.5L140 32.5"/>
+<text class="lbl" x="22" y="52.5" text-anchor="end">B</text>
+<path class="wire" d="M30 47.5L140 47.5"/>
+<text class="lbl" x="22" y="127.5" text-anchor="end">C</text>
+<path class="wire" d="M30 122.5L140 122.5"/>
+<text class="lbl" x="22" y="142.5" text-anchor="end">D</text>
+<path class="wire" d="M30 137.5L140 137.5"/>
+<path class="wire" d="M194.0 40L258 40L258 77.5L290 77.5"/>
+<path class="wire" d="M194.0 130L264 130L264 92.5L290 92.5"/>
+<path class="wire" d="M344.0 85L372.0 85"/>
+<text class="lbl" x="380.0" y="90" text-anchor="start">F</text>
+</svg>
+<figcaption>the same function in three NAND gates</figcaption></figure>
+<p>Three gates before, three gates after. That is the general result and it is the
+reason the technique is worth knowing: <strong>converting a two-level AND&ndash;OR
+circuit to NAND costs nothing at all</strong>. One NAND per product term, plus one to
+collect them.</p>
+<p>The algebra confirms it in one line, using De Morgan on the double complement:</p>
+<p style="text-align:center;font-size:1.05rem">
+AB + CD = ((AB)&prime; &middot; (CD)&prime;)&prime; =
+NAND(NAND(A, B), NAND(C, D))</p>
+<p>The same manipulation with sums and products exchanged converts a two-level
+OR&ndash;AND circuit into pure NOR at the same price, which is Exercise 7.10.</p></div>
+
+<h2 id="ref"><span class="secnum">7.6</span>Reference</h2>
+
+<div class="tablewrap"><table class="lawtab">
+<thead><tr><th>built from NAND</th><th>from NOR</th></tr></thead>
+<tbody>
+<tr><td>A&prime; = NAND(A, A)</td><td>A&prime; = NOR(A, A)</td></tr>
+<tr><td>AB = NAND(NAND(A,B), NAND(A,B))</td>
+    <td>AB = NOR(NOR(A,A), NOR(B,B))</td></tr>
+<tr><td>A + B = NAND(NAND(A,A), NAND(B,B))</td>
+    <td>A + B = NOR(NOR(A,B), NOR(A,B))</td></tr>
+</tbody></table></div>
+
+<ul>
+<li><strong>NAND = AND then invert</strong>, NOR = OR then invert. The bubble is on the
+output.</li>
+<li><strong>Alternate symbols.</strong> NAND = OR with inverted inputs; NOR = AND with
+inverted inputs. Both are De Morgan drawn rather than written.</li>
+<li><strong>Double bubbles cancel</strong> on any wire.</li>
+<li><strong>Two-level SOP to NAND is free:</strong> <var>k</var> product terms become
+<var>k</var>&nbsp;+&nbsp;1 NAND gates, plus one NAND per complemented input.</li>
+<li><strong>Notation.</strong> A&nbsp;&uarr;&nbsp;B is NAND(A,&nbsp;B) and
+A&nbsp;&darr;&nbsp;B is NOR(A,&nbsp;B).</li>
+<li><strong>Neither gate is associative</strong>, so a chain of two-input NANDs is not
+a multi-input NAND, and the brackets in an arrow expression cannot be dropped.
+Exercises 7.4 and 7.5.</li>
+</ul>
+
+<h2 id="exercises"><span class="secnum">7.7</span>Exercises</h2>
+
+<p>Where a question says "pure NAND", every gate in your answer must be a NAND gate,
+inverters included. Count the gates when you are done; that number is the point of most
+of these.</p>
+
+<h3>The gates and their toolkits</h3>
+
+<details class="prob"><summary data-label="Exercise 7.1">Give the truth tables of NAND and NOR side by side with AND and OR. Then answer: is NAND the same as A&prime;&nbsp;&middot;&nbsp;B&prime;? Is NOR?</summary><div class="sol">
+<div class="ttrow"><div class="tablewrap"><table class="ttab">
+<thead><tr><th>A</th><th>B</th><th>AB</th><th>NAND</th><th>A + B</th><th>NOR</th></tr></thead>
+<tbody><tr><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin hilite">1</td><td class="bin">0</td><td class="bin hilite">1</td></tr><tr><td class="bin">0</td><td class="bin">1</td><td class="bin">0</td><td class="bin hilite">1</td><td class="bin">1</td><td class="bin hilite">0</td></tr><tr><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin hilite">1</td><td class="bin">1</td><td class="bin hilite">0</td></tr><tr><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td><td class="bin hilite">0</td><td class="bin">1</td><td class="bin hilite">0</td></tr></tbody></table></div></div>
+<p>Each new column is the complement of the one to its left, row by row.</p>
+<p><strong>NAND is not A&prime;B&prime;.</strong> NAND is
+(AB)&prime;&nbsp;=&nbsp;A&prime;&nbsp;+&nbsp;B&prime; by De Morgan &mdash; a
+<em>sum</em>. One row settles it: at A&nbsp;=&nbsp;1, B&nbsp;=&nbsp;0, NAND gives
+(1&middot;0)&prime;&nbsp;=&nbsp;1 while A&prime;B&prime; gives
+0&middot;1&nbsp;=&nbsp;0.</p>
+<p><strong>NOR, on the other hand, is exactly A&prime;B&prime;</strong>, again by De
+Morgan: (A&nbsp;+&nbsp;B)&prime;&nbsp;=&nbsp;A&prime;B&prime;. Check the table &mdash;
+the NOR column is 1 only in the row where both inputs are 0, which is precisely when
+both complements are 1.</p>
+<p>So of the two tempting identifications, one is wrong and the other is right, and
+guessing gets you a 50% score. The reliable move is to apply De Morgan rather than
+read the gate name: push the complement inward and the gate flips.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 7.2">Using NAND gates only, build NOT, AND and OR. Give the gate count for each, and verify the OR construction with a truth table.</summary><div class="sol">
+<p><strong>NOT &mdash; one gate.</strong> Tie the inputs together:
+(A&middot;A)&prime;&nbsp;=&nbsp;A&prime;, since A&middot;A&nbsp;=&nbsp;A.</p>
+<figure class="fig" style="--figmax:16rem">
+<svg viewBox="0 0 260 92" role="img" aria-label="A&prime; = NAND(A, A)">
+<path class="wire" d="M120 37.5H130M120 52.5H130"/>
+<path class="gate" d="M128 30.0H142A15.0 15.0 0 0 1 142 60.0H128Z"/>
+<circle class="gate" cx="161.0" cy="45" r="4"/>
+<path class="wire" d="M165.0 45H174.0"/>
+<text class="lbl" x="22" y="50" text-anchor="end">A</text>
+<path class="wire" d="M30 45L60 45"/>
+<circle class="dot" cx="60" cy="45" r="3.2"/>
+<path class="wire" d="M60 45L60 37.5L120 37.5"/>
+<path class="wire" d="M60 45L60 52.5L120 52.5"/>
+<path class="wire" d="M174.0 45L198.0 45"/>
+<text class="lbl" x="206.0" y="50" text-anchor="start">A&prime;</text>
+</svg>
+<figcaption>A&prime; = NAND(A, A)</figcaption></figure>
+<p><strong>AND &mdash; two gates.</strong> NAND the inputs, then invert the result with
+a second NAND wired as a NOT: ((AB)&prime;)&prime;&nbsp;=&nbsp;AB.</p>
+<figure class="fig" style="--figmax:26rem">
+<svg viewBox="0 0 400 100" role="img" aria-label="AB = NAND(NAND(A,B), NAND(A,B))">
+<path class="wire" d="M110 42.5H120M110 57.5H120"/>
+<path class="gate" d="M118 35.0H132A15.0 15.0 0 0 1 132 65.0H118Z"/>
+<circle class="gate" cx="151.0" cy="50" r="4"/>
+<path class="wire" d="M155.0 50H164.0"/>
+<path class="wire" d="M250 42.5H260M250 57.5H260"/>
+<path class="gate" d="M258 35.0H272A15.0 15.0 0 0 1 272 65.0H258Z"/>
+<circle class="gate" cx="291.0" cy="50" r="4"/>
+<path class="wire" d="M295.0 50H304.0"/>
+<text class="lbl" x="22" y="47.5" text-anchor="end">A</text>
+<path class="wire" d="M30 42.5L110 42.5"/>
+<text class="lbl" x="22" y="62.5" text-anchor="end">B</text>
+<path class="wire" d="M30 57.5L110 57.5"/>
+<path class="wire" d="M164.0 50L200 50"/>
+<circle class="dot" cx="200" cy="50" r="3.2"/>
+<path class="wire" d="M200 50L200 42.5L250 42.5"/>
+<path class="wire" d="M200 50L200 57.5L250 57.5"/>
+<path class="wire" d="M304.0 50L328.0 50"/>
+<text class="lbl" x="336.0" y="55" text-anchor="start">AB</text>
+</svg>
+<figcaption>AB = NAND(NAND(A,B), NAND(A,B))</figcaption></figure>
+<p><strong>OR &mdash; three gates.</strong> Invert each input, then NAND the two
+results.</p>
+<figure class="fig" style="--figmax:27rem">
+<svg viewBox="0 0 420 175" role="img" aria-label="A + B = NAND(NAND(A,A), NAND(B,B))">
+<path class="wire" d="M120 32.5H130M120 47.5H130"/>
+<path class="gate" d="M128 25.0H142A15.0 15.0 0 0 1 142 55.0H128Z"/>
+<circle class="gate" cx="161.0" cy="40" r="4"/>
+<path class="wire" d="M165.0 40H174.0"/>
+<path class="wire" d="M120 122.5H130M120 137.5H130"/>
+<path class="gate" d="M128 115.0H142A15.0 15.0 0 0 1 142 145.0H128Z"/>
+<circle class="gate" cx="161.0" cy="130" r="4"/>
+<path class="wire" d="M165.0 130H174.0"/>
+<path class="wire" d="M270 77.5H280M270 92.5H280"/>
+<path class="gate" d="M278 70.0H292A15.0 15.0 0 0 1 292 100.0H278Z"/>
+<circle class="gate" cx="311.0" cy="85" r="4"/>
+<path class="wire" d="M315.0 85H324.0"/>
+<text class="lbl" x="22" y="45" text-anchor="end">A</text>
+<path class="wire" d="M30 40L70 40"/>
+<circle class="dot" cx="70" cy="40" r="3.2"/>
+<path class="wire" d="M70 40L70 32.5L120 32.5"/>
+<path class="wire" d="M70 40L70 47.5L120 47.5"/>
+<text class="lbl" x="22" y="135" text-anchor="end">B</text>
+<path class="wire" d="M30 130L70 130"/>
+<circle class="dot" cx="70" cy="130" r="3.2"/>
+<path class="wire" d="M70 130L70 122.5L120 122.5"/>
+<path class="wire" d="M70 130L70 137.5L120 137.5"/>
+<path class="wire" d="M174.0 40L232 40L232 77.5L270 77.5"/>
+<path class="wire" d="M174.0 130L238 130L238 92.5L270 92.5"/>
+<path class="wire" d="M324.0 85L348.0 85"/>
+<text class="lbl" x="356.0" y="90" text-anchor="start">A + B</text>
+</svg>
+<figcaption>A + B = NAND(NAND(A,A), NAND(B,B))</figcaption></figure>
+<p>The verification, column by column:</p>
+<div class="tablewrap"><table class="ttab">
+<thead><tr><th>A</th><th>B</th><th>A&prime; = A&uarr;A</th><th>B&prime; = B&uarr;B</th><th>F = A&prime; &uarr; B&prime;</th></tr></thead>
+<tbody><tr><td class="bin">0</td><td class="bin">0</td><td class="bin">1</td><td class="bin">1</td><td class="bin hilite">0</td></tr><tr><td class="bin">0</td><td class="bin">1</td><td class="bin">1</td><td class="bin">0</td><td class="bin hilite">1</td></tr><tr><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin">1</td><td class="bin hilite">1</td></tr><tr><td class="bin">1</td><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin hilite">1</td></tr></tbody></table></div>
+<p>The last column is A&nbsp;+&nbsp;B.</p>
+<p>The algebra is one application of De Morgan:
+(A&prime;&nbsp;&middot;&nbsp;B&prime;)&prime;&nbsp;=&nbsp;(A&prime;)&prime;&nbsp;+&nbsp;(B&prime;)&prime;&nbsp;=&nbsp;A&nbsp;+&nbsp;B.
+The pattern is worth naming: to get an OR out of an AND-like gate, invert what goes in
+<em>and</em> what comes out.</p>
+<p>Note the asymmetry in the counts &mdash; 1, 2, 3. An AND is cheap in NAND and an OR
+is expensive, which is exactly backwards for NOR and is one reason a designer might
+prefer one gate family over the other for a particular circuit.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 7.3">Now do it with NOR gates only: build NOT, OR and AND, and give the gate counts. What is the pattern relating these three circuits to the NAND ones?</summary><div class="sol">
+<p><strong>NOT &mdash; one gate.</strong>
+(A&nbsp;+&nbsp;A)&prime;&nbsp;=&nbsp;A&prime;, since A&nbsp;+&nbsp;A&nbsp;=&nbsp;A.</p>
+<figure class="fig" style="--figmax:16rem">
+<svg viewBox="0 0 260 92" role="img" aria-label="A&prime; = NOR(A, A)">
+<path class="wire" d="M120 37.5H137M120 52.5H137"/>
+<path class="gate" d="M128 30.0C146 30.0 154 37.8 159 45C154 52.2 146 60.0 128 60.0Q137 45 128 30.0Z"/>
+<circle class="gate" cx="163" cy="45" r="4"/>
+<path class="wire" d="M167 45H176"/>
+<text class="lbl" x="22" y="50" text-anchor="end">A</text>
+<path class="wire" d="M30 45L60 45"/>
+<circle class="dot" cx="60" cy="45" r="3.2"/>
+<path class="wire" d="M60 45L60 37.5L120 37.5"/>
+<path class="wire" d="M60 45L60 52.5L120 52.5"/>
+<path class="wire" d="M176 45L200 45"/>
+<text class="lbl" x="208" y="50" text-anchor="start">A&prime;</text>
+</svg>
+<figcaption>A&prime; = NOR(A, A)</figcaption></figure>
+<p><strong>OR &mdash; two gates.</strong> A NOR followed by an inverter undoes the
+unwanted complement: ((A&nbsp;+&nbsp;B)&prime;)&prime;&nbsp;=&nbsp;A&nbsp;+&nbsp;B.</p>
+<figure class="fig" style="--figmax:26rem">
+<svg viewBox="0 0 400 100" role="img" aria-label="A + B = NOR(NOR(A,B), NOR(A,B))">
+<path class="wire" d="M110 42.5H127M110 57.5H127"/>
+<path class="gate" d="M118 35.0C136 35.0 144 42.8 149 50C144 57.2 136 65.0 118 65.0Q127 50 118 35.0Z"/>
+<circle class="gate" cx="153" cy="50" r="4"/>
+<path class="wire" d="M157 50H166"/>
+<path class="wire" d="M250 42.5H267M250 57.5H267"/>
+<path class="gate" d="M258 35.0C276 35.0 284 42.8 289 50C284 57.2 276 65.0 258 65.0Q267 50 258 35.0Z"/>
+<circle class="gate" cx="293" cy="50" r="4"/>
+<path class="wire" d="M297 50H306"/>
+<text class="lbl" x="22" y="47.5" text-anchor="end">A</text>
+<path class="wire" d="M30 42.5L110 42.5"/>
+<text class="lbl" x="22" y="62.5" text-anchor="end">B</text>
+<path class="wire" d="M30 57.5L110 57.5"/>
+<path class="wire" d="M166 50L200 50"/>
+<circle class="dot" cx="200" cy="50" r="3.2"/>
+<path class="wire" d="M200 50L200 42.5L250 42.5"/>
+<path class="wire" d="M200 50L200 57.5L250 57.5"/>
+<path class="wire" d="M306 50L330 50"/>
+<text class="lbl" x="338" y="55" text-anchor="start">A + B</text>
+</svg>
+<figcaption>A + B = NOR(NOR(A,B), NOR(A,B))</figcaption></figure>
+<p><strong>AND &mdash; three gates.</strong> Invert both inputs, then NOR them:
+(A&prime;&nbsp;+&nbsp;B&prime;)&prime;&nbsp;=&nbsp;AB.</p>
+<figure class="fig" style="--figmax:27rem">
+<svg viewBox="0 0 420 175" role="img" aria-label="AB = NOR(NOR(A,A), NOR(B,B))">
+<path class="wire" d="M120 32.5H137M120 47.5H137"/>
+<path class="gate" d="M128 25.0C146 25.0 154 32.8 159 40C154 47.2 146 55.0 128 55.0Q137 40 128 25.0Z"/>
+<circle class="gate" cx="163" cy="40" r="4"/>
+<path class="wire" d="M167 40H176"/>
+<path class="wire" d="M120 122.5H137M120 137.5H137"/>
+<path class="gate" d="M128 115.0C146 115.0 154 122.8 159 130C154 137.2 146 145.0 128 145.0Q137 130 128 115.0Z"/>
+<circle class="gate" cx="163" cy="130" r="4"/>
+<path class="wire" d="M167 130H176"/>
+<path class="wire" d="M270 77.5H287M270 92.5H287"/>
+<path class="gate" d="M278 70.0C296 70.0 304 77.8 309 85C304 92.2 296 100.0 278 100.0Q287 85 278 70.0Z"/>
+<circle class="gate" cx="313" cy="85" r="4"/>
+<path class="wire" d="M317 85H326"/>
+<text class="lbl" x="22" y="45" text-anchor="end">A</text>
+<path class="wire" d="M30 40L70 40"/>
+<circle class="dot" cx="70" cy="40" r="3.2"/>
+<path class="wire" d="M70 40L70 32.5L120 32.5"/>
+<path class="wire" d="M70 40L70 47.5L120 47.5"/>
+<text class="lbl" x="22" y="135" text-anchor="end">B</text>
+<path class="wire" d="M30 130L70 130"/>
+<circle class="dot" cx="70" cy="130" r="3.2"/>
+<path class="wire" d="M70 130L70 122.5L120 122.5"/>
+<path class="wire" d="M70 130L70 137.5L120 137.5"/>
+<path class="wire" d="M176 40L232 40L232 77.5L270 77.5"/>
+<path class="wire" d="M176 130L238 130L238 92.5L270 92.5"/>
+<path class="wire" d="M326 85L350 85"/>
+<text class="lbl" x="358" y="90" text-anchor="start">AB</text>
+</svg>
+<figcaption>AB = NOR(NOR(A,A), NOR(B,B))</figcaption></figure>
+<p><strong>The pattern.</strong> Each circuit is its NAND counterpart with every gate
+replaced by a NOR and the roles of AND and OR exchanged. That is the duality principle
+from Set 4 showing up as a fact about drawings: swap AND with OR, and 0 with 1, and a
+true statement stays true.</p>
+<p>The counts swap too &mdash; 1, 2, 3 for NOT, OR, AND, where NAND gave 1, 2, 3 for
+NOT, AND, OR. A circuit that is mostly ORs is cheaper in NOR; one that is mostly ANDs
+is cheaper in NAND.</p></div></details>
+
+<h3>The algebra of NAND</h3>
+
+<details class="prob"><summary data-label="Exercise 7.4">Is NAND associative? That is, does (A&nbsp;&uarr;&nbsp;B)&nbsp;&uarr;&nbsp;C always equal A&nbsp;&uarr;&nbsp;(B&nbsp;&uarr;&nbsp;C)? Tabulate both. (Recall that A&nbsp;&uarr;&nbsp;B is shorthand for NAND(A,&nbsp;B), so the first expression is a NAND gate feeding a second one.)</summary><div class="sol">
+<div class="tablewrap"><table class="ttab">
+<thead><tr><th>A</th><th>B</th><th>C</th><th>(A &uarr; B) &uarr; C</th><th>A &uarr; (B &uarr; C)</th></tr></thead>
+<tbody><tr><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin hilite">1</td><td class="bin hilite">1</td></tr><tr><td class="bin">0</td><td class="bin">0</td><td class="bin">1</td><td class="bin hilite">0</td><td class="bin hilite">1</td></tr><tr><td class="bin">0</td><td class="bin">1</td><td class="bin">0</td><td class="bin hilite">1</td><td class="bin hilite">1</td></tr><tr><td class="bin">0</td><td class="bin">1</td><td class="bin">1</td><td class="bin hilite">0</td><td class="bin hilite">1</td></tr><tr><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin hilite">1</td><td class="bin hilite">0</td></tr><tr><td class="bin">1</td><td class="bin">0</td><td class="bin">1</td><td class="bin hilite">0</td><td class="bin hilite">0</td></tr><tr><td class="bin">1</td><td class="bin">1</td><td class="bin">0</td><td class="bin hilite">1</td><td class="bin hilite">0</td></tr><tr><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td><td class="bin hilite">1</td><td class="bin hilite">1</td></tr></tbody></table></div>
+<p><strong>No.</strong> The two columns differ in four of the eight rows &mdash;
+for instance at A&nbsp;=&nbsp;1, B&nbsp;=&nbsp;1, C&nbsp;=&nbsp;0, where
+(1&nbsp;&uarr;&nbsp;1)&nbsp;&uarr;&nbsp;0&nbsp;=&nbsp;0&nbsp;&uarr;&nbsp;0&nbsp;=&nbsp;1
+and
+1&nbsp;&uarr;&nbsp;(1&nbsp;&uarr;&nbsp;0)&nbsp;=&nbsp;1&nbsp;&uarr;&nbsp;1&nbsp;=&nbsp;0.</p>
+<p>This is a real difference from AND, OR and XOR, all three of which are associative
+and can therefore be chained without brackets. With NAND the brackets are part of the
+meaning, and a drawing that leaves the grouping ambiguous is a drawing of nothing in
+particular.</p>
+<p>The underlying reason is the inversion. AND is associative, but NAND inverts after
+every operation, and an odd number of extra inversions lands in a different place
+depending on where the brackets are.</p>
+<p>NAND <em>is</em> commutative &mdash;
+A&nbsp;&uarr;&nbsp;B&nbsp;=&nbsp;B&nbsp;&uarr;&nbsp;A, since AB&nbsp;=&nbsp;BA and
+complementing preserves equality &mdash; so the order of the two inputs to one gate
+never matters. It is only the grouping of several gates that does.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 7.5">A three-input NAND gate outputs (ABC)&prime;. Does chaining two-input NANDs &mdash; (A&nbsp;&uarr;&nbsp;B)&nbsp;&uarr;&nbsp;C &mdash; give the same thing? If not, what does the chain compute, and how would you build a genuine three-input NAND from two-input gates?</summary><div class="sol">
+<div class="tablewrap"><table class="ttab">
+<thead><tr><th>A</th><th>B</th><th>C</th><th>(ABC)&prime;</th><th>(A &uarr; B) &uarr; C</th></tr></thead>
+<tbody><tr><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin hilite">1</td><td class="bin hilite">1</td></tr><tr><td class="bin">0</td><td class="bin">0</td><td class="bin">1</td><td class="bin hilite">1</td><td class="bin hilite">0</td></tr><tr><td class="bin">0</td><td class="bin">1</td><td class="bin">0</td><td class="bin hilite">1</td><td class="bin hilite">1</td></tr><tr><td class="bin">0</td><td class="bin">1</td><td class="bin">1</td><td class="bin hilite">1</td><td class="bin hilite">0</td></tr><tr><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin hilite">1</td><td class="bin hilite">1</td></tr><tr><td class="bin">1</td><td class="bin">0</td><td class="bin">1</td><td class="bin hilite">1</td><td class="bin hilite">0</td></tr><tr><td class="bin">1</td><td class="bin">1</td><td class="bin">0</td><td class="bin hilite">1</td><td class="bin hilite">1</td></tr><tr><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td><td class="bin hilite">0</td><td class="bin hilite">1</td></tr></tbody></table></div>
+<p><strong>No.</strong> The two columns agree in only four of the eight rows,
+and disagree everywhere else &mdash; including every row where C&nbsp;=&nbsp;1.</p>
+<p>What the chain computes, worked out algebraically:</p>
+<p style="text-align:center;font-size:1.05rem">
+(A &uarr; B) &uarr; C = ((AB)&prime; &middot; C)&prime; = (AB)&prime;&prime; + C&prime;
+= <strong>AB + C&prime;</strong></p>
+<p>which is nothing like (ABC)&prime;&nbsp;=&nbsp;A&prime;&nbsp;+&nbsp;B&prime;&nbsp;+&nbsp;C&prime;.</p>
+<p><strong>Building a real three-input NAND.</strong> Work out what you want &mdash;
+AND the three inputs, then invert once. Chain two NANDs to get
+(AB)&prime;, invert it back to AB with a third, NAND that with C to get (ABC)&prime;.
+Three gates: NAND(NAND(NAND(A,B), NAND(A,B)), C).</p>
+<p>The lesson generalises past this gate. Chaining works for associative operations and
+silently produces a different function for the others, so before you extend any
+two-input gate into a chain, check that the operation is associative. AND, OR and XOR
+pass; NAND and NOR do not.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 7.6">Build a NAND gate out of NOR gates only, and a NOR gate out of NAND gates only. How many gates does each take, and what does the result prove?</summary><div class="sol">
+<p><strong>NAND from NOR &mdash; four gates.</strong> Build AB from three NORs as in
+Exercise 7.3, then invert with a fourth:</p>
+<p style="text-align:center;font-size:1.05rem">
+(AB)&prime; where AB = NOR(NOR(A,A), NOR(B,B))</p>
+<p>so NAND(A,&nbsp;B) = NOR(<var>t</var>,&nbsp;<var>t</var>) with
+<var>t</var> = NOR(NOR(A,A), NOR(B,B)). Two inverters, one NOR to combine, one more to
+invert the result.</p>
+<p><strong>NOR from NAND &mdash; four gates</strong>, by the mirror-image argument:
+build A&nbsp;+&nbsp;B from three NANDs, then invert with a fourth.</p>
+<p><strong>What it proves.</strong> Either gate can simulate the other, so the two
+universality claims are really one claim. Once you know NAND is universal, NOR must be:
+build every NAND you need out of NORs and the job is done.</p>
+<p>It also shows the cost of insisting on the wrong family. A circuit needing <var>n</var>
+NAND gates can always be built with 4<var>n</var> NOR gates, and usually far fewer
+&mdash; four is the crude upper bound you get by translating gate by gate without
+looking for cancellations. Converting a whole circuit properly, as in &sect;7.5, is
+much cheaper than converting each gate in isolation.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 7.7">Draw a NAND gate in its alternate form, and a NOR gate in its alternate form. State which law each drawing expresses, and use one of them to explain why two bubbles on a wire cancel.</summary><div class="sol">
+<p><strong>NAND</strong> is an AND with an output bubble, and equally an OR with input
+bubbles:</p>
+<div class="grid2">
+  <div class="symcard"><figure class="fig" style="--figmax:9.5rem">
+<svg viewBox="0 0 104 52" role="img" aria-label="NAND">
+<path class="wire" d="M34 18.5H44M34 33.5H44"/>
+<path class="gate" d="M42 11.0H56A15.0 15.0 0 0 1 56 41.0H42Z"/>
+<circle class="gate" cx="75.0" cy="26" r="4"/>
+<path class="wire" d="M79.0 26H88.0"/>
+<path class="wire" d="M12 18.5L34 18.5"/>
+<text class="lbl" x="10" y="22.5" text-anchor="end">A</text>
+<path class="wire" d="M12 33.5L34 33.5"/>
+<text class="lbl" x="10" y="37.5" text-anchor="end">B</text>
+<path class="wire" d="M88.0 26L98.0 26"/>
+</svg>
+<figcaption>NAND</figcaption></figure><p>(AB)&prime;</p></div>
+  <div class="symcard"><figure class="fig" style="--figmax:9.5rem">
+<svg viewBox="0 0 104 52" role="img" aria-label="OR with inverted inputs">
+<path class="wire" d="M34 18.5H43M34 33.5H43"/><circle class="gate" cx="47" cy="18.5" r="4"/><circle class="gate" cx="47" cy="33.5" r="4"/>
+<path class="gate" d="M42 11.0C60 11.0 68 18.8 73 26C68 33.2 60 41.0 42 41.0Q51 26 42 11.0Z"/>
+<path class="wire" d="M73 26H82"/>
+<path class="wire" d="M12 18.5L34 18.5"/>
+<text class="lbl" x="10" y="22.5" text-anchor="end">A</text>
+<path class="wire" d="M12 33.5L34 33.5"/>
+<text class="lbl" x="10" y="37.5" text-anchor="end">B</text>
+<path class="wire" d="M82 26L92 26"/>
+</svg>
+<figcaption>OR with inverted inputs</figcaption></figure><p>A&prime; + B&prime;</p></div>
+</div>
+<p>which is the law (AB)&prime;&nbsp;=&nbsp;A&prime;&nbsp;+&nbsp;B&prime;.</p>
+<p><strong>NOR</strong> is an OR with an output bubble, and equally an AND with input
+bubbles:</p>
+<div class="grid2">
+  <div class="symcard"><figure class="fig" style="--figmax:9.5rem">
+<svg viewBox="0 0 104 52" role="img" aria-label="NOR">
+<path class="wire" d="M34 18.5H51M34 33.5H51"/>
+<path class="gate" d="M42 11.0C60 11.0 68 18.8 73 26C68 33.2 60 41.0 42 41.0Q51 26 42 11.0Z"/>
+<circle class="gate" cx="77" cy="26" r="4"/>
+<path class="wire" d="M81 26H90"/>
+<path class="wire" d="M12 18.5L34 18.5"/>
+<text class="lbl" x="10" y="22.5" text-anchor="end">A</text>
+<path class="wire" d="M12 33.5L34 33.5"/>
+<text class="lbl" x="10" y="37.5" text-anchor="end">B</text>
+<path class="wire" d="M90 26L100 26"/>
+</svg>
+<figcaption>NOR</figcaption></figure><p>(A + B)&prime;</p></div>
+  <div class="symcard"><figure class="fig" style="--figmax:9.5rem">
+<svg viewBox="0 0 104 52" role="img" aria-label="AND with inverted inputs">
+<path class="wire" d="M34 18.5H36M34 33.5H36"/><circle class="gate" cx="40" cy="18.5" r="4"/><circle class="gate" cx="40" cy="33.5" r="4"/>
+<path class="gate" d="M42 11.0H56A15.0 15.0 0 0 1 56 41.0H42Z"/>
+<path class="wire" d="M71.0 26H80.0"/>
+<path class="wire" d="M12 18.5L34 18.5"/>
+<text class="lbl" x="10" y="22.5" text-anchor="end">A</text>
+<path class="wire" d="M12 33.5L34 33.5"/>
+<text class="lbl" x="10" y="37.5" text-anchor="end">B</text>
+<path class="wire" d="M80.0 26L90.0 26"/>
+</svg>
+<figcaption>AND with inverted inputs</figcaption></figure><p>A&prime;B&prime;</p></div>
+</div>
+<p>which is (A&nbsp;+&nbsp;B)&prime;&nbsp;=&nbsp;A&prime;B&prime;. Both drawings are De
+Morgan's laws with the algebra taken out.</p>
+<p><strong>Why bubbles cancel.</strong> A bubble is an inverter, and
+(X&prime;)&prime;&nbsp;=&nbsp;X by the involution law. So a wire carrying two bubbles
+&mdash; one from the gate that drives it, one on the input it feeds &mdash; carries the
+signal unchanged, and both may be erased.</p>
+<p>That is what makes the conversion in &sect;7.5 legitimate rather than a trick. You
+are allowed to add a pair of bubbles anywhere, because a pair does nothing; and once
+they are there, each can be absorbed into the gate beside it by redrawing that gate in
+its alternate form.</p></div></details>
+
+<h3>Conversion</h3>
+
+<details class="prob"><summary data-label="Exercise 7.8">Convert F = AB&nbsp;+&nbsp;CD into a pure NAND circuit. How many gates does each version use?</summary><div class="sol">
+<p>The AND&ndash;OR version, three gates:</p>
+<figure class="fig" style="--figmax:27rem">
+<svg viewBox="0 0 420 175" role="img" aria-label="F = AB + CD, drawn with AND and OR">
+<path class="wire" d="M140 32.5H150M140 47.5H150"/>
+<path class="gate" d="M148 25.0H162A15.0 15.0 0 0 1 162 55.0H148Z"/>
+<path class="wire" d="M177.0 40H186.0"/>
+<path class="wire" d="M140 122.5H150M140 137.5H150"/>
+<path class="gate" d="M148 115.0H162A15.0 15.0 0 0 1 162 145.0H148Z"/>
+<path class="wire" d="M177.0 130H186.0"/>
+<path class="wire" d="M290 77.5H307M290 92.5H307"/>
+<path class="gate" d="M298 70.0C316 70.0 324 77.8 329 85C324 92.2 316 100.0 298 100.0Q307 85 298 70.0Z"/>
+<path class="wire" d="M329 85H338"/>
+<text class="lbl" x="22" y="37.5" text-anchor="end">A</text>
+<path class="wire" d="M30 32.5L140 32.5"/>
+<text class="lbl" x="22" y="52.5" text-anchor="end">B</text>
+<path class="wire" d="M30 47.5L140 47.5"/>
+<text class="lbl" x="22" y="127.5" text-anchor="end">C</text>
+<path class="wire" d="M30 122.5L140 122.5"/>
+<text class="lbl" x="22" y="142.5" text-anchor="end">D</text>
+<path class="wire" d="M30 137.5L140 137.5"/>
+<path class="wire" d="M186.0 40L250 40L250 77.5L290 77.5"/>
+<path class="wire" d="M186.0 130L256 130L256 92.5L290 92.5"/>
+<path class="wire" d="M338 85L366 85"/>
+<text class="lbl" x="374" y="90" text-anchor="start">F</text>
+</svg>
+<figcaption>F = AB + CD, drawn with AND and OR</figcaption></figure>
+<p>Bubble the two AND outputs and the two OR inputs. The bubbles cancel in pairs, so
+the function is untouched; the ANDs become NANDs and the OR, now drawn with input
+bubbles, is a NAND as well:</p>
+<figure class="fig" style="--figmax:27rem">
+<svg viewBox="0 0 430 175" role="img" aria-label="the same function in three NAND gates">
+<path class="wire" d="M140 32.5H150M140 47.5H150"/>
+<path class="gate" d="M148 25.0H162A15.0 15.0 0 0 1 162 55.0H148Z"/>
+<circle class="gate" cx="181.0" cy="40" r="4"/>
+<path class="wire" d="M185.0 40H194.0"/>
+<path class="wire" d="M140 122.5H150M140 137.5H150"/>
+<path class="gate" d="M148 115.0H162A15.0 15.0 0 0 1 162 145.0H148Z"/>
+<circle class="gate" cx="181.0" cy="130" r="4"/>
+<path class="wire" d="M185.0 130H194.0"/>
+<path class="wire" d="M290 77.5H300M290 92.5H300"/>
+<path class="gate" d="M298 70.0H312A15.0 15.0 0 0 1 312 100.0H298Z"/>
+<circle class="gate" cx="331.0" cy="85" r="4"/>
+<path class="wire" d="M335.0 85H344.0"/>
+<text class="lbl" x="22" y="37.5" text-anchor="end">A</text>
+<path class="wire" d="M30 32.5L140 32.5"/>
+<text class="lbl" x="22" y="52.5" text-anchor="end">B</text>
+<path class="wire" d="M30 47.5L140 47.5"/>
+<text class="lbl" x="22" y="127.5" text-anchor="end">C</text>
+<path class="wire" d="M30 122.5L140 122.5"/>
+<text class="lbl" x="22" y="142.5" text-anchor="end">D</text>
+<path class="wire" d="M30 137.5L140 137.5"/>
+<path class="wire" d="M194.0 40L258 40L258 77.5L290 77.5"/>
+<path class="wire" d="M194.0 130L264 130L264 92.5L290 92.5"/>
+<path class="wire" d="M344.0 85L372.0 85"/>
+<text class="lbl" x="380.0" y="90" text-anchor="start">F</text>
+</svg>
+<figcaption>the same function in three NAND gates</figcaption></figure>
+<p><strong>Three gates either way.</strong> Two-level AND&ndash;OR to NAND is free
+&mdash; a fact worth internalising, because it means the K-map minimisation of Set 6
+is also the right thing to do when your target technology is NAND. Minimise as SOP,
+then translate.</p>
+<p>Checking it algebraically:</p>
+<p style="text-align:center;font-size:1.05rem">
+NAND(NAND(A,B), NAND(C,D)) = ((AB)&prime; &middot; (CD)&prime;)&prime;
+= (AB)&prime;&prime; + (CD)&prime;&prime; = AB + CD</p>
+<p>The middle step is De Morgan and the last is involution. Every conversion in this
+set is that same pair of moves.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 7.9">Convert F = AB&prime;&nbsp;+&nbsp;BC into a pure NAND circuit. Count the gates and say where the extra one came from.</summary><div class="sol">
+<figure class="fig" style="--figmax:100%">
+<svg viewBox="0 0 540 265" role="img" aria-label="F = AB&prime; + BC in four NAND gates">
+<path class="wire" d="M120 112.5H130M120 127.5H130"/>
+<path class="gate" d="M128 105.0H142A15.0 15.0 0 0 1 142 135.0H128Z"/>
+<circle class="gate" cx="161.0" cy="120" r="4"/>
+<path class="wire" d="M165.0 120H174.0"/>
+<path class="wire" d="M260 42.5H270M260 57.5H270"/>
+<path class="gate" d="M268 35.0H282A15.0 15.0 0 0 1 282 65.0H268Z"/>
+<circle class="gate" cx="301.0" cy="50" r="4"/>
+<path class="wire" d="M305.0 50H314.0"/>
+<path class="wire" d="M260 167.5H270M260 182.5H270"/>
+<path class="gate" d="M268 160.0H282A15.0 15.0 0 0 1 282 190.0H268Z"/>
+<circle class="gate" cx="301.0" cy="175" r="4"/>
+<path class="wire" d="M305.0 175H314.0"/>
+<path class="wire" d="M400 104.5H410M400 119.5H410"/>
+<path class="gate" d="M408 97.0H422A15.0 15.0 0 0 1 422 127.0H408Z"/>
+<circle class="gate" cx="441.0" cy="112" r="4"/>
+<path class="wire" d="M445.0 112H454.0"/>
+<text class="lbl" x="22" y="35" text-anchor="end">A</text>
+<path class="wire" d="M30 30L230 30L230 42.5L260 42.5"/>
+<text class="lbl" x="22" y="125" text-anchor="end">B</text>
+<path class="wire" d="M30 120L70 120"/>
+<circle class="dot" cx="70" cy="120" r="3.2"/>
+<path class="wire" d="M70 120L70 112.5L120 112.5"/>
+<path class="wire" d="M70 120L70 127.5L120 127.5"/>
+<path class="wire" d="M70 120L70 205L200 205L200 167.5L260 167.5"/>
+<circle class="dot" cx="70" cy="120" r="3.2"/>
+<text class="lbl" x="22" y="240" text-anchor="end">C</text>
+<path class="wire" d="M30 235L215 235L215 182.5L260 182.5"/>
+<path class="wire" d="M174.0 120L222 120L222 57.5L260 57.5"/>
+<path class="wire" d="M314.0 50L362 50L362 104.5L400 104.5"/>
+<path class="wire" d="M314.0 175L368 175L368 119.5L400 119.5"/>
+<path class="wire" d="M454.0 112L482.0 112"/>
+<text class="lbl" x="490.0" y="117" text-anchor="start">F</text>
+<text class="ann" x="176.0" y="111" text-anchor="start">B&prime;</text>
+</svg>
+<figcaption>F = AB&prime; + BC in four NAND gates</figcaption></figure>
+<p><strong>Four gates.</strong> Three of them are the two-level conversion from
+Exercise 7.8 &mdash; one NAND per product term and one to collect them. The fourth is
+an inverter for B&prime;, built as a NAND with its inputs tied together.</p>
+<p>That is the general rule: <strong>a <var>k</var>-term SOP needs
+<var>k</var>&nbsp;+&nbsp;1 NAND gates, plus one more for every input that appears
+complemented</strong>. Here <var>k</var>&nbsp;=&nbsp;2 and one literal is
+complemented, giving 2&nbsp;+&nbsp;1&nbsp;+&nbsp;1&nbsp;=&nbsp;4.</p>
+<p>Note that B itself is used twice &mdash; once through the inverter and once
+directly into the second NAND &mdash; so the B input fans out, and the dot on the
+drawing is doing real work.</p>
+<p>A practical consequence: complemented literals are not free in NAND logic, so a
+minimisation that removes a complemented variable is worth more than one that removes
+a plain one. It is a small thing, and it is the kind of small thing that decides
+between two K-map covers of equal literal count.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 7.10">Convert F = (A&nbsp;+&nbsp;B)(C&nbsp;+&nbsp;D) into a pure NOR circuit, and justify it algebraically.</summary><div class="sol">
+<figure class="fig" style="--figmax:27rem">
+<svg viewBox="0 0 430 175" role="img" aria-label="F = (A + B)(C + D) in three NOR gates">
+<path class="wire" d="M140 32.5H157M140 47.5H157"/>
+<path class="gate" d="M148 25.0C166 25.0 174 32.8 179 40C174 47.2 166 55.0 148 55.0Q157 40 148 25.0Z"/>
+<circle class="gate" cx="183" cy="40" r="4"/>
+<path class="wire" d="M187 40H196"/>
+<path class="wire" d="M140 122.5H157M140 137.5H157"/>
+<path class="gate" d="M148 115.0C166 115.0 174 122.8 179 130C174 137.2 166 145.0 148 145.0Q157 130 148 115.0Z"/>
+<circle class="gate" cx="183" cy="130" r="4"/>
+<path class="wire" d="M187 130H196"/>
+<path class="wire" d="M290 77.5H307M290 92.5H307"/>
+<path class="gate" d="M298 70.0C316 70.0 324 77.8 329 85C324 92.2 316 100.0 298 100.0Q307 85 298 70.0Z"/>
+<circle class="gate" cx="333" cy="85" r="4"/>
+<path class="wire" d="M337 85H346"/>
+<text class="lbl" x="22" y="37.5" text-anchor="end">A</text>
+<path class="wire" d="M30 32.5L140 32.5"/>
+<text class="lbl" x="22" y="52.5" text-anchor="end">B</text>
+<path class="wire" d="M30 47.5L140 47.5"/>
+<text class="lbl" x="22" y="127.5" text-anchor="end">C</text>
+<path class="wire" d="M30 122.5L140 122.5"/>
+<text class="lbl" x="22" y="142.5" text-anchor="end">D</text>
+<path class="wire" d="M30 137.5L140 137.5"/>
+<path class="wire" d="M196 40L258 40L258 77.5L290 77.5"/>
+<path class="wire" d="M196 130L264 130L264 92.5L290 92.5"/>
+<path class="wire" d="M346 85L374 85"/>
+<text class="lbl" x="382" y="90" text-anchor="start">F</text>
+</svg>
+<figcaption>F = (A + B)(C + D) in three NOR gates</figcaption></figure>
+<p><strong>Three NOR gates</strong>, exactly mirroring Exercise 7.8. Bubble the two OR
+outputs and the two AND inputs; the ORs become NORs, and the AND with bubbled inputs is
+a NOR.</p>
+<p>The algebra, which is Exercise 7.8's with AND and OR exchanged throughout:</p>
+<p style="text-align:center;font-size:1.05rem">
+NOR(NOR(A,B), NOR(C,D)) = ((A+B)&prime; + (C+D)&prime;)&prime;
+= (A+B)&prime;&prime; &middot; (C+D)&prime;&prime; = (A + B)(C + D)</p>
+<p>So a two-level OR&ndash;AND circuit converts to pure NOR for free, just as
+AND&ndash;OR converts to pure NAND for free. Which pairing you get depends on whether
+you minimised into SOP or POS form, and that choice &mdash; made back on the K-map
+&mdash; is what decides which gate family your circuit wants.</p>
+<p>The symmetry is complete and worth stating once: <em>SOP goes with NAND, POS goes
+with NOR.</em> Mixing them up produces a working circuit with unnecessary inverters
+scattered through it.</p></div></details>
+
+<h3>Building and reading</h3>
+
+<details class="prob"><summary data-label="Exercise 7.11">Build A&nbsp;&oplus;&nbsp;B from four NAND gates. Verify it with a truth table.</summary><div class="sol">
+<p>The trick is to compute the shared term A&nbsp;&uarr;&nbsp;B once and feed it back
+into both branches.</p>
+<figure class="fig" style="--figmax:100%">
+<svg viewBox="0 0 560 200" role="img" aria-label="A &oplus; B from four NAND gates">
+<path class="wire" d="M150 82.5H160M150 97.5H160"/>
+<path class="gate" d="M158 75.0H172A15.0 15.0 0 0 1 172 105.0H158Z"/>
+<circle class="gate" cx="191.0" cy="90" r="4"/>
+<path class="wire" d="M195.0 90H204.0"/>
+<path class="wire" d="M290 32.5H300M290 47.5H300"/>
+<path class="gate" d="M298 25.0H312A15.0 15.0 0 0 1 312 55.0H298Z"/>
+<circle class="gate" cx="331.0" cy="40" r="4"/>
+<path class="wire" d="M335.0 40H344.0"/>
+<path class="wire" d="M290 142.5H300M290 157.5H300"/>
+<path class="gate" d="M298 135.0H312A15.0 15.0 0 0 1 312 165.0H298Z"/>
+<circle class="gate" cx="331.0" cy="150" r="4"/>
+<path class="wire" d="M335.0 150H344.0"/>
+<path class="wire" d="M420 87.5H430M420 102.5H430"/>
+<path class="gate" d="M428 80.0H442A15.0 15.0 0 0 1 442 110.0H428Z"/>
+<circle class="gate" cx="461.0" cy="95" r="4"/>
+<path class="wire" d="M465.0 95H474.0"/>
+<text class="lbl" x="22" y="31" text-anchor="end">A</text>
+<path class="wire" d="M30 26L100 26"/>
+<circle class="dot" cx="100" cy="26" r="3.2"/>
+<path class="wire" d="M100 26L100 82.5L150 82.5"/>
+<path class="wire" d="M100 26L250 26L250 32.5L290 32.5"/>
+<text class="lbl" x="22" y="165" text-anchor="end">B</text>
+<path class="wire" d="M30 160L120 160"/>
+<circle class="dot" cx="120" cy="160" r="3.2"/>
+<path class="wire" d="M120 160L120 97.5L150 97.5"/>
+<path class="wire" d="M120 160L240 160L240 157.5L290 157.5"/>
+<path class="wire" d="M204.0 90L222 90"/>
+<circle class="dot" cx="222" cy="90" r="3.2"/>
+<path class="wire" d="M222 90L222 47.5L290 47.5"/>
+<path class="wire" d="M222 90L222 142.5L290 142.5"/>
+<path class="wire" d="M344.0 40L388 40L388 87.5L420 87.5"/>
+<path class="wire" d="M344.0 150L394 150L394 102.5L420 102.5"/>
+<path class="wire" d="M474.0 95L502.0 95"/>
+<text class="lbl" x="510.0" y="100" text-anchor="start">F</text>
+</svg>
+<figcaption>A &oplus; B from four NAND gates</figcaption></figure>
+<p>Writing <var>t</var> for A&nbsp;&uarr;&nbsp;B, the output is
+(A&nbsp;&uarr;&nbsp;<var>t</var>)&nbsp;&uarr;&nbsp;(B&nbsp;&uarr;&nbsp;<var>t</var>).</p>
+<div class="tablewrap"><table class="ttab">
+<thead><tr><th>A</th><th>B</th><th>A &uarr; B</th><th>A &uarr; (A&uarr;B)</th><th>B &uarr; (A&uarr;B)</th><th>F</th></tr></thead>
+<tbody><tr><td class="bin">0</td><td class="bin">0</td><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td><td class="bin hilite">0</td></tr><tr><td class="bin">0</td><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td><td class="bin">0</td><td class="bin hilite">1</td></tr><tr><td class="bin">1</td><td class="bin">0</td><td class="bin">1</td><td class="bin">0</td><td class="bin">1</td><td class="bin hilite">1</td></tr><tr><td class="bin">1</td><td class="bin">1</td><td class="bin">0</td><td class="bin">1</td><td class="bin">1</td><td class="bin hilite">0</td></tr></tbody></table></div>
+<p>The last column is 0, 1, 1, 0 &mdash; XOR.</p>
+<p>Why it works, algebraically. <var>t</var>&nbsp;=&nbsp;(AB)&prime;, so</p>
+<p style="text-align:center;font-size:1.05rem">
+A &uarr; <var>t</var> = (A(AB)&prime;)&prime; = (A(A&prime;+B&prime;))&prime;
+= (AB&prime;)&prime;</p>
+<p>using A&middot;A&prime;&nbsp;=&nbsp;0, and symmetrically
+B&nbsp;&uarr;&nbsp;<var>t</var>&nbsp;=&nbsp;(A&prime;B)&prime;. NANDing those two gives
+AB&prime;&nbsp;+&nbsp;A&prime;B, which is Exercise 4.1's expression for XOR.</p>
+<p>Four gates is the minimum for XOR in pure NAND. The naive route &mdash; build
+AB&prime;&nbsp;+&nbsp;A&prime;B by translating each AND, OR and NOT separately &mdash;
+costs five, because both inverters get built explicitly instead of being shared. Reusing
+<var>t</var> is what saves the gate, and spotting shared sub-expressions is most of
+what hand optimisation consists of.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 7.12">Write down the function computed by this pure-NAND circuit, then simplify it.</summary><div class="sol">
+<figure class="fig" style="--figmax:100%">
+<svg viewBox="0 0 520 260" role="img" aria-label="Circuit for Exercise 7.12">
+<path class="wire" d="M110 32.5H120M110 47.5H120"/>
+<path class="gate" d="M118 25.0H132A15.0 15.0 0 0 1 132 55.0H118Z"/>
+<circle class="gate" cx="151.0" cy="40" r="4"/>
+<path class="wire" d="M155.0 40H164.0"/>
+<path class="wire" d="M250 67.5H260M250 82.5H260"/>
+<path class="gate" d="M258 60.0H272A15.0 15.0 0 0 1 272 90.0H258Z"/>
+<circle class="gate" cx="291.0" cy="75" r="4"/>
+<path class="wire" d="M295.0 75H304.0"/>
+<path class="wire" d="M250 177.5H260M250 192.5H260"/>
+<path class="gate" d="M258 170.0H272A15.0 15.0 0 0 1 272 200.0H258Z"/>
+<circle class="gate" cx="291.0" cy="185" r="4"/>
+<path class="wire" d="M295.0 185H304.0"/>
+<path class="wire" d="M390 117.5H400M390 132.5H400"/>
+<path class="gate" d="M398 110.0H412A15.0 15.0 0 0 1 412 140.0H398Z"/>
+<circle class="gate" cx="431.0" cy="125" r="4"/>
+<path class="wire" d="M435.0 125H444.0"/>
+<text class="lbl" x="22" y="45" text-anchor="end">A</text>
+<path class="wire" d="M30 40L70 40"/>
+<circle class="dot" cx="70" cy="40" r="3.2"/>
+<path class="wire" d="M70 40L70 32.5L110 32.5"/>
+<path class="wire" d="M70 40L70 47.5L110 47.5"/>
+<text class="lbl" x="22" y="145" text-anchor="end">B</text>
+<path class="wire" d="M30 140L95 140"/>
+<circle class="dot" cx="95" cy="140" r="3.2"/>
+<path class="wire" d="M95 140L95 82.5L250 82.5"/>
+<path class="wire" d="M95 140L95 177.5L250 177.5"/>
+<text class="lbl" x="22" y="235" text-anchor="end">C</text>
+<path class="wire" d="M30 230L215 230L215 192.5L250 192.5"/>
+<path class="wire" d="M164.0 40L215 40L215 67.5L250 67.5"/>
+<path class="wire" d="M304.0 75L352 75L352 117.5L390 117.5"/>
+<path class="wire" d="M304.0 185L358 185L358 132.5L390 132.5"/>
+<path class="wire" d="M444.0 125L472.0 125"/>
+<text class="lbl" x="480.0" y="130" text-anchor="start">F</text>
+</svg>
+<figcaption>Circuit for Exercise 7.12</figcaption></figure>
+<p>Label the gate outputs from left to right, exactly as in Set 3.</p>
+<ul>
+<li>The first gate has both inputs tied to A, so it is an inverter:
+<strong>A&prime;</strong>.</li>
+<li>The second takes A&prime; and B: <strong>(A&prime;B)&prime;</strong>.</li>
+<li>The third takes B and C: <strong>(BC)&prime;</strong>.</li>
+<li>The output gate NANDs those two together.</li>
+</ul>
+<p style="text-align:center;font-size:1.05rem">
+F = ((A&prime;B)&prime; &middot; (BC)&prime;)&prime; = A&prime;B + BC</p>
+<p>&mdash; the double complement collapsing by De Morgan, which is what happens every
+time the last gate of a pure-NAND SOP circuit is read.</p>
+<p><strong>Simplifying</strong>, by factoring out the B:</p>
+<p style="text-align:center;font-size:1.05rem">
+F = B(A&prime; + C)</p>
+<p>which is the same function in three literals rather than four. As a circuit that is
+an OR and an AND &mdash; but in NAND terms the factored form is not obviously cheaper,
+since it is a product of sums and NAND suits sums of products. Translating the factored
+version back into pure NAND gives four gates again.</p>
+<p>That is a useful caution about minimisation. "Fewer literals" is a good proxy for
+"cheaper circuit" only while the target is two-level AND&ndash;OR. Once the target is a
+specific gate family, the count that matters is the count of gates in that family, and
+it does not always move in the same direction.</p></div></details>
+
+<h3>Cost and reasoning</h3>
+
+<details class="prob"><summary data-label="Exercise 7.13">A function has been minimised to a four-term SOP in which three distinct variables appear complemented. How many NAND gates does the pure-NAND implementation need? State the general rule and where it fails.</summary><div class="sol">
+<p>Four product terms need four NAND gates, one collecting NAND, and one inverter per
+complemented variable:</p>
+<p style="text-align:center;font-size:1.05rem">
+4 + 1 + 3 = <strong>8 gates</strong></p>
+<p><strong>The general rule.</strong> A <var>k</var>-term SOP over a set of inputs of
+which <var>c</var> appear complemented somewhere needs
+<var>k</var>&nbsp;+&nbsp;1&nbsp;+&nbsp;<var>c</var> NAND gates. Note that
+<var>c</var> counts <em>distinct variables</em>, not occurrences: a variable that
+appears complemented in three different terms still needs only one inverter, whose
+output fans out.</p>
+<p><strong>Where it fails.</strong> Three places, all worth knowing.</p>
+<ul>
+<li><strong>A single-term SOP.</strong> With <var>k</var>&nbsp;=&nbsp;1 there is nothing
+to collect, and the second NAND is used as a plain inverter rather than as an OR. The
+formula still gives the right number, but for a different reason than you think.</li>
+<li><strong>Shared sub-expressions.</strong> If two terms have a common part, computing
+it once can beat the formula &mdash; which is exactly how Exercise 7.11 built XOR in
+four gates rather than five.</li>
+<li><strong>Fan-in limits.</strong> The formula assumes gates can have as many inputs as
+the terms are long. Real parts come in two-, three- and four-input versions, and a
+five-literal term has to be split across several gates, adding to the count.</li>
+</ul>
+<p>The rule is still the right first estimate, and its main use is comparative: given
+two minimal covers from a K-map with the same literal count, the one with fewer
+distinct complemented variables is the cheaper circuit.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 7.14">Why do real chips favour NAND over AND? Answer in terms of what a gate is physically made of, and say what this means for how you should count cost.</summary><div class="sol">
+<p>In CMOS, the technology essentially all digital chips are built in, a gate is made of
+transistors in two complementary networks, and the natural output of that arrangement is
+<em>inverting</em>. A two-input NAND is four transistors; so is a two-input NOR. A
+two-input AND is a NAND followed by an inverter &mdash; <strong>six</strong> transistors
+&mdash; and an OR is likewise six.</p>
+<p>So the inverting gates are not merely as cheap as the non-inverting ones, they are
+strictly cheaper, and the AND gate you draw is physically a NAND with an apology on the
+end. Building from NAND is not a clever economy; it is what the silicon was going to do
+anyway.</p>
+<p>There is a speed argument too. The extra inverter in an AND gate is an extra stage of
+delay on every signal passing through, so a circuit expressed in NANDs is not just
+smaller but faster than the same circuit in ANDs and ORs.</p>
+<p><strong>What it means for counting.</strong> The gate counts used in this course are a
+convenient fiction. A fairer measure is transistor count, or gate <em>inputs</em>, and
+by that measure the AND&ndash;OR circuit you started with was never as cheap as it
+looked. This is also why the conversion of &sect;7.5 being "free" understates the case:
+converting a three-gate AND&ndash;OR circuit to three NANDs removes two inverters that
+were there all along, hidden inside the symbols.</p>
+<p>The other half of the answer is manufacturing. A chip built from one repeated cell is
+easier to lay out, verify and yield than one built from a zoo of different cells, which
+is why a standard-cell library is dominated by a few gate types with NAND and NOR at the
+centre of it.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 7.15">Challenge. There are sixteen different two-input Boolean functions. Exactly two of them are universal on their own. Show that NAND and NOR are the only candidates.</summary><div class="sol">
+<p>Write a two-input function as the four values it takes, in the order
+<var>f</var>(0,0), <var>f</var>(0,1), <var>f</var>(1,0), <var>f</var>(1,1). There are
+2<sup>4</sup>&nbsp;=&nbsp;16 such patterns, which is where the sixteen comes from.</p>
+<p><strong>First requirement: <var>f</var>(0,0) must be 1.</strong> Suppose not &mdash;
+suppose <var>f</var>(0,0)&nbsp;=&nbsp;0. Feed 0 into every input of a circuit built
+entirely from copies of <var>f</var>. The first gate sees 0, 0 and outputs 0; so does
+every gate after it, by the same argument, all the way to the output. So the circuit
+outputs 0 whenever all its inputs are 0, and it can never compute A&prime; &mdash; which
+must be 1 when A is 0 &mdash; nor the constant 1. Such an <var>f</var> is not
+universal. (This is Exercise 3.15's argument, reused.)</p>
+<p><strong>Second requirement: <var>f</var>(1,1) must be 0</strong>, by the mirror image
+of that argument with every input set to 1.</p>
+<p>That leaves the two middle values free, so exactly four functions survive:</p>
+<div class="tablewrap"><table class="ttab">
+<thead><tr><th>f(0,0)</th><th>f(0,1)</th><th>f(1,0)</th><th>f(1,1)</th><th>function</th></tr></thead>
+<tbody>
+<tr><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin">NOR</td></tr>
+<tr><td class="bin">1</td><td class="bin">0</td><td class="bin">1</td><td class="bin">0</td><td class="bin">B&prime;</td></tr>
+<tr><td class="bin">1</td><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin">A&prime;</td></tr>
+<tr><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td><td class="bin">0</td><td class="bin">NAND</td></tr>
+</tbody></table></div>
+<p><strong>Eliminating the two middle ones.</strong> The function A&prime; ignores its
+second input entirely. Any circuit built from copies of it is a chain of inverters, so
+its output depends on exactly one input and is either that input or its complement.
+It cannot compute AB, which depends on two. The same argument kills B&prime;.</p>
+<p><strong>What remains</strong> is NAND and NOR, and &sect;7.2 showed both actually are
+universal &mdash; the argument above only showed that nothing else can be. Two
+necessary conditions narrowed sixteen candidates to four, an independent argument
+removed two more, and a construction confirmed the last two.</p>
+<div class="box extra"><span class="bt">The general result</span>
+<p>The full classification of which <em>sets</em> of Boolean functions are functionally
+complete is Post's theorem, and it says a set fails to be complete exactly when all of
+its members share one of five properties: preserving 0, preserving 1, being
+self-dual, being monotone, or being affine. The two conditions used above are the first
+two of those five. It is a satisfying piece of mathematics and the two-input case, which
+you have just done in full, is the whole idea in miniature.</p></div>
+</div></details>
+
+<div class="box extra"><span class="bt">Where this goes next</span>
+<p>The combinational half of the course closes here: from a specification to a truth
+table, to a minimal expression, to a two-level circuit, to a pure-NAND implementation
+that a fabrication process could actually build. What is missing is memory &mdash; every
+circuit so far forgets everything the instant its inputs change. Adding a feedback path
+to gates you already understand produces a device that remembers, and that is where the
+second half begins.</p></div>
+
+    <nav class="pagenav">
+      <a class="prev" href="ex-kmaps.html"><span>Previous</span>Set 6. Karnaugh maps and don&rsquo;t-cares</a>
+      <a class="next" href="setup-logisim.html"><span>Next</span>Installing Logisim-Evolution</a>
+    </nav>
+    <footer class="site">
+      <em>Computer Organization and Assembly Language</em> &middot; CSCI 240 / 640,
+      Queens College CUNY.
+    </footer>
+  </main>
+</div>
+</body>
+</html>

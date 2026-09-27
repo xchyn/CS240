@@ -1,0 +1,2247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Set 6 &mdash; Karnaugh maps and don&rsquo;t-cares</title>
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/notes.js" defer></script>
+</head>
+<body>
+<header class="topbar"><div class="topbar-in">
+  <a class="brand" href="index.html">CSCI 240</a>
+  <span class="crumb">Set 6 &middot; Karnaugh maps</span>
+  <nav class="topnav">
+    <a href="ex-sop-pos.html">&larr; Prev</a>
+    <a href="index.html">Contents</a>
+    <a href="ex-nand.html">Next &rarr;</a>
+    <button class="iconbtn" id="themebtn" type="button" title="Light / dark">&#9686;</button>
+  </nav>
+</div></header>
+<div class="wrap">
+  <aside class="toc"><p class="toc-title">On this page</p><ol>
+    <li><a href="#map"><span class="t">6.1</span>The table, rearranged</a></li>
+    <li><a href="#group"><span class="t">6.2</span>Grouping</a></li>
+    <li><a href="#implicants"><span class="t">6.3</span>Prime and essential</a></li>
+    <li><a href="#dc"><span class="t">6.4</span>Don&rsquo;t-cares</a></li>
+    <li><a href="#zeros"><span class="t">6.5</span>Grouping the zeros</a></li>
+    <li><a href="#ref"><span class="t">6.6</span>Reference and pitfalls</a></li>
+    <li><a href="#exercises"><span class="t">6.7</span>Exercises</a></li>
+  </ol></aside>
+  <main>
+
+<div class="chhead">
+  <span class="chpart">Exercise set 6 &middot; after the Karnaugh map lecture</span>
+  <span class="chnum">Karnaugh maps</span>
+  <h1>Minimising by looking</h1>
+  <p class="chsum">The truth table redrawn so that combinable terms sit next to
+  each other; grouping the 1s for a minimal sum of products and the 0s for a minimal
+  product of sums; prime and essential prime implicants; and don&rsquo;t-cares, which
+  are free simplification if you use them.</p>
+</div>
+
+<p>Set 5 gave you a circuit for any truth table and no way to tell whether it was
+wasteful. Set 4 gave you the laws to shrink it, but spotting where a law applies in a
+list of product terms is a hunt, and there is no way to know when to stop. The
+Karnaugh map fixes both problems at once by redrawing the truth table so that terms
+which <em>can</em> combine are physically adjacent. Simplification stops being algebra
+and becomes looking at a picture.</p>
+
+<p>The method is exact, not a heuristic: done properly it produces a genuinely minimal
+two-level expression. Its limit is human eyesight, which is why it runs out at four
+variables &mdash; and what happens past that is Exercise 6.21.</p>
+
+<h2 id="map"><span class="secnum">6.1</span>The table, rearranged</h2>
+
+<p>A three-variable map has eight cells for the table's eight rows, and a
+four-variable map has sixteen. The cells hold the output column; the whole trick is
+in the <em>order</em> of the labels along the edges.</p>
+
+<div class="krow"><figure class="fig" style="--figmax:12.0rem">
+<svg viewBox="0 0 312 186" role="img" aria-label="Three variables: eight cells">
+<text class="kvar" x="66" y="18" text-anchor="start">BC</text>
+<text class="kvar" x="46" y="40" text-anchor="end">A</text>
+<path class="kslash" d="M18 4L60 26"/>
+<text class="klab" x="91.0" y="38" text-anchor="middle">00</text>
+<text class="klab" x="149.0" y="38" text-anchor="middle">01</text>
+<text class="klab" x="207.0" y="38" text-anchor="middle">11</text>
+<text class="klab" x="265.0" y="38" text-anchor="middle">10</text>
+<text class="klab" x="50" y="84.0" text-anchor="end">0</text>
+<text class="klab" x="50" y="142.0" text-anchor="end">1</text>
+<rect class="kcell" x="62" y="50" width="58" height="58" rx="3"/>
+<text class="kval zero" x="91.0" y="87.0" text-anchor="middle">&nbsp;</text>
+<text class="kidx" x="67" y="64" text-anchor="start">0</text>
+<rect class="kcell" x="120" y="50" width="58" height="58" rx="3"/>
+<text class="kval zero" x="149.0" y="87.0" text-anchor="middle">&nbsp;</text>
+<text class="kidx" x="125" y="64" text-anchor="start">1</text>
+<rect class="kcell" x="236" y="50" width="58" height="58" rx="3"/>
+<text class="kval zero" x="265.0" y="87.0" text-anchor="middle">&nbsp;</text>
+<text class="kidx" x="241" y="64" text-anchor="start">2</text>
+<rect class="kcell" x="178" y="50" width="58" height="58" rx="3"/>
+<text class="kval zero" x="207.0" y="87.0" text-anchor="middle">&nbsp;</text>
+<text class="kidx" x="183" y="64" text-anchor="start">3</text>
+<rect class="kcell" x="62" y="108" width="58" height="58" rx="3"/>
+<text class="kval zero" x="91.0" y="145.0" text-anchor="middle">&nbsp;</text>
+<text class="kidx" x="67" y="122" text-anchor="start">4</text>
+<rect class="kcell" x="120" y="108" width="58" height="58" rx="3"/>
+<text class="kval zero" x="149.0" y="145.0" text-anchor="middle">&nbsp;</text>
+<text class="kidx" x="125" y="122" text-anchor="start">5</text>
+<rect class="kcell" x="236" y="108" width="58" height="58" rx="3"/>
+<text class="kval zero" x="265.0" y="145.0" text-anchor="middle">&nbsp;</text>
+<text class="kidx" x="241" y="122" text-anchor="start">6</text>
+<rect class="kcell" x="178" y="108" width="58" height="58" rx="3"/>
+<text class="kval zero" x="207.0" y="145.0" text-anchor="middle">&nbsp;</text>
+<text class="kidx" x="183" y="122" text-anchor="start">7</text>
+</svg>
+<figcaption>Three variables: eight cells</figcaption></figure><figure class="fig" style="--figmax:12.0rem">
+<svg viewBox="0 0 312 302" role="img" aria-label="Four variables: sixteen cells">
+<text class="kvar" x="66" y="18" text-anchor="start">CD</text>
+<text class="kvar" x="46" y="40" text-anchor="end">AB</text>
+<path class="kslash" d="M18 4L60 26"/>
+<text class="klab" x="91.0" y="38" text-anchor="middle">00</text>
+<text class="klab" x="149.0" y="38" text-anchor="middle">01</text>
+<text class="klab" x="207.0" y="38" text-anchor="middle">11</text>
+<text class="klab" x="265.0" y="38" text-anchor="middle">10</text>
+<text class="klab" x="50" y="84.0" text-anchor="end">00</text>
+<text class="klab" x="50" y="142.0" text-anchor="end">01</text>
+<text class="klab" x="50" y="200.0" text-anchor="end">11</text>
+<text class="klab" x="50" y="258.0" text-anchor="end">10</text>
+<rect class="kcell" x="62" y="50" width="58" height="58" rx="3"/>
+<text class="kval zero" x="91.0" y="87.0" text-anchor="middle">&nbsp;</text>
+<text class="kidx" x="67" y="64" text-anchor="start">0</text>
+<rect class="kcell" x="120" y="50" width="58" height="58" rx="3"/>
+<text class="kval zero" x="149.0" y="87.0" text-anchor="middle">&nbsp;</text>
+<text class="kidx" x="125" y="64" text-anchor="start">1</text>
+<rect class="kcell" x="236" y="50" width="58" height="58" rx="3"/>
+<text class="kval zero" x="265.0" y="87.0" text-anchor="middle">&nbsp;</text>
+<text class="kidx" x="241" y="64" text-anchor="start">2</text>
+<rect class="kcell" x="178" y="50" width="58" height="58" rx="3"/>
+<text class="kval zero" x="207.0" y="87.0" text-anchor="middle">&nbsp;</text>
+<text class="kidx" x="183" y="64" text-anchor="start">3</text>
+<rect class="kcell" x="62" y="108" width="58" height="58" rx="3"/>
+<text class="kval zero" x="91.0" y="145.0" text-anchor="middle">&nbsp;</text>
+<text class="kidx" x="67" y="122" text-anchor="start">4</text>
+<rect class="kcell" x="120" y="108" width="58" height="58" rx="3"/>
+<text class="kval zero" x="149.0" y="145.0" text-anchor="middle">&nbsp;</text>
+<text class="kidx" x="125" y="122" text-anchor="start">5</text>
+<rect class="kcell" x="236" y="108" width="58" height="58" rx="3"/>
+<text class="kval zero" x="265.0" y="145.0" text-anchor="middle">&nbsp;</text>
+<text class="kidx" x="241" y="122" text-anchor="start">6</text>
+<rect class="kcell" x="178" y="108" width="58" height="58" rx="3"/>
+<text class="kval zero" x="207.0" y="145.0" text-anchor="middle">&nbsp;</text>
+<text class="kidx" x="183" y="122" text-anchor="start">7</text>
+<rect class="kcell" x="62" y="224" width="58" height="58" rx="3"/>
+<text class="kval zero" x="91.0" y="261.0" text-anchor="middle">&nbsp;</text>
+<text class="kidx" x="67" y="238" text-anchor="start">8</text>
+<rect class="kcell" x="120" y="224" width="58" height="58" rx="3"/>
+<text class="kval zero" x="149.0" y="261.0" text-anchor="middle">&nbsp;</text>
+<text class="kidx" x="125" y="238" text-anchor="start">9</text>
+<rect class="kcell" x="236" y="224" width="58" height="58" rx="3"/>
+<text class="kval zero" x="265.0" y="261.0" text-anchor="middle">&nbsp;</text>
+<text class="kidx" x="241" y="238" text-anchor="start">10</text>
+<rect class="kcell" x="178" y="224" width="58" height="58" rx="3"/>
+<text class="kval zero" x="207.0" y="261.0" text-anchor="middle">&nbsp;</text>
+<text class="kidx" x="183" y="238" text-anchor="start">11</text>
+<rect class="kcell" x="62" y="166" width="58" height="58" rx="3"/>
+<text class="kval zero" x="91.0" y="203.0" text-anchor="middle">&nbsp;</text>
+<text class="kidx" x="67" y="180" text-anchor="start">12</text>
+<rect class="kcell" x="120" y="166" width="58" height="58" rx="3"/>
+<text class="kval zero" x="149.0" y="203.0" text-anchor="middle">&nbsp;</text>
+<text class="kidx" x="125" y="180" text-anchor="start">13</text>
+<rect class="kcell" x="236" y="166" width="58" height="58" rx="3"/>
+<text class="kval zero" x="265.0" y="203.0" text-anchor="middle">&nbsp;</text>
+<text class="kidx" x="241" y="180" text-anchor="start">14</text>
+<rect class="kcell" x="178" y="166" width="58" height="58" rx="3"/>
+<text class="kval zero" x="207.0" y="203.0" text-anchor="middle">&nbsp;</text>
+<text class="kidx" x="183" y="180" text-anchor="start">15</text>
+</svg>
+<figcaption>Four variables: sixteen cells</figcaption></figure></div>
+
+<p>Read the column headings: 00, 01, 11, <strong>10</strong> &mdash; not 00, 01, 10,
+11. This is <strong>Gray code</strong>, in which each label differs from its neighbour
+in exactly one bit. That single property is what the whole method rests on, because
+of the combining law from Set 4:</p>
+
+<p style="text-align:center;font-size:1.05rem">
+XY + XY&prime; = X</p>
+
+<p>Two terms merge when they agree everywhere except one variable. On the map, two
+cells that touch horizontally or vertically differ in exactly one variable &mdash;
+that is what Gray ordering buys &mdash; so <em>adjacent cells are exactly the pairs
+that combine</em>. Finding simplifications becomes finding neighbours.</p>
+
+<div class="box warn"><span class="bt">The edges wrap</span>
+<p>Adjacency does not stop at the border. The left and right columns differ in one
+variable too (00 and 10 differ only in the first bit), so they are neighbours; the
+same goes for the top and bottom rows of a four-variable map. Think of the map as
+rolled into a cylinder both ways &mdash; a torus &mdash; rather than as a flat sheet.
+The four corners of a four-variable map are all mutually adjacent, which Exercise 6.7
+puts to work.</p>
+<p>Diagonal cells are <em>never</em> adjacent. They differ in two variables, and
+nothing combines them.</p></div>
+
+<p>Filling a map is copying the output column into the right boxes, and the cell
+numbers above are the row numbers from Set 5 &mdash; so a function given as
+&Sigma;m(&hellip;) can be written straight onto the map without a table at all.</p>
+
+<h2 id="group"><span class="secnum">6.2</span>Grouping</h2>
+
+<p>Circle the 1s in blocks, and read a product term off each block. The rules:</p>
+
+<ol>
+<li><strong>Every group is a rectangle of 1, 2, 4, 8&hellip; cells</strong> &mdash; a
+power of two, and a full rectangle, wrapping around edges if it helps. Six cells in an
+L shape is not a group.</li>
+<li><strong>Make every group as large as possible.</strong> Each doubling in size
+removes one literal from the term, so a group of four beats two groups of two.</li>
+<li><strong>Cover every 1 at least once.</strong> Groups may overlap freely &mdash;
+X&nbsp;+&nbsp;X&nbsp;=&nbsp;X, so covering a cell twice costs nothing.</li>
+<li><strong>Use as few groups as possible</strong>, because each group is one AND
+gate.</li>
+</ol>
+
+<p>To read a term off a group, ask which variables are the same in every cell of it.
+Those go into the product, plain if they are 1 and complemented if they are 0. The
+variables that change across the group are the ones that dropped out.</p>
+
+<div class="box worked"><span class="bt">Worked example</span>
+<p>F(A,&nbsp;B,&nbsp;C) = &Sigma;m(0, 1, 3, 7), the running example for this page.</p>
+<figure class="fig" style="--figmax:12.0rem">
+<svg viewBox="0 0 312 186" role="img" aria-label="F = A&prime;B&prime; + BC">
+<text class="kvar" x="66" y="18" text-anchor="start">BC</text>
+<text class="kvar" x="46" y="40" text-anchor="end">A</text>
+<path class="kslash" d="M18 4L60 26"/>
+<text class="klab" x="91.0" y="38" text-anchor="middle">00</text>
+<text class="klab" x="149.0" y="38" text-anchor="middle">01</text>
+<text class="klab" x="207.0" y="38" text-anchor="middle">11</text>
+<text class="klab" x="265.0" y="38" text-anchor="middle">10</text>
+<text class="klab" x="50" y="84.0" text-anchor="end">0</text>
+<text class="klab" x="50" y="142.0" text-anchor="end">1</text>
+<rect class="kcell" x="62" y="50" width="58" height="58" rx="3"/>
+<text class="kval" x="91.0" y="87.0" text-anchor="middle">1</text>
+<text class="kidx" x="67" y="64" text-anchor="start">0</text>
+<rect class="kcell" x="120" y="50" width="58" height="58" rx="3"/>
+<text class="kval" x="149.0" y="87.0" text-anchor="middle">1</text>
+<text class="kidx" x="125" y="64" text-anchor="start">1</text>
+<rect class="kcell" x="236" y="50" width="58" height="58" rx="3"/>
+<text class="kval zero" x="265.0" y="87.0" text-anchor="middle">0</text>
+<text class="kidx" x="241" y="64" text-anchor="start">2</text>
+<rect class="kcell" x="178" y="50" width="58" height="58" rx="3"/>
+<text class="kval" x="207.0" y="87.0" text-anchor="middle">1</text>
+<text class="kidx" x="183" y="64" text-anchor="start">3</text>
+<rect class="kcell" x="62" y="108" width="58" height="58" rx="3"/>
+<text class="kval zero" x="91.0" y="145.0" text-anchor="middle">0</text>
+<text class="kidx" x="67" y="122" text-anchor="start">4</text>
+<rect class="kcell" x="120" y="108" width="58" height="58" rx="3"/>
+<text class="kval zero" x="149.0" y="145.0" text-anchor="middle">0</text>
+<text class="kidx" x="125" y="122" text-anchor="start">5</text>
+<rect class="kcell" x="236" y="108" width="58" height="58" rx="3"/>
+<text class="kval zero" x="265.0" y="145.0" text-anchor="middle">0</text>
+<text class="kidx" x="241" y="122" text-anchor="start">6</text>
+<rect class="kcell" x="178" y="108" width="58" height="58" rx="3"/>
+<text class="kval" x="207.0" y="145.0" text-anchor="middle">1</text>
+<text class="kidx" x="183" y="122" text-anchor="start">7</text>
+<rect class="kgrp grp0" x="67" y="55" width="106" height="48" rx="10"/>
+<rect class="kgrp grp1" x="187" y="59" width="40" height="98" rx="10"/>
+</svg>
+<figcaption>F = A&prime;B&prime; + BC</figcaption></figure>
+<p>Two groups, each a pair:</p>
+<ul>
+<li>Cells 0 and 1 sit side by side in the A&nbsp;=&nbsp;0 row, in columns 00 and 01.
+Across them A is always 0 and B is always 0, while C changes. So the term is
+<strong>A&prime;B&prime;</strong>.</li>
+<li>Cells 3 and 7 sit one above the other in column 11. Across them B and C are always
+1 while A changes, giving <strong>BC</strong>.</li>
+</ul>
+<p style="text-align:center;font-size:1.05rem">
+F = A&prime;B&prime; + BC</p>
+<p>Two AND gates and an OR, against four 3-input ANDs and a 4-input OR for the
+canonical form &mdash; and reading it off took about ten seconds.</p>
+<p>Notice what was <em>not</em> done. Cells 1 and 3 are also adjacent, giving A&prime;C,
+and that is a perfectly legal group. It is also unnecessary: both of its cells are
+already covered. Adding it would add a gate and change nothing, and rule 4 says leave
+it out. Knowing which groups to leave out is what &sect;6.3 is about.</p></div>
+
+<h2 id="implicants"><span class="secnum">6.3</span>Prime and essential</h2>
+
+<p>Two pieces of vocabulary, because the exam uses them and because they turn "circle
+the biggest blobs" into a procedure that is actually reliable.</p>
+
+<p>An <strong>implicant</strong> is any legal group &mdash; any product term that only
+ever makes the function 1. A <strong>prime implicant</strong> is one that cannot be
+made any bigger: no doubling of it stays inside the 1s. Only prime implicants can
+appear in a minimal expression, since a non-prime group is a term with an extra
+literal that could have been dropped.</p>
+
+<p>An <strong>essential prime implicant</strong> is a prime implicant that is the
+<em>only</em> one covering some particular 1. That cell has to be covered by
+something, and only this group can do it, so every minimal expression contains this
+term. No choice is involved.</p>
+
+<p>In the running example the prime implicants are A&prime;B&prime;, A&prime;C, BC. The essentials are
+A&prime;B&prime; and BC: cell 0 lies in no other group, and neither does cell 7. A&prime;C is
+prime &mdash; it cannot grow &mdash; but not essential, since both its cells belong to
+other groups as well.</p>
+
+<div class="box note"><span class="bt">The procedure</span>
+<ol>
+<li>Find <em>all</em> the prime implicants: for each 1, grow the largest legal groups
+containing it.</li>
+<li>Mark the essential ones &mdash; look for a 1 that only one group covers. Those
+terms are in the answer, whatever else happens.</li>
+<li>Cover any 1s the essentials missed, using as few of the remaining prime implicants
+as you can.</li>
+<li>Stop. Every 1 covered, nothing redundant.</li>
+</ol>
+<p>Step 2 is what most people skip, and it is the step that makes the result
+trustworthy. Circling greedily from the top-left corner can and does produce a term
+you did not need.</p></div>
+
+<p>Usually the essentials cover everything and the answer is forced. Sometimes step 3
+has a genuine choice, and then a function has more than one minimal expression
+&mdash; equally small, equally correct. Exercise 6.10 is a map where <em>no</em> prime
+implicant is essential and there are two different right answers, which is worth
+seeing once so that a disagreement with a classmate does not panic you.</p>
+
+<h2 id="dc"><span class="secnum">6.4</span>Don&rsquo;t-cares</h2>
+
+<p>Some input combinations never happen. A decimal digit stored in four bits is never
+1010; two sensors on the
+same shaft are never both active; a state encoding may leave codes unused. For those
+rows the output is nobody's business, and the truth table is written with an
+<strong>X</strong> rather than a 0 or a 1.</p>
+
+<p>On the map an X is a wildcard, and the rule is the useful one:</p>
+
+<p style="text-align:center;font-size:1.05rem">
+<strong>Include an X in a group when it makes the group bigger. Ignore it
+otherwise.</strong></p>
+
+<p>You are choosing, per cell, whether that input produces a 0 or a 1 &mdash; and
+since the input never occurs, either choice is correct. You may as well choose
+whichever makes the circuit smaller. An X you never circle is simply being treated as
+a 0.</p>
+
+<div class="box worked"><span class="bt">Worked example</span>
+<p>F(A,&nbsp;B,&nbsp;C,&nbsp;D) = &Sigma;m(2, 3, 4, 5) + d(6, 7), where the last two rows cannot occur.</p>
+<figure class="fig" style="--figmax:12.0rem">
+<svg viewBox="0 0 312 302" role="img" aria-label="F = A&prime;C + A&prime;B &mdash; both Xs used">
+<text class="kvar" x="66" y="18" text-anchor="start">CD</text>
+<text class="kvar" x="46" y="40" text-anchor="end">AB</text>
+<path class="kslash" d="M18 4L60 26"/>
+<text class="klab" x="91.0" y="38" text-anchor="middle">00</text>
+<text class="klab" x="149.0" y="38" text-anchor="middle">01</text>
+<text class="klab" x="207.0" y="38" text-anchor="middle">11</text>
+<text class="klab" x="265.0" y="38" text-anchor="middle">10</text>
+<text class="klab" x="50" y="84.0" text-anchor="end">00</text>
+<text class="klab" x="50" y="142.0" text-anchor="end">01</text>
+<text class="klab" x="50" y="200.0" text-anchor="end">11</text>
+<text class="klab" x="50" y="258.0" text-anchor="end">10</text>
+<rect class="kcell" x="62" y="50" width="58" height="58" rx="3"/>
+<text class="kval zero" x="91.0" y="87.0" text-anchor="middle">0</text>
+<text class="kidx" x="67" y="64" text-anchor="start">0</text>
+<rect class="kcell" x="120" y="50" width="58" height="58" rx="3"/>
+<text class="kval zero" x="149.0" y="87.0" text-anchor="middle">0</text>
+<text class="kidx" x="125" y="64" text-anchor="start">1</text>
+<rect class="kcell" x="236" y="50" width="58" height="58" rx="3"/>
+<text class="kval" x="265.0" y="87.0" text-anchor="middle">1</text>
+<text class="kidx" x="241" y="64" text-anchor="start">2</text>
+<rect class="kcell" x="178" y="50" width="58" height="58" rx="3"/>
+<text class="kval" x="207.0" y="87.0" text-anchor="middle">1</text>
+<text class="kidx" x="183" y="64" text-anchor="start">3</text>
+<rect class="kcell" x="62" y="108" width="58" height="58" rx="3"/>
+<text class="kval" x="91.0" y="145.0" text-anchor="middle">1</text>
+<text class="kidx" x="67" y="122" text-anchor="start">4</text>
+<rect class="kcell" x="120" y="108" width="58" height="58" rx="3"/>
+<text class="kval" x="149.0" y="145.0" text-anchor="middle">1</text>
+<text class="kidx" x="125" y="122" text-anchor="start">5</text>
+<rect class="kcell" x="236" y="108" width="58" height="58" rx="3"/>
+<text class="kval dc" x="265.0" y="145.0" text-anchor="middle">X</text>
+<text class="kidx" x="241" y="122" text-anchor="start">6</text>
+<rect class="kcell" x="178" y="108" width="58" height="58" rx="3"/>
+<text class="kval dc" x="207.0" y="145.0" text-anchor="middle">X</text>
+<text class="kidx" x="183" y="122" text-anchor="start">7</text>
+<rect class="kcell" x="62" y="224" width="58" height="58" rx="3"/>
+<text class="kval zero" x="91.0" y="261.0" text-anchor="middle">0</text>
+<text class="kidx" x="67" y="238" text-anchor="start">8</text>
+<rect class="kcell" x="120" y="224" width="58" height="58" rx="3"/>
+<text class="kval zero" x="149.0" y="261.0" text-anchor="middle">0</text>
+<text class="kidx" x="125" y="238" text-anchor="start">9</text>
+<rect class="kcell" x="236" y="224" width="58" height="58" rx="3"/>
+<text class="kval zero" x="265.0" y="261.0" text-anchor="middle">0</text>
+<text class="kidx" x="241" y="238" text-anchor="start">10</text>
+<rect class="kcell" x="178" y="224" width="58" height="58" rx="3"/>
+<text class="kval zero" x="207.0" y="261.0" text-anchor="middle">0</text>
+<text class="kidx" x="183" y="238" text-anchor="start">11</text>
+<rect class="kcell" x="62" y="166" width="58" height="58" rx="3"/>
+<text class="kval zero" x="91.0" y="203.0" text-anchor="middle">0</text>
+<text class="kidx" x="67" y="180" text-anchor="start">12</text>
+<rect class="kcell" x="120" y="166" width="58" height="58" rx="3"/>
+<text class="kval zero" x="149.0" y="203.0" text-anchor="middle">0</text>
+<text class="kidx" x="125" y="180" text-anchor="start">13</text>
+<rect class="kcell" x="236" y="166" width="58" height="58" rx="3"/>
+<text class="kval zero" x="265.0" y="203.0" text-anchor="middle">0</text>
+<text class="kidx" x="241" y="180" text-anchor="start">14</text>
+<rect class="kcell" x="178" y="166" width="58" height="58" rx="3"/>
+<text class="kval zero" x="207.0" y="203.0" text-anchor="middle">0</text>
+<text class="kidx" x="183" y="180" text-anchor="start">15</text>
+<rect class="kgrp grp0" x="183" y="55" width="106" height="106" rx="10"/>
+<rect class="kgrp grp1" x="71" y="117" width="214" height="40" rx="10"/>
+</svg>
+<figcaption>F = A&prime;C + A&prime;B &mdash; both Xs used</figcaption></figure>
+<p>Both Xs get absorbed. Cells 2 and 3 grow upward into 6 and 7 to make a group of
+four, and cells 4 and 5 grow rightward into 6 and 7 to make another:</p>
+<p style="text-align:center;font-size:1.05rem">
+F = A&prime;C + A&prime;B</p>
+<p>Treat the Xs as 0s instead and the best available is</p>
+<p style="text-align:center;font-size:1.05rem">
+F = A&prime;B&prime;C + A&prime;BC&prime;</p>
+<p>&mdash; the same number of gates, but each AND gate now needs three inputs instead
+of two. The don't-cares were worth two gate inputs for free, and on a bigger map they
+routinely save whole terms.</p>
+<p>The one thing to hold on to: those Xs are <em>not</em> zeros and they are not ones.
+Writing 0 in an X cell is a decision you were not asked to make, and it is the
+decision that costs you marks.</p></div>
+
+<h2 id="zeros"><span class="secnum">6.5</span>Grouping the zeros</h2>
+
+<p>Everything so far produced a sum of products, because groups of 1s are product
+terms. Group the <em>0s</em> instead and, with one twist, you get a minimal product of
+sums &mdash; the other form from Set 5, and sometimes the cheaper one.</p>
+
+<p>The method: circle the 0s by exactly the same rules, read each group as a product
+term in the usual way, and then <em>complement it</em> &mdash; every literal flips and
+the product becomes a sum. Grouping the 0s of F is grouping the 1s of F&prime;, so
+this is De Morgan applied one group at a time.</p>
+
+<div class="box worked"><span class="bt">Worked example</span>
+<p>The same running function, F = &Sigma;m(0, 1, 3, 7), now with its 0s circled:</p>
+<figure class="fig" style="--figmax:12.0rem">
+<svg viewBox="0 0 312 186" role="img" aria-label="the same map, with the 0s circled">
+<text class="kvar" x="66" y="18" text-anchor="start">BC</text>
+<text class="kvar" x="46" y="40" text-anchor="end">A</text>
+<path class="kslash" d="M18 4L60 26"/>
+<text class="klab" x="91.0" y="38" text-anchor="middle">00</text>
+<text class="klab" x="149.0" y="38" text-anchor="middle">01</text>
+<text class="klab" x="207.0" y="38" text-anchor="middle">11</text>
+<text class="klab" x="265.0" y="38" text-anchor="middle">10</text>
+<text class="klab" x="50" y="84.0" text-anchor="end">0</text>
+<text class="klab" x="50" y="142.0" text-anchor="end">1</text>
+<rect class="kcell" x="62" y="50" width="58" height="58" rx="3"/>
+<text class="kval" x="91.0" y="87.0" text-anchor="middle">1</text>
+<text class="kidx" x="67" y="64" text-anchor="start">0</text>
+<rect class="kcell" x="120" y="50" width="58" height="58" rx="3"/>
+<text class="kval" x="149.0" y="87.0" text-anchor="middle">1</text>
+<text class="kidx" x="125" y="64" text-anchor="start">1</text>
+<rect class="kcell" x="236" y="50" width="58" height="58" rx="3"/>
+<text class="kval zero" x="265.0" y="87.0" text-anchor="middle">0</text>
+<text class="kidx" x="241" y="64" text-anchor="start">2</text>
+<rect class="kcell" x="178" y="50" width="58" height="58" rx="3"/>
+<text class="kval" x="207.0" y="87.0" text-anchor="middle">1</text>
+<text class="kidx" x="183" y="64" text-anchor="start">3</text>
+<rect class="kcell" x="62" y="108" width="58" height="58" rx="3"/>
+<text class="kval zero" x="91.0" y="145.0" text-anchor="middle">0</text>
+<text class="kidx" x="67" y="122" text-anchor="start">4</text>
+<rect class="kcell" x="120" y="108" width="58" height="58" rx="3"/>
+<text class="kval zero" x="149.0" y="145.0" text-anchor="middle">0</text>
+<text class="kidx" x="125" y="122" text-anchor="start">5</text>
+<rect class="kcell" x="236" y="108" width="58" height="58" rx="3"/>
+<text class="kval zero" x="265.0" y="145.0" text-anchor="middle">0</text>
+<text class="kidx" x="241" y="122" text-anchor="start">6</text>
+<rect class="kcell" x="178" y="108" width="58" height="58" rx="3"/>
+<text class="kval" x="207.0" y="145.0" text-anchor="middle">1</text>
+<text class="kidx" x="183" y="122" text-anchor="start">7</text>
+<rect class="kgrp grp2" x="241" y="55" width="48" height="106" rx="10"/>
+<rect class="kgrp grp3" x="71" y="117" width="98" height="40" rx="10"/>
+</svg>
+<figcaption>the same map, with the 0s circled</figcaption></figure>
+<p>The 0s are in cells 2, 4, 5 and 6. Two groups: cells 2 and 6 sit one above the
+other in the rightmost column, BC&nbsp;=&nbsp;10, where B is 1 and C is 0 and A
+changes, giving BC&prime;; cells 4 and 5 sit side by side in the A&nbsp;=&nbsp;1 row
+where B is 0, giving AB&prime;. So</p>
+<p style="text-align:center;font-size:1.05rem">
+F&prime; = BC&prime; + AB&prime;</p>
+<p>Complement each term and turn the sum into a product:</p>
+<p style="text-align:center;font-size:1.05rem">
+F = (B&prime; + C)(A&prime; + B)</p>
+<p>Check it against the SOP answer from &sect;6.2, F&nbsp;=&nbsp;A&prime;B&prime; + BC, on row 5
+(ABC&nbsp;=&nbsp;101): the SOP gives
+0&nbsp;+&nbsp;0&nbsp;=&nbsp;0, and the POS gives
+(0&nbsp;+&nbsp;1)(0&nbsp;+&nbsp;0)&nbsp;=&nbsp;1&nbsp;&middot;&nbsp;0&nbsp;=&nbsp;0.
+Agreed.</p>
+<p>Here both forms cost two terms and four literals, so neither wins. When the map has
+many more 1s than 0s the POS is usually the cheaper of the two, and the count of each
+is visible at a glance &mdash; which is the practical reason to know this method
+rather than only the SOP one.</p></div>
+
+<h2 id="ref"><span class="secnum">6.6</span>Reference and pitfalls</h2>
+
+<ul>
+<li><strong>Label order is Gray code</strong>, 00 01 11 10. Writing 00 01 10 11 breaks
+every adjacency and is the single most common way to get a K-map wrong.</li>
+<li><strong>Group sizes are powers of two</strong>, in rectangles. A group of 2
+removes one variable, of 4 removes two, of 8 removes three.</li>
+<li><strong>Edges wrap</strong>, both horizontally and vertically. Corners count.</li>
+<li><strong>Diagonals are not adjacent.</strong></li>
+<li><strong>Overlap is free; redundancy is not.</strong> Cover each 1 at least once,
+and drop any group whose cells are all covered by others.</li>
+<li><strong>Don't-cares</strong> join a group when they enlarge it and are ignored
+otherwise.</li>
+<li><strong>1s give SOP, 0s give POS</strong> &mdash; and the 0-groups must be
+complemented as you read them.</li>
+<li><strong>Check your answer</strong> by evaluating one or two rows, or by expanding
+the minimal form back to minterms and comparing index lists.</li>
+</ul>
+
+<div class="box warn"><span class="bt">Two traps worth naming</span>
+<p><strong>Reading the term backwards.</strong> A group sitting in the region where
+B&nbsp;=&nbsp;0 contributes B&prime;, not B. Check one cell of the group against the
+edge labels before you write the literal down.</p>
+<p><strong>Stopping at the first cover that works.</strong> A cover with all the 1s
+circled is not automatically minimal. Find the prime implicants first, then the
+essentials, then fill in. Greedy circling is how a three-term answer gets written for
+a two-term function.</p></div>
+
+<h2 id="exercises"><span class="secnum">6.7</span>Exercises</h2>
+
+<p>Draw each map by hand before opening the solution &mdash; the drawing is half the
+skill, and a map with the labels in the wrong order cannot be rescued by careful
+grouping. Every answer here was checked mechanically, so if yours differs and you are
+sure of it, check the label order first.</p>
+<p>Exercises 6.13 to 6.19 are all about don&rsquo;t-cares, which are the part of this
+topic that is least like anything you have done before and the part the midterm leans
+on hardest. If you are short of time, do those.</p>
+
+<h3>Building and reading a map</h3>
+
+<details class="prob"><summary data-label="Exercise 6.1">List every cell adjacent to cell 5 of a four-variable map, and every cell adjacent to cell 0. Then explain why cells 5 and 10 are not adjacent even though they sit diagonally opposite in the middle of the map.</summary><div class="sol">
+<p>Two cells of a map are adjacent when their numbers differ in exactly one bit, so the
+neighbours of a cell are found by flipping each bit of its number in turn.</p>
+<p><strong>Cell 5</strong> is 0101. Flipping each bit gives 1101, 0001, 0111, 0100
+&mdash; that is <strong>13, 1, 7 and 4</strong>.</p>
+<p><strong>Cell 0</strong> is 0000, giving 1000, 0100, 0010, 0001 &mdash;
+<strong>8, 4, 2 and 1</strong>. Two of those, 8 and 2, are the wrap-around
+neighbours: on the drawn map they sit at the opposite end of cell 0's row and column.
+Every cell of a four-variable map has exactly four neighbours, edge cells
+included &mdash; that is the sense in which the map has no edges.</p>
+<p><strong>Cells 5 and 10</strong> are 0101 and 1010, which differ in <em>all four</em>
+bits. They are as far apart as two cells can be. Physical closeness on the paper is
+not the test; the bit patterns are. A diagonal step is always two bit flips at once,
+and the combining law needs exactly one.</p>
+<p>The habit worth building: when you are unsure whether two cells may be grouped,
+write their numbers in binary and count the differing bits. One bit means a legal pair;
+anything else means no.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 6.2">Map and minimise F(A,&nbsp;B) = &Sigma;m(0, 1, 3).</summary><div class="sol">
+<figure class="fig" style="--figmax:7.5rem">
+<svg viewBox="0 0 196 186" role="img" aria-label="F = A&prime; + B">
+<text class="kvar" x="66" y="18" text-anchor="start">B</text>
+<text class="kvar" x="46" y="40" text-anchor="end">A</text>
+<path class="kslash" d="M18 4L60 26"/>
+<text class="klab" x="91.0" y="38" text-anchor="middle">0</text>
+<text class="klab" x="149.0" y="38" text-anchor="middle">1</text>
+<text class="klab" x="50" y="84.0" text-anchor="end">0</text>
+<text class="klab" x="50" y="142.0" text-anchor="end">1</text>
+<rect class="kcell" x="62" y="50" width="58" height="58" rx="3"/>
+<text class="kval" x="91.0" y="87.0" text-anchor="middle">1</text>
+<text class="kidx" x="67" y="64" text-anchor="start">0</text>
+<rect class="kcell" x="120" y="50" width="58" height="58" rx="3"/>
+<text class="kval" x="149.0" y="87.0" text-anchor="middle">1</text>
+<text class="kidx" x="125" y="64" text-anchor="start">1</text>
+<rect class="kcell" x="62" y="108" width="58" height="58" rx="3"/>
+<text class="kval zero" x="91.0" y="145.0" text-anchor="middle">0</text>
+<text class="kidx" x="67" y="122" text-anchor="start">2</text>
+<rect class="kcell" x="120" y="108" width="58" height="58" rx="3"/>
+<text class="kval" x="149.0" y="145.0" text-anchor="middle">1</text>
+<text class="kidx" x="125" y="122" text-anchor="start">3</text>
+<rect class="kgrp grp0" x="67" y="55" width="106" height="48" rx="10"/>
+<rect class="kgrp grp1" x="129" y="59" width="40" height="98" rx="10"/>
+</svg>
+<figcaption>F = A&prime; + B</figcaption></figure>
+<p>Two groups, each a pair. The top row (cells 0 and 1) has A&nbsp;=&nbsp;0
+throughout while B changes, giving A&prime;. The right column (cells 1 and 3) has
+B&nbsp;=&nbsp;1 throughout while A changes, giving B.</p>
+<p style="text-align:center;font-size:1.05rem">
+F = A&prime; + B</p>
+<p>Cell 1 is in both groups, which is allowed and in fact unavoidable here. Overlap
+never costs anything: the OR gate does not care how many of its inputs are 1.</p>
+<p>Sanity check against the definition: the only cell that is 0 is cell 2, that is
+A&nbsp;=&nbsp;1, B&nbsp;=&nbsp;0 &mdash; and A&prime;&nbsp;+&nbsp;B is indeed 0 exactly
+when A is 1 and B is 0.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 6.3">Fill a map for F(A,&nbsp;B,&nbsp;C) = A&prime;B&nbsp;+&nbsp;BC&prime;&nbsp;+&nbsp;AB&prime;C directly from the expression, without building a truth table first. Then minimise it.</summary><div class="sol">
+<p>Each product term marks the cells where it is 1, and a term with a variable missing
+marks more than one cell. Take them one at a time:</p>
+<ul>
+<li><strong>A&prime;B</strong> &mdash; A&nbsp;=&nbsp;0, B&nbsp;=&nbsp;1, C free, so cells
+010 and 011: <strong>2 and 3</strong>.</li>
+<li><strong>BC&prime;</strong> &mdash; B&nbsp;=&nbsp;1, C&nbsp;=&nbsp;0, A free, so cells
+010 and 110: <strong>2 and 6</strong>.</li>
+<li><strong>AB&prime;C</strong> &mdash; all three fixed, so the single cell 101:
+<strong>5</strong>.</li>
+</ul>
+<p>Cell 2 gets marked twice, which changes nothing. The 1s are in cells 2, 3, 5 and 6,
+so F = &Sigma;m(2, 3, 5, 6).</p>
+<figure class="fig" style="--figmax:12.0rem">
+<svg viewBox="0 0 312 186" role="img" aria-label="F = BC&prime; + A&prime;B + AB&prime;C">
+<text class="kvar" x="66" y="18" text-anchor="start">BC</text>
+<text class="kvar" x="46" y="40" text-anchor="end">A</text>
+<path class="kslash" d="M18 4L60 26"/>
+<text class="klab" x="91.0" y="38" text-anchor="middle">00</text>
+<text class="klab" x="149.0" y="38" text-anchor="middle">01</text>
+<text class="klab" x="207.0" y="38" text-anchor="middle">11</text>
+<text class="klab" x="265.0" y="38" text-anchor="middle">10</text>
+<text class="klab" x="50" y="84.0" text-anchor="end">0</text>
+<text class="klab" x="50" y="142.0" text-anchor="end">1</text>
+<rect class="kcell" x="62" y="50" width="58" height="58" rx="3"/>
+<text class="kval zero" x="91.0" y="87.0" text-anchor="middle">0</text>
+<text class="kidx" x="67" y="64" text-anchor="start">0</text>
+<rect class="kcell" x="120" y="50" width="58" height="58" rx="3"/>
+<text class="kval zero" x="149.0" y="87.0" text-anchor="middle">0</text>
+<text class="kidx" x="125" y="64" text-anchor="start">1</text>
+<rect class="kcell" x="236" y="50" width="58" height="58" rx="3"/>
+<text class="kval" x="265.0" y="87.0" text-anchor="middle">1</text>
+<text class="kidx" x="241" y="64" text-anchor="start">2</text>
+<rect class="kcell" x="178" y="50" width="58" height="58" rx="3"/>
+<text class="kval" x="207.0" y="87.0" text-anchor="middle">1</text>
+<text class="kidx" x="183" y="64" text-anchor="start">3</text>
+<rect class="kcell" x="62" y="108" width="58" height="58" rx="3"/>
+<text class="kval zero" x="91.0" y="145.0" text-anchor="middle">0</text>
+<text class="kidx" x="67" y="122" text-anchor="start">4</text>
+<rect class="kcell" x="120" y="108" width="58" height="58" rx="3"/>
+<text class="kval" x="149.0" y="145.0" text-anchor="middle">1</text>
+<text class="kidx" x="125" y="122" text-anchor="start">5</text>
+<rect class="kcell" x="236" y="108" width="58" height="58" rx="3"/>
+<text class="kval" x="265.0" y="145.0" text-anchor="middle">1</text>
+<text class="kidx" x="241" y="122" text-anchor="start">6</text>
+<rect class="kcell" x="178" y="108" width="58" height="58" rx="3"/>
+<text class="kval zero" x="207.0" y="145.0" text-anchor="middle">0</text>
+<text class="kidx" x="183" y="122" text-anchor="start">7</text>
+<rect class="kgrp grp0" x="241" y="55" width="48" height="106" rx="10"/>
+<rect class="kgrp grp1" x="187" y="59" width="98" height="40" rx="10"/>
+<rect class="kgrp grp2" x="133" y="121" width="32" height="32" rx="10"/>
+</svg>
+<figcaption>F = BC&prime; + A&prime;B + AB&prime;C</figcaption></figure>
+<p>Now group. Cells 2 and 3 are a pair, cells 2 and 6 are a pair, and cell 5 sits alone
+with no neighbour that is 1 &mdash; its neighbours are cells 1, 4 and 7, all 0. So</p>
+<p style="text-align:center;font-size:1.05rem">
+F = BC&prime; + A&prime;B + AB&prime;C</p>
+<p>which is the expression you started with. <strong>It was already minimal</strong>, and
+the map has told you so.</p>
+<p>That is a result worth having. Algebra can tell you an expression <em>is</em> smaller
+than another, but it can never tell you that nothing more will come off &mdash; you just
+run out of ideas and hope. A map settles the question: every group is as large as it can
+be, every 1 is covered, and there is nothing left to try.</p>
+<p>Note also that marking cells from an expression is faster than building the truth
+table, and the two routes have to agree. If you are unsure of a term, expand it to
+minterms as in Exercise 5.5 and check the cell numbers.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 6.4">Map and minimise F(A,&nbsp;B,&nbsp;C) = &Sigma;m(0, 1, 4, 5).</summary><div class="sol">
+<figure class="fig" style="--figmax:12.0rem">
+<svg viewBox="0 0 312 186" role="img" aria-label="F = B&prime;">
+<text class="kvar" x="66" y="18" text-anchor="start">BC</text>
+<text class="kvar" x="46" y="40" text-anchor="end">A</text>
+<path class="kslash" d="M18 4L60 26"/>
+<text class="klab" x="91.0" y="38" text-anchor="middle">00</text>
+<text class="klab" x="149.0" y="38" text-anchor="middle">01</text>
+<text class="klab" x="207.0" y="38" text-anchor="middle">11</text>
+<text class="klab" x="265.0" y="38" text-anchor="middle">10</text>
+<text class="klab" x="50" y="84.0" text-anchor="end">0</text>
+<text class="klab" x="50" y="142.0" text-anchor="end">1</text>
+<rect class="kcell" x="62" y="50" width="58" height="58" rx="3"/>
+<text class="kval" x="91.0" y="87.0" text-anchor="middle">1</text>
+<text class="kidx" x="67" y="64" text-anchor="start">0</text>
+<rect class="kcell" x="120" y="50" width="58" height="58" rx="3"/>
+<text class="kval" x="149.0" y="87.0" text-anchor="middle">1</text>
+<text class="kidx" x="125" y="64" text-anchor="start">1</text>
+<rect class="kcell" x="236" y="50" width="58" height="58" rx="3"/>
+<text class="kval zero" x="265.0" y="87.0" text-anchor="middle">0</text>
+<text class="kidx" x="241" y="64" text-anchor="start">2</text>
+<rect class="kcell" x="178" y="50" width="58" height="58" rx="3"/>
+<text class="kval zero" x="207.0" y="87.0" text-anchor="middle">0</text>
+<text class="kidx" x="183" y="64" text-anchor="start">3</text>
+<rect class="kcell" x="62" y="108" width="58" height="58" rx="3"/>
+<text class="kval" x="91.0" y="145.0" text-anchor="middle">1</text>
+<text class="kidx" x="67" y="122" text-anchor="start">4</text>
+<rect class="kcell" x="120" y="108" width="58" height="58" rx="3"/>
+<text class="kval" x="149.0" y="145.0" text-anchor="middle">1</text>
+<text class="kidx" x="125" y="122" text-anchor="start">5</text>
+<rect class="kcell" x="236" y="108" width="58" height="58" rx="3"/>
+<text class="kval zero" x="265.0" y="145.0" text-anchor="middle">0</text>
+<text class="kidx" x="241" y="122" text-anchor="start">6</text>
+<rect class="kcell" x="178" y="108" width="58" height="58" rx="3"/>
+<text class="kval zero" x="207.0" y="145.0" text-anchor="middle">0</text>
+<text class="kidx" x="183" y="122" text-anchor="start">7</text>
+<rect class="kgrp grp0" x="67" y="55" width="106" height="106" rx="10"/>
+</svg>
+<figcaption>F = B&prime;</figcaption></figure>
+<p>All four 1s form a single group: they occupy both rows, in the two columns where
+B&nbsp;=&nbsp;0. A changes, C changes, B is 0 throughout.</p>
+<p style="text-align:center;font-size:1.05rem">
+F = B&prime;</p>
+<p>One literal, no gates at all beyond a single inverter. Four minterms with twelve
+literals between them collapsed because the group of four deletes two variables.</p>
+<p>The columns involved are 00 and 01, which are side by side, so the block is an
+honest 2&times;2 rectangle. Had the 1s been in columns 00 and 11 the cells would not
+have been adjacent and nothing would have combined &mdash; another reason the Gray
+ordering has to be right before you start.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 6.5">Map and minimise F(A,&nbsp;B,&nbsp;C) = &Sigma;m(0, 2, 4, 6). This one needs the wrap-around.</summary><div class="sol">
+<figure class="fig" style="--figmax:12.0rem">
+<svg viewBox="0 0 312 186" role="img" aria-label="F = C&prime; &mdash; one group, wrapped">
+<text class="kvar" x="66" y="18" text-anchor="start">BC</text>
+<text class="kvar" x="46" y="40" text-anchor="end">A</text>
+<path class="kslash" d="M18 4L60 26"/>
+<text class="klab" x="91.0" y="38" text-anchor="middle">00</text>
+<text class="klab" x="149.0" y="38" text-anchor="middle">01</text>
+<text class="klab" x="207.0" y="38" text-anchor="middle">11</text>
+<text class="klab" x="265.0" y="38" text-anchor="middle">10</text>
+<text class="klab" x="50" y="84.0" text-anchor="end">0</text>
+<text class="klab" x="50" y="142.0" text-anchor="end">1</text>
+<rect class="kcell" x="62" y="50" width="58" height="58" rx="3"/>
+<text class="kval" x="91.0" y="87.0" text-anchor="middle">1</text>
+<text class="kidx" x="67" y="64" text-anchor="start">0</text>
+<rect class="kcell" x="120" y="50" width="58" height="58" rx="3"/>
+<text class="kval zero" x="149.0" y="87.0" text-anchor="middle">0</text>
+<text class="kidx" x="125" y="64" text-anchor="start">1</text>
+<rect class="kcell" x="236" y="50" width="58" height="58" rx="3"/>
+<text class="kval" x="265.0" y="87.0" text-anchor="middle">1</text>
+<text class="kidx" x="241" y="64" text-anchor="start">2</text>
+<rect class="kcell" x="178" y="50" width="58" height="58" rx="3"/>
+<text class="kval zero" x="207.0" y="87.0" text-anchor="middle">0</text>
+<text class="kidx" x="183" y="64" text-anchor="start">3</text>
+<rect class="kcell" x="62" y="108" width="58" height="58" rx="3"/>
+<text class="kval" x="91.0" y="145.0" text-anchor="middle">1</text>
+<text class="kidx" x="67" y="122" text-anchor="start">4</text>
+<rect class="kcell" x="120" y="108" width="58" height="58" rx="3"/>
+<text class="kval zero" x="149.0" y="145.0" text-anchor="middle">0</text>
+<text class="kidx" x="125" y="122" text-anchor="start">5</text>
+<rect class="kcell" x="236" y="108" width="58" height="58" rx="3"/>
+<text class="kval" x="265.0" y="145.0" text-anchor="middle">1</text>
+<text class="kidx" x="241" y="122" text-anchor="start">6</text>
+<rect class="kcell" x="178" y="108" width="58" height="58" rx="3"/>
+<text class="kval zero" x="207.0" y="145.0" text-anchor="middle">0</text>
+<text class="kidx" x="183" y="122" text-anchor="start">7</text>
+<rect class="kgrp grp0" x="241" y="55" width="48" height="106" rx="10"/>
+<rect class="kgrp grp0" x="67" y="55" width="48" height="106" rx="10"/>
+</svg>
+<figcaption>F = C&prime; &mdash; one group, wrapped</figcaption></figure>
+<p>The 1s are in columns 00 and 10 &mdash; the leftmost and rightmost columns, which
+are drawn at opposite ends of the map and are nevertheless adjacent, since 00 and 10
+differ only in B. Wrapping the map into a cylinder puts them side by side, and all
+four cells form one group of four.</p>
+<p>Across it B changes and A changes; C is 0 in every cell.</p>
+<p style="text-align:center;font-size:1.05rem">
+F = C&prime;</p>
+<p>Which is obvious in hindsight: the four cells are exactly the even numbers, and an
+even minterm index is one whose last bit &mdash; C &mdash; is 0.</p>
+<p>Drawn as two separate pairs the answer would have come out as
+A&prime;C&prime;&nbsp;+&nbsp;AC&prime;, which is correct but not minimal, and one more
+application of the combining law finishes it off. The map is meant to save you that
+second step; taking the wrap seriously is how it does.</p></div></details>
+
+<h3>Four variables</h3>
+
+<details class="prob"><summary data-label="Exercise 6.6">Map and minimise F(A,&nbsp;B,&nbsp;C) = &Sigma;m(1, 2, 5, 6). What is the largest group you can find, and why?</summary><div class="sol">
+<figure class="fig" style="--figmax:12.0rem">
+<svg viewBox="0 0 312 186" role="img" aria-label="F = B&prime;C + BC&prime;">
+<text class="kvar" x="66" y="18" text-anchor="start">BC</text>
+<text class="kvar" x="46" y="40" text-anchor="end">A</text>
+<path class="kslash" d="M18 4L60 26"/>
+<text class="klab" x="91.0" y="38" text-anchor="middle">00</text>
+<text class="klab" x="149.0" y="38" text-anchor="middle">01</text>
+<text class="klab" x="207.0" y="38" text-anchor="middle">11</text>
+<text class="klab" x="265.0" y="38" text-anchor="middle">10</text>
+<text class="klab" x="50" y="84.0" text-anchor="end">0</text>
+<text class="klab" x="50" y="142.0" text-anchor="end">1</text>
+<rect class="kcell" x="62" y="50" width="58" height="58" rx="3"/>
+<text class="kval zero" x="91.0" y="87.0" text-anchor="middle">0</text>
+<text class="kidx" x="67" y="64" text-anchor="start">0</text>
+<rect class="kcell" x="120" y="50" width="58" height="58" rx="3"/>
+<text class="kval" x="149.0" y="87.0" text-anchor="middle">1</text>
+<text class="kidx" x="125" y="64" text-anchor="start">1</text>
+<rect class="kcell" x="236" y="50" width="58" height="58" rx="3"/>
+<text class="kval" x="265.0" y="87.0" text-anchor="middle">1</text>
+<text class="kidx" x="241" y="64" text-anchor="start">2</text>
+<rect class="kcell" x="178" y="50" width="58" height="58" rx="3"/>
+<text class="kval zero" x="207.0" y="87.0" text-anchor="middle">0</text>
+<text class="kidx" x="183" y="64" text-anchor="start">3</text>
+<rect class="kcell" x="62" y="108" width="58" height="58" rx="3"/>
+<text class="kval zero" x="91.0" y="145.0" text-anchor="middle">0</text>
+<text class="kidx" x="67" y="122" text-anchor="start">4</text>
+<rect class="kcell" x="120" y="108" width="58" height="58" rx="3"/>
+<text class="kval" x="149.0" y="145.0" text-anchor="middle">1</text>
+<text class="kidx" x="125" y="122" text-anchor="start">5</text>
+<rect class="kcell" x="236" y="108" width="58" height="58" rx="3"/>
+<text class="kval" x="265.0" y="145.0" text-anchor="middle">1</text>
+<text class="kidx" x="241" y="122" text-anchor="start">6</text>
+<rect class="kcell" x="178" y="108" width="58" height="58" rx="3"/>
+<text class="kval zero" x="207.0" y="145.0" text-anchor="middle">0</text>
+<text class="kidx" x="183" y="122" text-anchor="start">7</text>
+<rect class="kgrp grp0" x="125" y="55" width="48" height="106" rx="10"/>
+<rect class="kgrp grp1" x="245" y="59" width="40" height="98" rx="10"/>
+</svg>
+<figcaption>F = B&prime;C + BC&prime;</figcaption></figure>
+<p>The largest group is a <strong>pair</strong>, and there are only two of them:</p>
+<p style="text-align:center;font-size:1.05rem">
+F = B&prime;C + BC&prime;</p>
+<p>No group of four exists. The 1s fill two whole columns &mdash; BC&nbsp;=&nbsp;01
+and BC&nbsp;=&nbsp;10 &mdash; and those two columns are not next to each other, since
+the column BC&nbsp;=&nbsp;11 sits between them and they are not neighbours round the
+wrap either. Check the numbers if you doubt it: cells 1 and 2 differ in two bits, and
+so do 1 and 6, and 2 and 5. Nothing merges across.</p>
+<p>The reason is visible in the expression. B&prime;C&nbsp;+&nbsp;BC&prime; is the
+"B and C differ" function &mdash; the XOR of B and C, with A playing no part at all.
+Exercise 5.13 showed the same thing from the other side: a function of this kind has
+minterms that are pairwise two bits apart, so two-level minimisation gets no purchase
+on it and the canonical form is already as small as an SOP can be.</p>
+<p>That is a real limitation rather than a failure of technique. As an SOP this needs
+two AND gates and an OR; with an XOR gate it is one gate. Minimal-in-two-levels and
+minimal-overall are different questions.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 6.7">Map and minimise F(A,&nbsp;B,&nbsp;C,&nbsp;D) = &Sigma;m(0, 2, 8, 10).</summary><div class="sol">
+<figure class="fig" style="--figmax:12.0rem">
+<svg viewBox="0 0 312 302" role="img" aria-label="the four corners are one group: B&prime;D&prime;">
+<text class="kvar" x="66" y="18" text-anchor="start">CD</text>
+<text class="kvar" x="46" y="40" text-anchor="end">AB</text>
+<path class="kslash" d="M18 4L60 26"/>
+<text class="klab" x="91.0" y="38" text-anchor="middle">00</text>
+<text class="klab" x="149.0" y="38" text-anchor="middle">01</text>
+<text class="klab" x="207.0" y="38" text-anchor="middle">11</text>
+<text class="klab" x="265.0" y="38" text-anchor="middle">10</text>
+<text class="klab" x="50" y="84.0" text-anchor="end">00</text>
+<text class="klab" x="50" y="142.0" text-anchor="end">01</text>
+<text class="klab" x="50" y="200.0" text-anchor="end">11</text>
+<text class="klab" x="50" y="258.0" text-anchor="end">10</text>
+<rect class="kcell" x="62" y="50" width="58" height="58" rx="3"/>
+<text class="kval" x="91.0" y="87.0" text-anchor="middle">1</text>
+<text class="kidx" x="67" y="64" text-anchor="start">0</text>
+<rect class="kcell" x="120" y="50" width="58" height="58" rx="3"/>
+<text class="kval zero" x="149.0" y="87.0" text-anchor="middle">0</text>
+<text class="kidx" x="125" y="64" text-anchor="start">1</text>
+<rect class="kcell" x="236" y="50" width="58" height="58" rx="3"/>
+<text class="kval" x="265.0" y="87.0" text-anchor="middle">1</text>
+<text class="kidx" x="241" y="64" text-anchor="start">2</text>
+<rect class="kcell" x="178" y="50" width="58" height="58" rx="3"/>
+<text class="kval zero" x="207.0" y="87.0" text-anchor="middle">0</text>
+<text class="kidx" x="183" y="64" text-anchor="start">3</text>
+<rect class="kcell" x="62" y="108" width="58" height="58" rx="3"/>
+<text class="kval zero" x="91.0" y="145.0" text-anchor="middle">0</text>
+<text class="kidx" x="67" y="122" text-anchor="start">4</text>
+<rect class="kcell" x="120" y="108" width="58" height="58" rx="3"/>
+<text class="kval zero" x="149.0" y="145.0" text-anchor="middle">0</text>
+<text class="kidx" x="125" y="122" text-anchor="start">5</text>
+<rect class="kcell" x="236" y="108" width="58" height="58" rx="3"/>
+<text class="kval zero" x="265.0" y="145.0" text-anchor="middle">0</text>
+<text class="kidx" x="241" y="122" text-anchor="start">6</text>
+<rect class="kcell" x="178" y="108" width="58" height="58" rx="3"/>
+<text class="kval zero" x="207.0" y="145.0" text-anchor="middle">0</text>
+<text class="kidx" x="183" y="122" text-anchor="start">7</text>
+<rect class="kcell" x="62" y="224" width="58" height="58" rx="3"/>
+<text class="kval" x="91.0" y="261.0" text-anchor="middle">1</text>
+<text class="kidx" x="67" y="238" text-anchor="start">8</text>
+<rect class="kcell" x="120" y="224" width="58" height="58" rx="3"/>
+<text class="kval zero" x="149.0" y="261.0" text-anchor="middle">0</text>
+<text class="kidx" x="125" y="238" text-anchor="start">9</text>
+<rect class="kcell" x="236" y="224" width="58" height="58" rx="3"/>
+<text class="kval" x="265.0" y="261.0" text-anchor="middle">1</text>
+<text class="kidx" x="241" y="238" text-anchor="start">10</text>
+<rect class="kcell" x="178" y="224" width="58" height="58" rx="3"/>
+<text class="kval zero" x="207.0" y="261.0" text-anchor="middle">0</text>
+<text class="kidx" x="183" y="238" text-anchor="start">11</text>
+<rect class="kcell" x="62" y="166" width="58" height="58" rx="3"/>
+<text class="kval zero" x="91.0" y="203.0" text-anchor="middle">0</text>
+<text class="kidx" x="67" y="180" text-anchor="start">12</text>
+<rect class="kcell" x="120" y="166" width="58" height="58" rx="3"/>
+<text class="kval zero" x="149.0" y="203.0" text-anchor="middle">0</text>
+<text class="kidx" x="125" y="180" text-anchor="start">13</text>
+<rect class="kcell" x="236" y="166" width="58" height="58" rx="3"/>
+<text class="kval zero" x="265.0" y="203.0" text-anchor="middle">0</text>
+<text class="kidx" x="241" y="180" text-anchor="start">14</text>
+<rect class="kcell" x="178" y="166" width="58" height="58" rx="3"/>
+<text class="kval zero" x="207.0" y="203.0" text-anchor="middle">0</text>
+<text class="kidx" x="183" y="180" text-anchor="start">15</text>
+<rect class="kgrp grp0" x="241" y="229" width="48" height="48" rx="10"/>
+<rect class="kgrp grp0" x="67" y="229" width="48" height="48" rx="10"/>
+<rect class="kgrp grp0" x="241" y="55" width="48" height="48" rx="10"/>
+<rect class="kgrp grp0" x="67" y="55" width="48" height="48" rx="10"/>
+</svg>
+<figcaption>the four corners are one group: B&prime;D&prime;</figcaption></figure>
+<p>The four 1s are in the four corners of the map, and the corners are all mutually
+adjacent: wrapping top to bottom and left to right brings them together into a single
+2&times;2 block. Check the numbers &mdash; 0 and 2 differ in one bit, 0 and 8 differ in
+one bit, and so on round the four.</p>
+<p>Across the group A changes and C changes; B is 0 in all four cells and so is D.</p>
+<p style="text-align:center;font-size:1.05rem">
+F = B&prime;D&prime;</p>
+<p>This is the pattern the wrap-around rule exists for, and the one most often missed
+in an exam. Four corners always form a group. Two corners on the same edge always form
+a pair.</p>
+<p>The check: B&prime;D&prime; should be 1 exactly when B and D are both 0, which is
+minterms 0000, 0010, 1000 and 1010 &mdash; cells 0, 2, 8 and 10, exactly the given
+list.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 6.8">Map and minimise F(A,&nbsp;B,&nbsp;C,&nbsp;D) = &Sigma;m(4, 5, 6, 7, 12, 13, 14, 15).</summary><div class="sol">
+<figure class="fig" style="--figmax:12.0rem">
+<svg viewBox="0 0 312 302" role="img" aria-label="a group of eight: F = B">
+<text class="kvar" x="66" y="18" text-anchor="start">CD</text>
+<text class="kvar" x="46" y="40" text-anchor="end">AB</text>
+<path class="kslash" d="M18 4L60 26"/>
+<text class="klab" x="91.0" y="38" text-anchor="middle">00</text>
+<text class="klab" x="149.0" y="38" text-anchor="middle">01</text>
+<text class="klab" x="207.0" y="38" text-anchor="middle">11</text>
+<text class="klab" x="265.0" y="38" text-anchor="middle">10</text>
+<text class="klab" x="50" y="84.0" text-anchor="end">00</text>
+<text class="klab" x="50" y="142.0" text-anchor="end">01</text>
+<text class="klab" x="50" y="200.0" text-anchor="end">11</text>
+<text class="klab" x="50" y="258.0" text-anchor="end">10</text>
+<rect class="kcell" x="62" y="50" width="58" height="58" rx="3"/>
+<text class="kval zero" x="91.0" y="87.0" text-anchor="middle">0</text>
+<text class="kidx" x="67" y="64" text-anchor="start">0</text>
+<rect class="kcell" x="120" y="50" width="58" height="58" rx="3"/>
+<text class="kval zero" x="149.0" y="87.0" text-anchor="middle">0</text>
+<text class="kidx" x="125" y="64" text-anchor="start">1</text>
+<rect class="kcell" x="236" y="50" width="58" height="58" rx="3"/>
+<text class="kval zero" x="265.0" y="87.0" text-anchor="middle">0</text>
+<text class="kidx" x="241" y="64" text-anchor="start">2</text>
+<rect class="kcell" x="178" y="50" width="58" height="58" rx="3"/>
+<text class="kval zero" x="207.0" y="87.0" text-anchor="middle">0</text>
+<text class="kidx" x="183" y="64" text-anchor="start">3</text>
+<rect class="kcell" x="62" y="108" width="58" height="58" rx="3"/>
+<text class="kval" x="91.0" y="145.0" text-anchor="middle">1</text>
+<text class="kidx" x="67" y="122" text-anchor="start">4</text>
+<rect class="kcell" x="120" y="108" width="58" height="58" rx="3"/>
+<text class="kval" x="149.0" y="145.0" text-anchor="middle">1</text>
+<text class="kidx" x="125" y="122" text-anchor="start">5</text>
+<rect class="kcell" x="236" y="108" width="58" height="58" rx="3"/>
+<text class="kval" x="265.0" y="145.0" text-anchor="middle">1</text>
+<text class="kidx" x="241" y="122" text-anchor="start">6</text>
+<rect class="kcell" x="178" y="108" width="58" height="58" rx="3"/>
+<text class="kval" x="207.0" y="145.0" text-anchor="middle">1</text>
+<text class="kidx" x="183" y="122" text-anchor="start">7</text>
+<rect class="kcell" x="62" y="224" width="58" height="58" rx="3"/>
+<text class="kval zero" x="91.0" y="261.0" text-anchor="middle">0</text>
+<text class="kidx" x="67" y="238" text-anchor="start">8</text>
+<rect class="kcell" x="120" y="224" width="58" height="58" rx="3"/>
+<text class="kval zero" x="149.0" y="261.0" text-anchor="middle">0</text>
+<text class="kidx" x="125" y="238" text-anchor="start">9</text>
+<rect class="kcell" x="236" y="224" width="58" height="58" rx="3"/>
+<text class="kval zero" x="265.0" y="261.0" text-anchor="middle">0</text>
+<text class="kidx" x="241" y="238" text-anchor="start">10</text>
+<rect class="kcell" x="178" y="224" width="58" height="58" rx="3"/>
+<text class="kval zero" x="207.0" y="261.0" text-anchor="middle">0</text>
+<text class="kidx" x="183" y="238" text-anchor="start">11</text>
+<rect class="kcell" x="62" y="166" width="58" height="58" rx="3"/>
+<text class="kval" x="91.0" y="203.0" text-anchor="middle">1</text>
+<text class="kidx" x="67" y="180" text-anchor="start">12</text>
+<rect class="kcell" x="120" y="166" width="58" height="58" rx="3"/>
+<text class="kval" x="149.0" y="203.0" text-anchor="middle">1</text>
+<text class="kidx" x="125" y="180" text-anchor="start">13</text>
+<rect class="kcell" x="236" y="166" width="58" height="58" rx="3"/>
+<text class="kval" x="265.0" y="203.0" text-anchor="middle">1</text>
+<text class="kidx" x="241" y="180" text-anchor="start">14</text>
+<rect class="kcell" x="178" y="166" width="58" height="58" rx="3"/>
+<text class="kval" x="207.0" y="203.0" text-anchor="middle">1</text>
+<text class="kidx" x="183" y="180" text-anchor="start">15</text>
+<rect class="kgrp grp0" x="67" y="113" width="222" height="106" rx="10"/>
+</svg>
+<figcaption>a group of eight: F = B</figcaption></figure>
+<p>Eight 1s, filling the two middle rows of the map &mdash; the rows labelled
+AB&nbsp;=&nbsp;01 and AB&nbsp;=&nbsp;11. A group of eight is legal, and across it
+A changes, C changes and D changes, leaving only</p>
+<p style="text-align:center;font-size:1.05rem">
+F = B</p>
+<p>A group of 8 in a 16-cell map removes three of the four variables, which is why the
+answer is a single literal and the circuit is a wire from B.</p>
+<p>Note that those two rows are adjacent because the row labels are in Gray order:
+01 and 11 differ only in A. In a map mislabelled 00, 01, 10, 11 the 1s would be in
+rows 2 and 4, which are not adjacent in that ordering, and this eight-cell group would
+be invisible. It is the clearest demonstration of why the ordering matters.</p>
+<p>Half the table being 1 for a single-variable answer is the expected ratio: B is 1 in
+exactly half of all input combinations.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 6.9">Map and minimise F(A,&nbsp;B,&nbsp;C,&nbsp;D) = &Sigma;m(0, 1, 4, 5, 10, 11, 14, 15). Describe what the function does in one sentence.</summary><div class="sol">
+<figure class="fig" style="--figmax:12.0rem">
+<svg viewBox="0 0 312 302" role="img" aria-label="F = A&prime;C&prime; + AC">
+<text class="kvar" x="66" y="18" text-anchor="start">CD</text>
+<text class="kvar" x="46" y="40" text-anchor="end">AB</text>
+<path class="kslash" d="M18 4L60 26"/>
+<text class="klab" x="91.0" y="38" text-anchor="middle">00</text>
+<text class="klab" x="149.0" y="38" text-anchor="middle">01</text>
+<text class="klab" x="207.0" y="38" text-anchor="middle">11</text>
+<text class="klab" x="265.0" y="38" text-anchor="middle">10</text>
+<text class="klab" x="50" y="84.0" text-anchor="end">00</text>
+<text class="klab" x="50" y="142.0" text-anchor="end">01</text>
+<text class="klab" x="50" y="200.0" text-anchor="end">11</text>
+<text class="klab" x="50" y="258.0" text-anchor="end">10</text>
+<rect class="kcell" x="62" y="50" width="58" height="58" rx="3"/>
+<text class="kval" x="91.0" y="87.0" text-anchor="middle">1</text>
+<text class="kidx" x="67" y="64" text-anchor="start">0</text>
+<rect class="kcell" x="120" y="50" width="58" height="58" rx="3"/>
+<text class="kval" x="149.0" y="87.0" text-anchor="middle">1</text>
+<text class="kidx" x="125" y="64" text-anchor="start">1</text>
+<rect class="kcell" x="236" y="50" width="58" height="58" rx="3"/>
+<text class="kval zero" x="265.0" y="87.0" text-anchor="middle">0</text>
+<text class="kidx" x="241" y="64" text-anchor="start">2</text>
+<rect class="kcell" x="178" y="50" width="58" height="58" rx="3"/>
+<text class="kval zero" x="207.0" y="87.0" text-anchor="middle">0</text>
+<text class="kidx" x="183" y="64" text-anchor="start">3</text>
+<rect class="kcell" x="62" y="108" width="58" height="58" rx="3"/>
+<text class="kval" x="91.0" y="145.0" text-anchor="middle">1</text>
+<text class="kidx" x="67" y="122" text-anchor="start">4</text>
+<rect class="kcell" x="120" y="108" width="58" height="58" rx="3"/>
+<text class="kval" x="149.0" y="145.0" text-anchor="middle">1</text>
+<text class="kidx" x="125" y="122" text-anchor="start">5</text>
+<rect class="kcell" x="236" y="108" width="58" height="58" rx="3"/>
+<text class="kval zero" x="265.0" y="145.0" text-anchor="middle">0</text>
+<text class="kidx" x="241" y="122" text-anchor="start">6</text>
+<rect class="kcell" x="178" y="108" width="58" height="58" rx="3"/>
+<text class="kval zero" x="207.0" y="145.0" text-anchor="middle">0</text>
+<text class="kidx" x="183" y="122" text-anchor="start">7</text>
+<rect class="kcell" x="62" y="224" width="58" height="58" rx="3"/>
+<text class="kval zero" x="91.0" y="261.0" text-anchor="middle">0</text>
+<text class="kidx" x="67" y="238" text-anchor="start">8</text>
+<rect class="kcell" x="120" y="224" width="58" height="58" rx="3"/>
+<text class="kval zero" x="149.0" y="261.0" text-anchor="middle">0</text>
+<text class="kidx" x="125" y="238" text-anchor="start">9</text>
+<rect class="kcell" x="236" y="224" width="58" height="58" rx="3"/>
+<text class="kval" x="265.0" y="261.0" text-anchor="middle">1</text>
+<text class="kidx" x="241" y="238" text-anchor="start">10</text>
+<rect class="kcell" x="178" y="224" width="58" height="58" rx="3"/>
+<text class="kval" x="207.0" y="261.0" text-anchor="middle">1</text>
+<text class="kidx" x="183" y="238" text-anchor="start">11</text>
+<rect class="kcell" x="62" y="166" width="58" height="58" rx="3"/>
+<text class="kval zero" x="91.0" y="203.0" text-anchor="middle">0</text>
+<text class="kidx" x="67" y="180" text-anchor="start">12</text>
+<rect class="kcell" x="120" y="166" width="58" height="58" rx="3"/>
+<text class="kval zero" x="149.0" y="203.0" text-anchor="middle">0</text>
+<text class="kidx" x="125" y="180" text-anchor="start">13</text>
+<rect class="kcell" x="236" y="166" width="58" height="58" rx="3"/>
+<text class="kval" x="265.0" y="203.0" text-anchor="middle">1</text>
+<text class="kidx" x="241" y="180" text-anchor="start">14</text>
+<rect class="kcell" x="178" y="166" width="58" height="58" rx="3"/>
+<text class="kval" x="207.0" y="203.0" text-anchor="middle">1</text>
+<text class="kidx" x="183" y="180" text-anchor="start">15</text>
+<rect class="kgrp grp0" x="67" y="55" width="106" height="106" rx="10"/>
+<rect class="kgrp grp1" x="187" y="175" width="98" height="98" rx="10"/>
+</svg>
+<figcaption>F = A&prime;C&prime; + AC</figcaption></figure>
+<p>Two groups of four. The top-left block, cells 0, 1, 4 and 5, has A&nbsp;=&nbsp;0 and
+C&nbsp;=&nbsp;0 throughout, with B and D changing. The bottom-right block, cells 10,
+11, 14 and 15, has A&nbsp;=&nbsp;1 and C&nbsp;=&nbsp;1.</p>
+<p style="text-align:center;font-size:1.05rem">
+F = A&prime;C&prime; + AC</p>
+<p><strong>In words:</strong> the output is 1 exactly when A and C are equal, and B and
+D are irrelevant. Both have vanished from the expression, which is the map telling you
+that two of the four inputs do not matter.</p>
+<p>Both blocks are ordinary 2&times;2 squares on the drawn map, which makes this an
+easy one; the thing to carry away is what a quad costs. Four cells means two variables
+deleted, so each term has two literals rather than four, and the pair of quads replaces
+eight minterms of four literals each.</p>
+<p>The complement is worth noticing too: F is 0 exactly when A and C differ, so
+F&prime; = A&prime;C&nbsp;+&nbsp;AC&prime;, the same "they differ" shape as Exercise
+6.5.</p></div></details>
+
+<h3>Prime implicants</h3>
+
+<details class="prob"><summary data-label="Exercise 6.10">For F(A,&nbsp;B,&nbsp;C) = &Sigma;m(0, 1, 2, 5, 6, 7), list every prime implicant, identify the essential ones, and give a minimal SOP. How many different minimal answers are there?</summary><div class="sol">
+<div class="krow"><figure class="fig" style="--figmax:12.0rem">
+<svg viewBox="0 0 312 186" role="img" aria-label="one minimal cover">
+<text class="kvar" x="66" y="18" text-anchor="start">BC</text>
+<text class="kvar" x="46" y="40" text-anchor="end">A</text>
+<path class="kslash" d="M18 4L60 26"/>
+<text class="klab" x="91.0" y="38" text-anchor="middle">00</text>
+<text class="klab" x="149.0" y="38" text-anchor="middle">01</text>
+<text class="klab" x="207.0" y="38" text-anchor="middle">11</text>
+<text class="klab" x="265.0" y="38" text-anchor="middle">10</text>
+<text class="klab" x="50" y="84.0" text-anchor="end">0</text>
+<text class="klab" x="50" y="142.0" text-anchor="end">1</text>
+<rect class="kcell" x="62" y="50" width="58" height="58" rx="3"/>
+<text class="kval" x="91.0" y="87.0" text-anchor="middle">1</text>
+<text class="kidx" x="67" y="64" text-anchor="start">0</text>
+<rect class="kcell" x="120" y="50" width="58" height="58" rx="3"/>
+<text class="kval" x="149.0" y="87.0" text-anchor="middle">1</text>
+<text class="kidx" x="125" y="64" text-anchor="start">1</text>
+<rect class="kcell" x="236" y="50" width="58" height="58" rx="3"/>
+<text class="kval" x="265.0" y="87.0" text-anchor="middle">1</text>
+<text class="kidx" x="241" y="64" text-anchor="start">2</text>
+<rect class="kcell" x="178" y="50" width="58" height="58" rx="3"/>
+<text class="kval zero" x="207.0" y="87.0" text-anchor="middle">0</text>
+<text class="kidx" x="183" y="64" text-anchor="start">3</text>
+<rect class="kcell" x="62" y="108" width="58" height="58" rx="3"/>
+<text class="kval zero" x="91.0" y="145.0" text-anchor="middle">0</text>
+<text class="kidx" x="67" y="122" text-anchor="start">4</text>
+<rect class="kcell" x="120" y="108" width="58" height="58" rx="3"/>
+<text class="kval" x="149.0" y="145.0" text-anchor="middle">1</text>
+<text class="kidx" x="125" y="122" text-anchor="start">5</text>
+<rect class="kcell" x="236" y="108" width="58" height="58" rx="3"/>
+<text class="kval" x="265.0" y="145.0" text-anchor="middle">1</text>
+<text class="kidx" x="241" y="122" text-anchor="start">6</text>
+<rect class="kcell" x="178" y="108" width="58" height="58" rx="3"/>
+<text class="kval" x="207.0" y="145.0" text-anchor="middle">1</text>
+<text class="kidx" x="183" y="122" text-anchor="start">7</text>
+<rect class="kgrp grp0" x="241" y="55" width="48" height="48" rx="10"/>
+<rect class="kgrp grp0" x="67" y="55" width="48" height="48" rx="10"/>
+<rect class="kgrp grp1" x="129" y="59" width="40" height="98" rx="10"/>
+<rect class="kgrp grp2" x="191" y="121" width="90" height="32" rx="10"/>
+</svg>
+<figcaption>one minimal cover</figcaption></figure><figure class="fig" style="--figmax:12.0rem">
+<svg viewBox="0 0 312 186" role="img" aria-label="the other, equally minimal">
+<text class="kvar" x="66" y="18" text-anchor="start">BC</text>
+<text class="kvar" x="46" y="40" text-anchor="end">A</text>
+<path class="kslash" d="M18 4L60 26"/>
+<text class="klab" x="91.0" y="38" text-anchor="middle">00</text>
+<text class="klab" x="149.0" y="38" text-anchor="middle">01</text>
+<text class="klab" x="207.0" y="38" text-anchor="middle">11</text>
+<text class="klab" x="265.0" y="38" text-anchor="middle">10</text>
+<text class="klab" x="50" y="84.0" text-anchor="end">0</text>
+<text class="klab" x="50" y="142.0" text-anchor="end">1</text>
+<rect class="kcell" x="62" y="50" width="58" height="58" rx="3"/>
+<text class="kval" x="91.0" y="87.0" text-anchor="middle">1</text>
+<text class="kidx" x="67" y="64" text-anchor="start">0</text>
+<rect class="kcell" x="120" y="50" width="58" height="58" rx="3"/>
+<text class="kval" x="149.0" y="87.0" text-anchor="middle">1</text>
+<text class="kidx" x="125" y="64" text-anchor="start">1</text>
+<rect class="kcell" x="236" y="50" width="58" height="58" rx="3"/>
+<text class="kval" x="265.0" y="87.0" text-anchor="middle">1</text>
+<text class="kidx" x="241" y="64" text-anchor="start">2</text>
+<rect class="kcell" x="178" y="50" width="58" height="58" rx="3"/>
+<text class="kval zero" x="207.0" y="87.0" text-anchor="middle">0</text>
+<text class="kidx" x="183" y="64" text-anchor="start">3</text>
+<rect class="kcell" x="62" y="108" width="58" height="58" rx="3"/>
+<text class="kval zero" x="91.0" y="145.0" text-anchor="middle">0</text>
+<text class="kidx" x="67" y="122" text-anchor="start">4</text>
+<rect class="kcell" x="120" y="108" width="58" height="58" rx="3"/>
+<text class="kval" x="149.0" y="145.0" text-anchor="middle">1</text>
+<text class="kidx" x="125" y="122" text-anchor="start">5</text>
+<rect class="kcell" x="236" y="108" width="58" height="58" rx="3"/>
+<text class="kval" x="265.0" y="145.0" text-anchor="middle">1</text>
+<text class="kidx" x="241" y="122" text-anchor="start">6</text>
+<rect class="kcell" x="178" y="108" width="58" height="58" rx="3"/>
+<text class="kval" x="207.0" y="145.0" text-anchor="middle">1</text>
+<text class="kidx" x="183" y="122" text-anchor="start">7</text>
+<rect class="kgrp grp0" x="67" y="55" width="106" height="48" rx="10"/>
+<rect class="kgrp grp1" x="245" y="59" width="40" height="98" rx="10"/>
+<rect class="kgrp grp2" x="133" y="121" width="90" height="32" rx="10"/>
+</svg>
+<figcaption>the other, equally minimal</figcaption></figure></div>
+<p><strong>The prime implicants</strong> &mdash; every pair of adjacent 1s, and no
+group of four exists:</p>
+<p style="text-align:center;font-size:1.05rem">A&prime;C&prime;, A&prime;B&prime;, B&prime;C, BC&prime;, AC, AB</p>
+<p>Six of them, each covering two cells.</p>
+<p><strong>The essential ones: none.</strong> Check each 1 in turn. Cell 0 is covered
+by A&prime;C&prime; and by A&prime;B&prime;; cell 1 by A&prime;B&prime; and B&prime;C;
+cell 2 by A&prime;C&prime; and BC&prime;; and so on round the map. Every cell has two
+prime implicants covering it, so no group is forced.</p>
+<p><strong>Minimal answers.</strong> Three groups are needed &mdash; six cells, two
+per group &mdash; and there are <strong>two</strong> ways to choose them:</p>
+<p style="text-align:center;font-size:1.05rem">
+F = A&prime;C&prime; + B&prime;C + AB &nbsp;&nbsp;or&nbsp;&nbsp; F = A&prime;B&prime; + BC&prime; + AC</p>
+<p>Both use three terms and six literals. Neither is better; they are alternate minimal
+covers, and a map like this is called <em>cyclic</em> because the prime implicants
+chain around it in a ring with no place to start.</p>
+<p>What to do when you meet one: pick either. If an exam answer differs from yours in
+a case like this, check the cost &mdash; same number of terms and literals means both
+are right. Only when the costs differ has someone made a mistake.</p>
+<p>The map also shows why greedy circling is risky. Start at cell 0, take A&prime;B&prime;,
+then take BC&prime; for cell 2, then AC for cell 5, and cells 6 and 7 are still
+uncovered &mdash; you have painted yourself into a four-group answer. Cyclic maps
+punish improvisation.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 6.11">For F(A,&nbsp;B,&nbsp;C,&nbsp;D) = &Sigma;m(0, 1, 2, 5, 6, 7, 8, 9, 10, 13), find the prime implicants, mark the essential ones, and give the minimal SOP. Show that the essentials do not cover everything.</summary><div class="sol">
+<figure class="fig" style="--figmax:12.0rem">
+<svg viewBox="0 0 312 302" role="img" aria-label="the two essentials, plus the group that covers what they miss">
+<text class="kvar" x="66" y="18" text-anchor="start">CD</text>
+<text class="kvar" x="46" y="40" text-anchor="end">AB</text>
+<path class="kslash" d="M18 4L60 26"/>
+<text class="klab" x="91.0" y="38" text-anchor="middle">00</text>
+<text class="klab" x="149.0" y="38" text-anchor="middle">01</text>
+<text class="klab" x="207.0" y="38" text-anchor="middle">11</text>
+<text class="klab" x="265.0" y="38" text-anchor="middle">10</text>
+<text class="klab" x="50" y="84.0" text-anchor="end">00</text>
+<text class="klab" x="50" y="142.0" text-anchor="end">01</text>
+<text class="klab" x="50" y="200.0" text-anchor="end">11</text>
+<text class="klab" x="50" y="258.0" text-anchor="end">10</text>
+<rect class="kcell" x="62" y="50" width="58" height="58" rx="3"/>
+<text class="kval" x="91.0" y="87.0" text-anchor="middle">1</text>
+<text class="kidx" x="67" y="64" text-anchor="start">0</text>
+<rect class="kcell" x="120" y="50" width="58" height="58" rx="3"/>
+<text class="kval" x="149.0" y="87.0" text-anchor="middle">1</text>
+<text class="kidx" x="125" y="64" text-anchor="start">1</text>
+<rect class="kcell" x="236" y="50" width="58" height="58" rx="3"/>
+<text class="kval" x="265.0" y="87.0" text-anchor="middle">1</text>
+<text class="kidx" x="241" y="64" text-anchor="start">2</text>
+<rect class="kcell" x="178" y="50" width="58" height="58" rx="3"/>
+<text class="kval zero" x="207.0" y="87.0" text-anchor="middle">0</text>
+<text class="kidx" x="183" y="64" text-anchor="start">3</text>
+<rect class="kcell" x="62" y="108" width="58" height="58" rx="3"/>
+<text class="kval zero" x="91.0" y="145.0" text-anchor="middle">0</text>
+<text class="kidx" x="67" y="122" text-anchor="start">4</text>
+<rect class="kcell" x="120" y="108" width="58" height="58" rx="3"/>
+<text class="kval" x="149.0" y="145.0" text-anchor="middle">1</text>
+<text class="kidx" x="125" y="122" text-anchor="start">5</text>
+<rect class="kcell" x="236" y="108" width="58" height="58" rx="3"/>
+<text class="kval" x="265.0" y="145.0" text-anchor="middle">1</text>
+<text class="kidx" x="241" y="122" text-anchor="start">6</text>
+<rect class="kcell" x="178" y="108" width="58" height="58" rx="3"/>
+<text class="kval" x="207.0" y="145.0" text-anchor="middle">1</text>
+<text class="kidx" x="183" y="122" text-anchor="start">7</text>
+<rect class="kcell" x="62" y="224" width="58" height="58" rx="3"/>
+<text class="kval" x="91.0" y="261.0" text-anchor="middle">1</text>
+<text class="kidx" x="67" y="238" text-anchor="start">8</text>
+<rect class="kcell" x="120" y="224" width="58" height="58" rx="3"/>
+<text class="kval" x="149.0" y="261.0" text-anchor="middle">1</text>
+<text class="kidx" x="125" y="238" text-anchor="start">9</text>
+<rect class="kcell" x="236" y="224" width="58" height="58" rx="3"/>
+<text class="kval" x="265.0" y="261.0" text-anchor="middle">1</text>
+<text class="kidx" x="241" y="238" text-anchor="start">10</text>
+<rect class="kcell" x="178" y="224" width="58" height="58" rx="3"/>
+<text class="kval zero" x="207.0" y="261.0" text-anchor="middle">0</text>
+<text class="kidx" x="183" y="238" text-anchor="start">11</text>
+<rect class="kcell" x="62" y="166" width="58" height="58" rx="3"/>
+<text class="kval zero" x="91.0" y="203.0" text-anchor="middle">0</text>
+<text class="kidx" x="67" y="180" text-anchor="start">12</text>
+<rect class="kcell" x="120" y="166" width="58" height="58" rx="3"/>
+<text class="kval" x="149.0" y="203.0" text-anchor="middle">1</text>
+<text class="kidx" x="125" y="180" text-anchor="start">13</text>
+<rect class="kcell" x="236" y="166" width="58" height="58" rx="3"/>
+<text class="kval zero" x="265.0" y="203.0" text-anchor="middle">0</text>
+<text class="kidx" x="241" y="180" text-anchor="start">14</text>
+<rect class="kcell" x="178" y="166" width="58" height="58" rx="3"/>
+<text class="kval zero" x="207.0" y="203.0" text-anchor="middle">0</text>
+<text class="kidx" x="183" y="180" text-anchor="start">15</text>
+<rect class="kgrp grp0" x="241" y="229" width="48" height="48" rx="10"/>
+<rect class="kgrp grp0" x="67" y="229" width="48" height="48" rx="10"/>
+<rect class="kgrp grp0" x="241" y="55" width="48" height="48" rx="10"/>
+<rect class="kgrp grp0" x="67" y="55" width="48" height="48" rx="10"/>
+<rect class="kgrp grp1" x="129" y="59" width="40" height="214" rx="10"/>
+<rect class="kgrp grp2" x="191" y="121" width="90" height="32" rx="10"/>
+</svg>
+<figcaption>the two essentials, plus the group that covers what they miss</figcaption></figure>
+<p><strong>Prime implicants:</strong> B&prime;D&prime;, B&prime;C&prime;, C&prime;D, A&prime;CD&prime;, A&prime;BD, A&prime;BC.</p>
+<p><strong>Essential:</strong> B&prime;D&prime; and C&prime;D &mdash; and it is worth seeing exactly
+which cell forces each. The 1 in <strong>cell 10</strong> belongs to no prime implicant
+except B&prime;D&prime;, so that term must be in the answer. The 1 in
+<strong>cell 13</strong> belongs to no prime implicant except C&prime;D. Every other 1
+on this map lies in at least two prime implicants, so it forces nothing by itself
+&mdash; cell 0, for instance, is in both B&prime;D&prime; and B&prime;C&prime;.</p>
+<p><strong>What they miss.</strong> B&prime;D&prime; accounts for cells 0, 2, 8 and 10;
+C&prime;D accounts for 1, 5, 9 and 13. Between them that is eight of the ten 1s, and
+cells <strong>6 and 7</strong> are still uncovered.</p>
+<p>Those two are covered by A&prime;BC, and adding it finishes the job:</p>
+<p style="text-align:center;font-size:1.05rem">
+F = B&prime;D&prime; + C&prime;D + A&prime;BC</p>
+<p>Three terms, and this time the answer is unique.</p>
+<p>The exercise is the procedure in miniature. Circling the two essentials is
+mechanical; the only judgement needed is in the last step, and by then the problem has
+shrunk to two cells. That is the value of finding the essentials first &mdash; not that
+it avoids choices, but that it shrinks the part where choices exist.</p>
+<p>The non-essential prime implicants are B&prime;C&prime;, A&prime;CD&prime;, A&prime;BD, A&prime;BC &mdash; and note that one of
+them, A&prime;BC, is in the answer anyway. Non-essential does not mean useless; it means
+not forced. Cells 6 and 7 could equally have been covered by A&prime;CD&prime; together
+with A&prime;BD, which is correct but costs two terms instead of one. B&prime;C&prime; is
+the only prime implicant here that earns nothing at all: everything it covers is
+already covered by the two essentials.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 6.12">A classmate offers this cover for F(A,&nbsp;B,&nbsp;C,&nbsp;D) = &Sigma;m(0, 1, 2, 3, 4, 5, 10, 11, 14, 15): every group is a legal prime implicant and every 1 is covered. Is it minimal? If not, fix it.</summary><div class="sol">
+<p>The proposed answer, drawn out:</p>
+<p style="text-align:center;font-size:1.05rem">
+F = A&prime;C&prime; + A&prime;B&prime; + B&prime;C + AC</p>
+<figure class="fig" style="--figmax:12.0rem">
+<svg viewBox="0 0 312 302" role="img" aria-label="the proposed cover: four groups">
+<text class="kvar" x="66" y="18" text-anchor="start">CD</text>
+<text class="kvar" x="46" y="40" text-anchor="end">AB</text>
+<path class="kslash" d="M18 4L60 26"/>
+<text class="klab" x="91.0" y="38" text-anchor="middle">00</text>
+<text class="klab" x="149.0" y="38" text-anchor="middle">01</text>
+<text class="klab" x="207.0" y="38" text-anchor="middle">11</text>
+<text class="klab" x="265.0" y="38" text-anchor="middle">10</text>
+<text class="klab" x="50" y="84.0" text-anchor="end">00</text>
+<text class="klab" x="50" y="142.0" text-anchor="end">01</text>
+<text class="klab" x="50" y="200.0" text-anchor="end">11</text>
+<text class="klab" x="50" y="258.0" text-anchor="end">10</text>
+<rect class="kcell" x="62" y="50" width="58" height="58" rx="3"/>
+<text class="kval" x="91.0" y="87.0" text-anchor="middle">1</text>
+<text class="kidx" x="67" y="64" text-anchor="start">0</text>
+<rect class="kcell" x="120" y="50" width="58" height="58" rx="3"/>
+<text class="kval" x="149.0" y="87.0" text-anchor="middle">1</text>
+<text class="kidx" x="125" y="64" text-anchor="start">1</text>
+<rect class="kcell" x="236" y="50" width="58" height="58" rx="3"/>
+<text class="kval" x="265.0" y="87.0" text-anchor="middle">1</text>
+<text class="kidx" x="241" y="64" text-anchor="start">2</text>
+<rect class="kcell" x="178" y="50" width="58" height="58" rx="3"/>
+<text class="kval" x="207.0" y="87.0" text-anchor="middle">1</text>
+<text class="kidx" x="183" y="64" text-anchor="start">3</text>
+<rect class="kcell" x="62" y="108" width="58" height="58" rx="3"/>
+<text class="kval" x="91.0" y="145.0" text-anchor="middle">1</text>
+<text class="kidx" x="67" y="122" text-anchor="start">4</text>
+<rect class="kcell" x="120" y="108" width="58" height="58" rx="3"/>
+<text class="kval" x="149.0" y="145.0" text-anchor="middle">1</text>
+<text class="kidx" x="125" y="122" text-anchor="start">5</text>
+<rect class="kcell" x="236" y="108" width="58" height="58" rx="3"/>
+<text class="kval zero" x="265.0" y="145.0" text-anchor="middle">0</text>
+<text class="kidx" x="241" y="122" text-anchor="start">6</text>
+<rect class="kcell" x="178" y="108" width="58" height="58" rx="3"/>
+<text class="kval zero" x="207.0" y="145.0" text-anchor="middle">0</text>
+<text class="kidx" x="183" y="122" text-anchor="start">7</text>
+<rect class="kcell" x="62" y="224" width="58" height="58" rx="3"/>
+<text class="kval zero" x="91.0" y="261.0" text-anchor="middle">0</text>
+<text class="kidx" x="67" y="238" text-anchor="start">8</text>
+<rect class="kcell" x="120" y="224" width="58" height="58" rx="3"/>
+<text class="kval zero" x="149.0" y="261.0" text-anchor="middle">0</text>
+<text class="kidx" x="125" y="238" text-anchor="start">9</text>
+<rect class="kcell" x="236" y="224" width="58" height="58" rx="3"/>
+<text class="kval" x="265.0" y="261.0" text-anchor="middle">1</text>
+<text class="kidx" x="241" y="238" text-anchor="start">10</text>
+<rect class="kcell" x="178" y="224" width="58" height="58" rx="3"/>
+<text class="kval" x="207.0" y="261.0" text-anchor="middle">1</text>
+<text class="kidx" x="183" y="238" text-anchor="start">11</text>
+<rect class="kcell" x="62" y="166" width="58" height="58" rx="3"/>
+<text class="kval zero" x="91.0" y="203.0" text-anchor="middle">0</text>
+<text class="kidx" x="67" y="180" text-anchor="start">12</text>
+<rect class="kcell" x="120" y="166" width="58" height="58" rx="3"/>
+<text class="kval zero" x="149.0" y="203.0" text-anchor="middle">0</text>
+<text class="kidx" x="125" y="180" text-anchor="start">13</text>
+<rect class="kcell" x="236" y="166" width="58" height="58" rx="3"/>
+<text class="kval" x="265.0" y="203.0" text-anchor="middle">1</text>
+<text class="kidx" x="241" y="180" text-anchor="start">14</text>
+<rect class="kcell" x="178" y="166" width="58" height="58" rx="3"/>
+<text class="kval" x="207.0" y="203.0" text-anchor="middle">1</text>
+<text class="kidx" x="183" y="180" text-anchor="start">15</text>
+<rect class="kgrp grp0" x="67" y="55" width="106" height="106" rx="10"/>
+<rect class="kgrp grp1" x="71" y="59" width="214" height="40" rx="10"/>
+<rect class="kgrp grp2" x="191" y="237" width="90" height="32" rx="10"/>
+<rect class="kgrp grp2" x="191" y="63" width="90" height="32" rx="10"/>
+<rect class="kgrp grp3" x="195" y="183" width="82" height="82" rx="10"/>
+</svg>
+<figcaption>the proposed cover: four groups</figcaption></figure>
+<p>All four groups are genuine prime implicants and every 1 does lie in at least one of
+them, so the expression is <strong>correct</strong>. It is not minimal.</p>
+<p><strong>Work the procedure.</strong> The prime implicants are A&prime;C&prime;, A&prime;B&prime;, B&prime;C, AC. Now look
+for cells that only one of them covers:</p>
+<ul>
+<li>Cell 4 lies only in A&prime;C&prime;, so <strong>A&prime;C&prime; is
+essential</strong>.</li>
+<li>Cells 14 and 15 lie only in AC, so <strong>AC is essential</strong>.</li>
+<li>Every other 1 lies in two prime implicants, so nothing else is forced.</li>
+</ul>
+<p>Those two essentials cover 0, 1, 4, 5, 10, 11, 14 and 15 &mdash; everything except
+cells <strong>2 and 3</strong>. One more group finishes the job, and there are two
+candidates, A&prime;B&prime; and B&prime;C, either of which covers both:</p>
+<p style="text-align:center;font-size:1.05rem">
+F = A&prime;C&prime; + A&prime;B&prime; + AC &nbsp;&nbsp;or&nbsp;&nbsp; F = A&prime;C&prime; + B&prime;C + AC</p>
+<figure class="fig" style="--figmax:12.0rem">
+<svg viewBox="0 0 312 302" role="img" aria-label="three groups do the same job">
+<text class="kvar" x="66" y="18" text-anchor="start">CD</text>
+<text class="kvar" x="46" y="40" text-anchor="end">AB</text>
+<path class="kslash" d="M18 4L60 26"/>
+<text class="klab" x="91.0" y="38" text-anchor="middle">00</text>
+<text class="klab" x="149.0" y="38" text-anchor="middle">01</text>
+<text class="klab" x="207.0" y="38" text-anchor="middle">11</text>
+<text class="klab" x="265.0" y="38" text-anchor="middle">10</text>
+<text class="klab" x="50" y="84.0" text-anchor="end">00</text>
+<text class="klab" x="50" y="142.0" text-anchor="end">01</text>
+<text class="klab" x="50" y="200.0" text-anchor="end">11</text>
+<text class="klab" x="50" y="258.0" text-anchor="end">10</text>
+<rect class="kcell" x="62" y="50" width="58" height="58" rx="3"/>
+<text class="kval" x="91.0" y="87.0" text-anchor="middle">1</text>
+<text class="kidx" x="67" y="64" text-anchor="start">0</text>
+<rect class="kcell" x="120" y="50" width="58" height="58" rx="3"/>
+<text class="kval" x="149.0" y="87.0" text-anchor="middle">1</text>
+<text class="kidx" x="125" y="64" text-anchor="start">1</text>
+<rect class="kcell" x="236" y="50" width="58" height="58" rx="3"/>
+<text class="kval" x="265.0" y="87.0" text-anchor="middle">1</text>
+<text class="kidx" x="241" y="64" text-anchor="start">2</text>
+<rect class="kcell" x="178" y="50" width="58" height="58" rx="3"/>
+<text class="kval" x="207.0" y="87.0" text-anchor="middle">1</text>
+<text class="kidx" x="183" y="64" text-anchor="start">3</text>
+<rect class="kcell" x="62" y="108" width="58" height="58" rx="3"/>
+<text class="kval" x="91.0" y="145.0" text-anchor="middle">1</text>
+<text class="kidx" x="67" y="122" text-anchor="start">4</text>
+<rect class="kcell" x="120" y="108" width="58" height="58" rx="3"/>
+<text class="kval" x="149.0" y="145.0" text-anchor="middle">1</text>
+<text class="kidx" x="125" y="122" text-anchor="start">5</text>
+<rect class="kcell" x="236" y="108" width="58" height="58" rx="3"/>
+<text class="kval zero" x="265.0" y="145.0" text-anchor="middle">0</text>
+<text class="kidx" x="241" y="122" text-anchor="start">6</text>
+<rect class="kcell" x="178" y="108" width="58" height="58" rx="3"/>
+<text class="kval zero" x="207.0" y="145.0" text-anchor="middle">0</text>
+<text class="kidx" x="183" y="122" text-anchor="start">7</text>
+<rect class="kcell" x="62" y="224" width="58" height="58" rx="3"/>
+<text class="kval zero" x="91.0" y="261.0" text-anchor="middle">0</text>
+<text class="kidx" x="67" y="238" text-anchor="start">8</text>
+<rect class="kcell" x="120" y="224" width="58" height="58" rx="3"/>
+<text class="kval zero" x="149.0" y="261.0" text-anchor="middle">0</text>
+<text class="kidx" x="125" y="238" text-anchor="start">9</text>
+<rect class="kcell" x="236" y="224" width="58" height="58" rx="3"/>
+<text class="kval" x="265.0" y="261.0" text-anchor="middle">1</text>
+<text class="kidx" x="241" y="238" text-anchor="start">10</text>
+<rect class="kcell" x="178" y="224" width="58" height="58" rx="3"/>
+<text class="kval" x="207.0" y="261.0" text-anchor="middle">1</text>
+<text class="kidx" x="183" y="238" text-anchor="start">11</text>
+<rect class="kcell" x="62" y="166" width="58" height="58" rx="3"/>
+<text class="kval zero" x="91.0" y="203.0" text-anchor="middle">0</text>
+<text class="kidx" x="67" y="180" text-anchor="start">12</text>
+<rect class="kcell" x="120" y="166" width="58" height="58" rx="3"/>
+<text class="kval zero" x="149.0" y="203.0" text-anchor="middle">0</text>
+<text class="kidx" x="125" y="180" text-anchor="start">13</text>
+<rect class="kcell" x="236" y="166" width="58" height="58" rx="3"/>
+<text class="kval" x="265.0" y="203.0" text-anchor="middle">1</text>
+<text class="kidx" x="241" y="180" text-anchor="start">14</text>
+<rect class="kcell" x="178" y="166" width="58" height="58" rx="3"/>
+<text class="kval" x="207.0" y="203.0" text-anchor="middle">1</text>
+<text class="kidx" x="183" y="180" text-anchor="start">15</text>
+<rect class="kgrp grp0" x="67" y="55" width="106" height="106" rx="10"/>
+<rect class="kgrp grp1" x="71" y="59" width="214" height="40" rx="10"/>
+<rect class="kgrp grp2" x="191" y="179" width="90" height="90" rx="10"/>
+</svg>
+<figcaption>three groups do the same job</figcaption></figure>
+<p>Three terms, not four. The classmate's cover used <em>both</em> of the optional
+groups when either alone would do.</p>
+<p>This is the characteristic failure of circling greedily: each group taken was
+reasonable on its own, and no rule was broken, and the result is still one gate too
+big. The check that catches it costs ten seconds &mdash; take each group in turn and
+ask whether every one of its cells is covered by some other group. If the answer is
+yes, delete it.</p></div></details>
+
+<h3>Don&rsquo;t-cares</h3>
+
+<details class="prob"><summary data-label="Exercise 6.13">Minimise F(A,&nbsp;B,&nbsp;C) = &Sigma;m(1, 3) + d(5, 7), where the inputs marked X never occur. What would the answer be if you treated the Xs as 0s?</summary><div class="sol">
+<figure class="fig" style="--figmax:12.0rem">
+<svg viewBox="0 0 312 186" role="img" aria-label="both Xs joined the group: F = C">
+<text class="kvar" x="66" y="18" text-anchor="start">BC</text>
+<text class="kvar" x="46" y="40" text-anchor="end">A</text>
+<path class="kslash" d="M18 4L60 26"/>
+<text class="klab" x="91.0" y="38" text-anchor="middle">00</text>
+<text class="klab" x="149.0" y="38" text-anchor="middle">01</text>
+<text class="klab" x="207.0" y="38" text-anchor="middle">11</text>
+<text class="klab" x="265.0" y="38" text-anchor="middle">10</text>
+<text class="klab" x="50" y="84.0" text-anchor="end">0</text>
+<text class="klab" x="50" y="142.0" text-anchor="end">1</text>
+<rect class="kcell" x="62" y="50" width="58" height="58" rx="3"/>
+<text class="kval zero" x="91.0" y="87.0" text-anchor="middle">0</text>
+<text class="kidx" x="67" y="64" text-anchor="start">0</text>
+<rect class="kcell" x="120" y="50" width="58" height="58" rx="3"/>
+<text class="kval" x="149.0" y="87.0" text-anchor="middle">1</text>
+<text class="kidx" x="125" y="64" text-anchor="start">1</text>
+<rect class="kcell" x="236" y="50" width="58" height="58" rx="3"/>
+<text class="kval zero" x="265.0" y="87.0" text-anchor="middle">0</text>
+<text class="kidx" x="241" y="64" text-anchor="start">2</text>
+<rect class="kcell" x="178" y="50" width="58" height="58" rx="3"/>
+<text class="kval" x="207.0" y="87.0" text-anchor="middle">1</text>
+<text class="kidx" x="183" y="64" text-anchor="start">3</text>
+<rect class="kcell" x="62" y="108" width="58" height="58" rx="3"/>
+<text class="kval zero" x="91.0" y="145.0" text-anchor="middle">0</text>
+<text class="kidx" x="67" y="122" text-anchor="start">4</text>
+<rect class="kcell" x="120" y="108" width="58" height="58" rx="3"/>
+<text class="kval dc" x="149.0" y="145.0" text-anchor="middle">X</text>
+<text class="kidx" x="125" y="122" text-anchor="start">5</text>
+<rect class="kcell" x="236" y="108" width="58" height="58" rx="3"/>
+<text class="kval zero" x="265.0" y="145.0" text-anchor="middle">0</text>
+<text class="kidx" x="241" y="122" text-anchor="start">6</text>
+<rect class="kcell" x="178" y="108" width="58" height="58" rx="3"/>
+<text class="kval dc" x="207.0" y="145.0" text-anchor="middle">X</text>
+<text class="kidx" x="183" y="122" text-anchor="start">7</text>
+<rect class="kgrp grp0" x="125" y="55" width="106" height="106" rx="10"/>
+</svg>
+<figcaption>both Xs joined the group: F = C</figcaption></figure>
+<p>The two 1s are cells 1 and 3, and the two Xs are directly below them at cells 5 and
+7. Taking both Xs into the group makes one block of four covering the whole
+C&nbsp;=&nbsp;1 column pair:</p>
+<p style="text-align:center;font-size:1.05rem">
+F = C</p>
+<p>A single wire from C.</p>
+<p><strong>Treating the Xs as 0s</strong> leaves cells 1 and 3 as a pair on their own,
+covering the A&nbsp;=&nbsp;0 row where C&nbsp;=&nbsp;1, so
+F&nbsp;=&nbsp;A&prime;C &mdash; an AND gate and an inverter instead of nothing at
+all.</p>
+<p>Both circuits are correct, because they differ only on inputs that never arrive. The
+second one just pays for a distinction nobody asked for. That is the whole argument for
+using don't-cares, and it is why an X left uncircled should be a deliberate decision
+rather than an oversight.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 6.14">F(A,&nbsp;B,&nbsp;C) = &Sigma;m(1, 5) + d(0, 4, 7). Which of the don&rsquo;t-cares end up inside a group and which does not? Give the minimal SOP, and the answer you would get by treating every X as 0.</summary><div class="sol">
+<figure class="fig" style="--figmax:12.0rem">
+<svg viewBox="0 0 312 186" role="img" aria-label="two of the three Xs join the group; the one in cell 7 is left as a 0">
+<text class="kvar" x="66" y="18" text-anchor="start">BC</text>
+<text class="kvar" x="46" y="40" text-anchor="end">A</text>
+<path class="kslash" d="M18 4L60 26"/>
+<text class="klab" x="91.0" y="38" text-anchor="middle">00</text>
+<text class="klab" x="149.0" y="38" text-anchor="middle">01</text>
+<text class="klab" x="207.0" y="38" text-anchor="middle">11</text>
+<text class="klab" x="265.0" y="38" text-anchor="middle">10</text>
+<text class="klab" x="50" y="84.0" text-anchor="end">0</text>
+<text class="klab" x="50" y="142.0" text-anchor="end">1</text>
+<rect class="kcell" x="62" y="50" width="58" height="58" rx="3"/>
+<text class="kval dc" x="91.0" y="87.0" text-anchor="middle">X</text>
+<text class="kidx" x="67" y="64" text-anchor="start">0</text>
+<rect class="kcell" x="120" y="50" width="58" height="58" rx="3"/>
+<text class="kval" x="149.0" y="87.0" text-anchor="middle">1</text>
+<text class="kidx" x="125" y="64" text-anchor="start">1</text>
+<rect class="kcell" x="236" y="50" width="58" height="58" rx="3"/>
+<text class="kval zero" x="265.0" y="87.0" text-anchor="middle">0</text>
+<text class="kidx" x="241" y="64" text-anchor="start">2</text>
+<rect class="kcell" x="178" y="50" width="58" height="58" rx="3"/>
+<text class="kval zero" x="207.0" y="87.0" text-anchor="middle">0</text>
+<text class="kidx" x="183" y="64" text-anchor="start">3</text>
+<rect class="kcell" x="62" y="108" width="58" height="58" rx="3"/>
+<text class="kval dc" x="91.0" y="145.0" text-anchor="middle">X</text>
+<text class="kidx" x="67" y="122" text-anchor="start">4</text>
+<rect class="kcell" x="120" y="108" width="58" height="58" rx="3"/>
+<text class="kval" x="149.0" y="145.0" text-anchor="middle">1</text>
+<text class="kidx" x="125" y="122" text-anchor="start">5</text>
+<rect class="kcell" x="236" y="108" width="58" height="58" rx="3"/>
+<text class="kval zero" x="265.0" y="145.0" text-anchor="middle">0</text>
+<text class="kidx" x="241" y="122" text-anchor="start">6</text>
+<rect class="kcell" x="178" y="108" width="58" height="58" rx="3"/>
+<text class="kval dc" x="207.0" y="145.0" text-anchor="middle">X</text>
+<text class="kidx" x="183" y="122" text-anchor="start">7</text>
+<rect class="kgrp grp0" x="67" y="55" width="106" height="106" rx="10"/>
+</svg>
+<figcaption>two of the three Xs join the group; the one in cell 7 is left as a 0</figcaption></figure>
+<p>The two 1s are cells 1 and 5. Look at what each X could do for them:</p>
+<ul>
+<li><strong>The X in cell 0</strong> sits beside cell 1, and <strong>the X in cell
+4</strong> sits beside cell 5. Taking both turns the pair {1,&nbsp;5} into the block
+{0,&nbsp;1,&nbsp;4,&nbsp;5} &mdash; four cells, spanning both rows and the two columns
+where B&nbsp;=&nbsp;0.</li>
+<li><strong>The X in cell 7</strong> is adjacent to cell 5, and the pair {5,&nbsp;7}
+gives AC. But cell 5 is already inside the block above, and cell 7 is an X that nobody
+needs covered. Circling it would add a gate to cover nothing.</li>
+</ul>
+<p style="text-align:center;font-size:1.05rem">
+F = B&prime;</p>
+<p>So two of the three don't-cares are used and one is not &mdash; and the one left out
+is simply being treated as a 0, which is a legitimate choice because that input never
+arrives.</p>
+<p><strong>Treating every X as 0</strong> leaves cells 1 and 5 as a pair on their own,
+in the column where B&nbsp;=&nbsp;0 and C&nbsp;=&nbsp;1:</p>
+<p style="text-align:center;font-size:1.05rem">
+F = B&prime;C</p>
+<p>An AND gate and two inverters, where the don't-cares bought you a single inverter.</p>
+<p>The rule from &sect;6.4 in action: <em>include an X when it makes a group bigger,
+ignore it otherwise</em>. There is no penalty for ignoring one, and no prize for
+circling them all. A student who dutifully covers every X on the map will often produce
+a <em>larger</em> circuit than one who covers none.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 6.15">Three position sensors A, B and C are mounted on a rotating shaft, and the mechanism guarantees that at most one of them is ever active at a time. Design a circuit that outputs 1 when sensor A or sensor B is active. Give the &Sigma; and d lists and the minimal SOP.</summary><div class="sol">
+<p><strong>Setting up the lists.</strong> An input with two or more sensors active
+cannot occur, so those rows are don't-cares: 011, 101, 110 and 111, that is cells 3, 5,
+6 and 7.</p>
+<p>Of the rows that <em>can</em> occur, the output is 1 when A is active (cell 4, that
+is 100) or B is active (cell 2, that is 010). The row 000 &mdash; no sensor active at
+all &mdash; is a perfectly legal input, and the output there should be
+<strong>0</strong>, not a don't-care. So does cell 1, where only C is active.</p>
+<p style="text-align:center;font-size:1.05rem">
+F(A, B, C) = &Sigma;m(2, 4) + d(3, 5, 6, 7)</p>
+<figure class="fig" style="--figmax:12.0rem">
+<svg viewBox="0 0 312 186" role="img" aria-label="F = B + A &mdash; each group of two grows to four">
+<text class="kvar" x="66" y="18" text-anchor="start">BC</text>
+<text class="kvar" x="46" y="40" text-anchor="end">A</text>
+<path class="kslash" d="M18 4L60 26"/>
+<text class="klab" x="91.0" y="38" text-anchor="middle">00</text>
+<text class="klab" x="149.0" y="38" text-anchor="middle">01</text>
+<text class="klab" x="207.0" y="38" text-anchor="middle">11</text>
+<text class="klab" x="265.0" y="38" text-anchor="middle">10</text>
+<text class="klab" x="50" y="84.0" text-anchor="end">0</text>
+<text class="klab" x="50" y="142.0" text-anchor="end">1</text>
+<rect class="kcell" x="62" y="50" width="58" height="58" rx="3"/>
+<text class="kval zero" x="91.0" y="87.0" text-anchor="middle">0</text>
+<text class="kidx" x="67" y="64" text-anchor="start">0</text>
+<rect class="kcell" x="120" y="50" width="58" height="58" rx="3"/>
+<text class="kval zero" x="149.0" y="87.0" text-anchor="middle">0</text>
+<text class="kidx" x="125" y="64" text-anchor="start">1</text>
+<rect class="kcell" x="236" y="50" width="58" height="58" rx="3"/>
+<text class="kval" x="265.0" y="87.0" text-anchor="middle">1</text>
+<text class="kidx" x="241" y="64" text-anchor="start">2</text>
+<rect class="kcell" x="178" y="50" width="58" height="58" rx="3"/>
+<text class="kval dc" x="207.0" y="87.0" text-anchor="middle">X</text>
+<text class="kidx" x="183" y="64" text-anchor="start">3</text>
+<rect class="kcell" x="62" y="108" width="58" height="58" rx="3"/>
+<text class="kval" x="91.0" y="145.0" text-anchor="middle">1</text>
+<text class="kidx" x="67" y="122" text-anchor="start">4</text>
+<rect class="kcell" x="120" y="108" width="58" height="58" rx="3"/>
+<text class="kval dc" x="149.0" y="145.0" text-anchor="middle">X</text>
+<text class="kidx" x="125" y="122" text-anchor="start">5</text>
+<rect class="kcell" x="236" y="108" width="58" height="58" rx="3"/>
+<text class="kval dc" x="265.0" y="145.0" text-anchor="middle">X</text>
+<text class="kidx" x="241" y="122" text-anchor="start">6</text>
+<rect class="kcell" x="178" y="108" width="58" height="58" rx="3"/>
+<text class="kval dc" x="207.0" y="145.0" text-anchor="middle">X</text>
+<text class="kidx" x="183" y="122" text-anchor="start">7</text>
+<rect class="kgrp grp0" x="183" y="55" width="106" height="106" rx="10"/>
+<rect class="kgrp grp1" x="71" y="117" width="214" height="40" rx="10"/>
+</svg>
+<figcaption>F = B + A &mdash; each group of two grows to four</figcaption></figure>
+<p>Both groups grow to four cells by absorbing don't-cares. The row A&nbsp;=&nbsp;1
+gives A, and the two columns where B&nbsp;=&nbsp;1 give B:</p>
+<p style="text-align:center;font-size:1.05rem">
+F = B + A</p>
+<p>A single OR gate, which in hindsight is exactly what the specification says: output 1
+if A or B is on. The don't-cares let the map discover the obvious answer instead of an
+elaborate one.</p>
+<p><strong>Without them</strong> &mdash; that is, if the illegal combinations had to
+output 0 &mdash; the two 1s are isolated and neither pairs with anything:</p>
+<p style="text-align:center;font-size:1.05rem">
+F = A&prime;BC&prime; + AB&prime;C&prime;</p>
+<p>Two three-input AND gates, four inverters and an OR, to compute what one OR gate
+computes. That circuit spends all its effort on inputs that never happen.</p>
+<p>The judgement call is whether to trust the guarantee, and it is the same question as
+in Exercise 6.16. Here the guarantee is mechanical &mdash; one shaft, one lobe, sensors
+that physically cannot overlap &mdash; which is about as trustworthy as a guarantee
+gets. A guarantee that rests on another engineer remembering something is worth
+less.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 6.16">A four-bit input A B C D holds a single decimal digit in <em>binary-coded decimal</em> &mdash; the digit 0 to 9 written in binary, four bits to a digit, so that a multi-digit number keeps one four-bit group per digit. Only 0000 to 1001 are used, and the codes 1010 to 1111 never occur. Design a circuit that outputs 1 when the digit is prime. Give the &Sigma; and d lists, and the minimal SOP.</summary><div class="sol">
+<p>The one-digit primes are 2, 3, 5 and 7, so</p>
+<p style="text-align:center;font-size:1.05rem">
+F(A, B, C, D) = &Sigma;m(2, 3, 5, 7) + d(10, 11, 12, 13, 14, 15)</p>
+<p>(1 is not prime, and 9 is 3&times;3.)</p>
+<figure class="fig" style="--figmax:12.0rem">
+<svg viewBox="0 0 312 302" role="img" aria-label="F = B&prime;C + BD &mdash; both groups reach into the Xs">
+<text class="kvar" x="66" y="18" text-anchor="start">CD</text>
+<text class="kvar" x="46" y="40" text-anchor="end">AB</text>
+<path class="kslash" d="M18 4L60 26"/>
+<text class="klab" x="91.0" y="38" text-anchor="middle">00</text>
+<text class="klab" x="149.0" y="38" text-anchor="middle">01</text>
+<text class="klab" x="207.0" y="38" text-anchor="middle">11</text>
+<text class="klab" x="265.0" y="38" text-anchor="middle">10</text>
+<text class="klab" x="50" y="84.0" text-anchor="end">00</text>
+<text class="klab" x="50" y="142.0" text-anchor="end">01</text>
+<text class="klab" x="50" y="200.0" text-anchor="end">11</text>
+<text class="klab" x="50" y="258.0" text-anchor="end">10</text>
+<rect class="kcell" x="62" y="50" width="58" height="58" rx="3"/>
+<text class="kval zero" x="91.0" y="87.0" text-anchor="middle">0</text>
+<text class="kidx" x="67" y="64" text-anchor="start">0</text>
+<rect class="kcell" x="120" y="50" width="58" height="58" rx="3"/>
+<text class="kval zero" x="149.0" y="87.0" text-anchor="middle">0</text>
+<text class="kidx" x="125" y="64" text-anchor="start">1</text>
+<rect class="kcell" x="236" y="50" width="58" height="58" rx="3"/>
+<text class="kval" x="265.0" y="87.0" text-anchor="middle">1</text>
+<text class="kidx" x="241" y="64" text-anchor="start">2</text>
+<rect class="kcell" x="178" y="50" width="58" height="58" rx="3"/>
+<text class="kval" x="207.0" y="87.0" text-anchor="middle">1</text>
+<text class="kidx" x="183" y="64" text-anchor="start">3</text>
+<rect class="kcell" x="62" y="108" width="58" height="58" rx="3"/>
+<text class="kval zero" x="91.0" y="145.0" text-anchor="middle">0</text>
+<text class="kidx" x="67" y="122" text-anchor="start">4</text>
+<rect class="kcell" x="120" y="108" width="58" height="58" rx="3"/>
+<text class="kval" x="149.0" y="145.0" text-anchor="middle">1</text>
+<text class="kidx" x="125" y="122" text-anchor="start">5</text>
+<rect class="kcell" x="236" y="108" width="58" height="58" rx="3"/>
+<text class="kval zero" x="265.0" y="145.0" text-anchor="middle">0</text>
+<text class="kidx" x="241" y="122" text-anchor="start">6</text>
+<rect class="kcell" x="178" y="108" width="58" height="58" rx="3"/>
+<text class="kval" x="207.0" y="145.0" text-anchor="middle">1</text>
+<text class="kidx" x="183" y="122" text-anchor="start">7</text>
+<rect class="kcell" x="62" y="224" width="58" height="58" rx="3"/>
+<text class="kval zero" x="91.0" y="261.0" text-anchor="middle">0</text>
+<text class="kidx" x="67" y="238" text-anchor="start">8</text>
+<rect class="kcell" x="120" y="224" width="58" height="58" rx="3"/>
+<text class="kval zero" x="149.0" y="261.0" text-anchor="middle">0</text>
+<text class="kidx" x="125" y="238" text-anchor="start">9</text>
+<rect class="kcell" x="236" y="224" width="58" height="58" rx="3"/>
+<text class="kval dc" x="265.0" y="261.0" text-anchor="middle">X</text>
+<text class="kidx" x="241" y="238" text-anchor="start">10</text>
+<rect class="kcell" x="178" y="224" width="58" height="58" rx="3"/>
+<text class="kval dc" x="207.0" y="261.0" text-anchor="middle">X</text>
+<text class="kidx" x="183" y="238" text-anchor="start">11</text>
+<rect class="kcell" x="62" y="166" width="58" height="58" rx="3"/>
+<text class="kval dc" x="91.0" y="203.0" text-anchor="middle">X</text>
+<text class="kidx" x="67" y="180" text-anchor="start">12</text>
+<rect class="kcell" x="120" y="166" width="58" height="58" rx="3"/>
+<text class="kval dc" x="149.0" y="203.0" text-anchor="middle">X</text>
+<text class="kidx" x="125" y="180" text-anchor="start">13</text>
+<rect class="kcell" x="236" y="166" width="58" height="58" rx="3"/>
+<text class="kval dc" x="265.0" y="203.0" text-anchor="middle">X</text>
+<text class="kidx" x="241" y="180" text-anchor="start">14</text>
+<rect class="kcell" x="178" y="166" width="58" height="58" rx="3"/>
+<text class="kval dc" x="207.0" y="203.0" text-anchor="middle">X</text>
+<text class="kidx" x="183" y="180" text-anchor="start">15</text>
+<rect class="kgrp grp0" x="183" y="229" width="106" height="48" rx="10"/>
+<rect class="kgrp grp0" x="183" y="55" width="106" height="48" rx="10"/>
+<rect class="kgrp grp1" x="129" y="117" width="98" height="98" rx="10"/>
+</svg>
+<figcaption>F = B&prime;C + BD &mdash; both groups reach into the Xs</figcaption></figure>
+<p>Two groups, both reaching into the don't-care region:</p>
+<ul>
+<li>Cells 2 and 3 extend down into the Xs at 10 and 11, giving a block of four in which
+B&nbsp;=&nbsp;0 and C&nbsp;=&nbsp;1 &mdash; the term <strong>B&prime;C</strong>.</li>
+<li>Cells 5 and 7 extend down into the Xs at 13 and 15, giving a block in which
+B&nbsp;=&nbsp;1 and D&nbsp;=&nbsp;1 &mdash; the term <strong>BD</strong>.</li>
+</ul>
+<p style="text-align:center;font-size:1.05rem">
+F = B&prime;C + BD</p>
+<p>Two AND gates and an OR, with no inverter needed except on B.</p>
+<p>Worth checking that this does the right thing on the legal inputs only. It claims
+F&nbsp;=&nbsp;1 for 1010 and 1011 &mdash; decimal 10 and 11 &mdash; which as it happens
+is right for 11 and wrong for 10, and neither matters, because a binary-coded decimal
+digit is never those values. Outside its specification the circuit may do anything at all, and
+exploiting that freedom is exactly what made it small.</p>
+<p>If the input were <em>not</em> guaranteed to be a single decimal digit, this would be
+a bug, and a
+serious one. Don't-cares are a contract: they are only safe as long as the guarantee
+that produced them holds. When a circuit like this is fed from somewhere new, the
+assumption has to be rechecked.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 6.17">Redo Exercise 6.16 with no don't-cares &mdash; that is, the six illegal codes must produce 0. Compare the two circuits.</summary><div class="sol">
+<figure class="fig" style="--figmax:12.0rem">
+<svg viewBox="0 0 312 302" role="img" aria-label="the same 1s with the Xs forced to 0: F = A&prime;B&prime;C + A&prime;BD">
+<text class="kvar" x="66" y="18" text-anchor="start">CD</text>
+<text class="kvar" x="46" y="40" text-anchor="end">AB</text>
+<path class="kslash" d="M18 4L60 26"/>
+<text class="klab" x="91.0" y="38" text-anchor="middle">00</text>
+<text class="klab" x="149.0" y="38" text-anchor="middle">01</text>
+<text class="klab" x="207.0" y="38" text-anchor="middle">11</text>
+<text class="klab" x="265.0" y="38" text-anchor="middle">10</text>
+<text class="klab" x="50" y="84.0" text-anchor="end">00</text>
+<text class="klab" x="50" y="142.0" text-anchor="end">01</text>
+<text class="klab" x="50" y="200.0" text-anchor="end">11</text>
+<text class="klab" x="50" y="258.0" text-anchor="end">10</text>
+<rect class="kcell" x="62" y="50" width="58" height="58" rx="3"/>
+<text class="kval zero" x="91.0" y="87.0" text-anchor="middle">0</text>
+<text class="kidx" x="67" y="64" text-anchor="start">0</text>
+<rect class="kcell" x="120" y="50" width="58" height="58" rx="3"/>
+<text class="kval zero" x="149.0" y="87.0" text-anchor="middle">0</text>
+<text class="kidx" x="125" y="64" text-anchor="start">1</text>
+<rect class="kcell" x="236" y="50" width="58" height="58" rx="3"/>
+<text class="kval" x="265.0" y="87.0" text-anchor="middle">1</text>
+<text class="kidx" x="241" y="64" text-anchor="start">2</text>
+<rect class="kcell" x="178" y="50" width="58" height="58" rx="3"/>
+<text class="kval" x="207.0" y="87.0" text-anchor="middle">1</text>
+<text class="kidx" x="183" y="64" text-anchor="start">3</text>
+<rect class="kcell" x="62" y="108" width="58" height="58" rx="3"/>
+<text class="kval zero" x="91.0" y="145.0" text-anchor="middle">0</text>
+<text class="kidx" x="67" y="122" text-anchor="start">4</text>
+<rect class="kcell" x="120" y="108" width="58" height="58" rx="3"/>
+<text class="kval" x="149.0" y="145.0" text-anchor="middle">1</text>
+<text class="kidx" x="125" y="122" text-anchor="start">5</text>
+<rect class="kcell" x="236" y="108" width="58" height="58" rx="3"/>
+<text class="kval zero" x="265.0" y="145.0" text-anchor="middle">0</text>
+<text class="kidx" x="241" y="122" text-anchor="start">6</text>
+<rect class="kcell" x="178" y="108" width="58" height="58" rx="3"/>
+<text class="kval" x="207.0" y="145.0" text-anchor="middle">1</text>
+<text class="kidx" x="183" y="122" text-anchor="start">7</text>
+<rect class="kcell" x="62" y="224" width="58" height="58" rx="3"/>
+<text class="kval zero" x="91.0" y="261.0" text-anchor="middle">0</text>
+<text class="kidx" x="67" y="238" text-anchor="start">8</text>
+<rect class="kcell" x="120" y="224" width="58" height="58" rx="3"/>
+<text class="kval zero" x="149.0" y="261.0" text-anchor="middle">0</text>
+<text class="kidx" x="125" y="238" text-anchor="start">9</text>
+<rect class="kcell" x="236" y="224" width="58" height="58" rx="3"/>
+<text class="kval zero" x="265.0" y="261.0" text-anchor="middle">0</text>
+<text class="kidx" x="241" y="238" text-anchor="start">10</text>
+<rect class="kcell" x="178" y="224" width="58" height="58" rx="3"/>
+<text class="kval zero" x="207.0" y="261.0" text-anchor="middle">0</text>
+<text class="kidx" x="183" y="238" text-anchor="start">11</text>
+<rect class="kcell" x="62" y="166" width="58" height="58" rx="3"/>
+<text class="kval zero" x="91.0" y="203.0" text-anchor="middle">0</text>
+<text class="kidx" x="67" y="180" text-anchor="start">12</text>
+<rect class="kcell" x="120" y="166" width="58" height="58" rx="3"/>
+<text class="kval zero" x="149.0" y="203.0" text-anchor="middle">0</text>
+<text class="kidx" x="125" y="180" text-anchor="start">13</text>
+<rect class="kcell" x="236" y="166" width="58" height="58" rx="3"/>
+<text class="kval zero" x="265.0" y="203.0" text-anchor="middle">0</text>
+<text class="kidx" x="241" y="180" text-anchor="start">14</text>
+<rect class="kcell" x="178" y="166" width="58" height="58" rx="3"/>
+<text class="kval zero" x="207.0" y="203.0" text-anchor="middle">0</text>
+<text class="kidx" x="183" y="180" text-anchor="start">15</text>
+<rect class="kgrp grp0" x="183" y="55" width="106" height="48" rx="10"/>
+<rect class="kgrp grp1" x="129" y="117" width="98" height="40" rx="10"/>
+</svg>
+<figcaption>the same 1s with the Xs forced to 0: F = A&prime;B&prime;C + A&prime;BD</figcaption></figure>
+<p>With the bottom half of the map forced to 0, neither group can grow downward. Cells
+2 and 3 pair off, and cells 5 and 7 pair off, but each pair now needs three literals to
+pin it down:</p>
+<p style="text-align:center;font-size:1.05rem">
+F = A&prime;B&prime;C + A&prime;BD</p>
+<p><strong>The comparison.</strong> Both answers have two product terms and therefore
+the same gate count &mdash; two ANDs and an OR. But the don't-care version uses
+two-input ANDs and one inverter, while this one needs three-input ANDs and two
+inverters: 6 literals against 4.</p>
+<p>So the saving here is modest, and it is worth being honest that it usually is on a
+map this small. The reason to reach for don't-cares is not the typical case but the
+occasional one where six wildcards let a whole term disappear &mdash; and the fact that
+the saving is free either way.</p>
+<p>There is also a design question hiding in the comparison. This second circuit is
+<em>safer</em>: fed an illegal code it outputs 0 rather than something arbitrary. If
+the guarantee about the input being a decimal digit is one you actually trust, take the
+smaller circuit; if
+it comes from another team's hardware, the extra inverter may be cheap insurance.</p>
+</div></details>
+
+<details class="prob"><summary data-label="Exercise 6.18">F(A,&nbsp;B,&nbsp;C,&nbsp;D) = &Sigma;m(0, 4, 12, 14) + d(2, 6, 8, 10). Minimise it, then minimise it again with the don&rsquo;t-cares forced to 0, and compare.</summary><div class="sol">
+<figure class="fig" style="--figmax:12.0rem">
+<svg viewBox="0 0 312 302" role="img" aria-label="1s and Xs together fill every even cell: F = D&prime;">
+<text class="kvar" x="66" y="18" text-anchor="start">CD</text>
+<text class="kvar" x="46" y="40" text-anchor="end">AB</text>
+<path class="kslash" d="M18 4L60 26"/>
+<text class="klab" x="91.0" y="38" text-anchor="middle">00</text>
+<text class="klab" x="149.0" y="38" text-anchor="middle">01</text>
+<text class="klab" x="207.0" y="38" text-anchor="middle">11</text>
+<text class="klab" x="265.0" y="38" text-anchor="middle">10</text>
+<text class="klab" x="50" y="84.0" text-anchor="end">00</text>
+<text class="klab" x="50" y="142.0" text-anchor="end">01</text>
+<text class="klab" x="50" y="200.0" text-anchor="end">11</text>
+<text class="klab" x="50" y="258.0" text-anchor="end">10</text>
+<rect class="kcell" x="62" y="50" width="58" height="58" rx="3"/>
+<text class="kval" x="91.0" y="87.0" text-anchor="middle">1</text>
+<text class="kidx" x="67" y="64" text-anchor="start">0</text>
+<rect class="kcell" x="120" y="50" width="58" height="58" rx="3"/>
+<text class="kval zero" x="149.0" y="87.0" text-anchor="middle">0</text>
+<text class="kidx" x="125" y="64" text-anchor="start">1</text>
+<rect class="kcell" x="236" y="50" width="58" height="58" rx="3"/>
+<text class="kval dc" x="265.0" y="87.0" text-anchor="middle">X</text>
+<text class="kidx" x="241" y="64" text-anchor="start">2</text>
+<rect class="kcell" x="178" y="50" width="58" height="58" rx="3"/>
+<text class="kval zero" x="207.0" y="87.0" text-anchor="middle">0</text>
+<text class="kidx" x="183" y="64" text-anchor="start">3</text>
+<rect class="kcell" x="62" y="108" width="58" height="58" rx="3"/>
+<text class="kval" x="91.0" y="145.0" text-anchor="middle">1</text>
+<text class="kidx" x="67" y="122" text-anchor="start">4</text>
+<rect class="kcell" x="120" y="108" width="58" height="58" rx="3"/>
+<text class="kval zero" x="149.0" y="145.0" text-anchor="middle">0</text>
+<text class="kidx" x="125" y="122" text-anchor="start">5</text>
+<rect class="kcell" x="236" y="108" width="58" height="58" rx="3"/>
+<text class="kval dc" x="265.0" y="145.0" text-anchor="middle">X</text>
+<text class="kidx" x="241" y="122" text-anchor="start">6</text>
+<rect class="kcell" x="178" y="108" width="58" height="58" rx="3"/>
+<text class="kval zero" x="207.0" y="145.0" text-anchor="middle">0</text>
+<text class="kidx" x="183" y="122" text-anchor="start">7</text>
+<rect class="kcell" x="62" y="224" width="58" height="58" rx="3"/>
+<text class="kval dc" x="91.0" y="261.0" text-anchor="middle">X</text>
+<text class="kidx" x="67" y="238" text-anchor="start">8</text>
+<rect class="kcell" x="120" y="224" width="58" height="58" rx="3"/>
+<text class="kval zero" x="149.0" y="261.0" text-anchor="middle">0</text>
+<text class="kidx" x="125" y="238" text-anchor="start">9</text>
+<rect class="kcell" x="236" y="224" width="58" height="58" rx="3"/>
+<text class="kval dc" x="265.0" y="261.0" text-anchor="middle">X</text>
+<text class="kidx" x="241" y="238" text-anchor="start">10</text>
+<rect class="kcell" x="178" y="224" width="58" height="58" rx="3"/>
+<text class="kval zero" x="207.0" y="261.0" text-anchor="middle">0</text>
+<text class="kidx" x="183" y="238" text-anchor="start">11</text>
+<rect class="kcell" x="62" y="166" width="58" height="58" rx="3"/>
+<text class="kval" x="91.0" y="203.0" text-anchor="middle">1</text>
+<text class="kidx" x="67" y="180" text-anchor="start">12</text>
+<rect class="kcell" x="120" y="166" width="58" height="58" rx="3"/>
+<text class="kval zero" x="149.0" y="203.0" text-anchor="middle">0</text>
+<text class="kidx" x="125" y="180" text-anchor="start">13</text>
+<rect class="kcell" x="236" y="166" width="58" height="58" rx="3"/>
+<text class="kval" x="265.0" y="203.0" text-anchor="middle">1</text>
+<text class="kidx" x="241" y="180" text-anchor="start">14</text>
+<rect class="kcell" x="178" y="166" width="58" height="58" rx="3"/>
+<text class="kval zero" x="207.0" y="203.0" text-anchor="middle">0</text>
+<text class="kidx" x="183" y="180" text-anchor="start">15</text>
+<rect class="kgrp grp0" x="241" y="55" width="48" height="222" rx="10"/>
+<rect class="kgrp grp0" x="67" y="55" width="48" height="222" rx="10"/>
+</svg>
+<figcaption>1s and Xs together fill every even cell: F = D&prime;</figcaption></figure>
+<p>The four 1s and the four Xs together fill every cell where D&nbsp;=&nbsp;0 &mdash;
+cells 0, 2, 4, 6, 8, 10, 12 and 14, which are exactly the even-numbered cells. That is a
+group of eight, and a group of eight in a sixteen-cell map deletes three variables:</p>
+<p style="text-align:center;font-size:1.05rem">
+F = D&prime;</p>
+<p>One literal. The circuit is an inverter on D, and A, B and C are not connected to
+anything.</p>
+<p><strong>With the Xs forced to 0</strong>, the four 1s cannot merge into anything that
+large. Cells 0 and 4 pair, cells 12 and 14 pair, and the best available is</p>
+<p style="text-align:center;font-size:1.05rem">
+F = A&prime;C&prime;D&prime; + ABD&prime;</p>
+<p>Two terms, six literals: two three-input ANDs, an OR and four inverters, against one
+inverter.</p>
+<p>This is the case Exercise 6.17 said was worth waiting for. There, four don't-cares
+saved two gate inputs; here, four of them delete an entire product term and three of the
+four inputs. The difference is where the Xs happen to fall &mdash; scattered among the
+1s so that they bridge groups that could not otherwise reach each other.</p>
+<p>Which is the practical lesson about don't-cares. You cannot tell in advance whether
+they will save you a little or a lot, and the cost of finding out is zero: put the Xs on
+the map and let the grouping tell you.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 6.19">F(A,&nbsp;B,&nbsp;C,&nbsp;D) = &Sigma;m(2, 3, 6, 7, 10, 11) + d(0, 1, 4, 5). Find the minimal POS by grouping the 0s &mdash; an X may join a 0-group just as readily as a 1-group. Then find the minimal SOP and compare the two answers on cell 0.</summary><div class="sol">
+<p><strong>Grouping the 0s.</strong> The 0s are in cells 8, 9, 12, 13, 14 and 15. Treat
+the four Xs as 0s wherever that enlarges a group:</p>
+<figure class="fig" style="--figmax:12.0rem">
+<svg viewBox="0 0 312 302" role="img" aria-label="grouping the 0s, with the Xs used as 0s">
+<text class="kvar" x="66" y="18" text-anchor="start">CD</text>
+<text class="kvar" x="46" y="40" text-anchor="end">AB</text>
+<path class="kslash" d="M18 4L60 26"/>
+<text class="klab" x="91.0" y="38" text-anchor="middle">00</text>
+<text class="klab" x="149.0" y="38" text-anchor="middle">01</text>
+<text class="klab" x="207.0" y="38" text-anchor="middle">11</text>
+<text class="klab" x="265.0" y="38" text-anchor="middle">10</text>
+<text class="klab" x="50" y="84.0" text-anchor="end">00</text>
+<text class="klab" x="50" y="142.0" text-anchor="end">01</text>
+<text class="klab" x="50" y="200.0" text-anchor="end">11</text>
+<text class="klab" x="50" y="258.0" text-anchor="end">10</text>
+<rect class="kcell" x="62" y="50" width="58" height="58" rx="3"/>
+<text class="kval dc" x="91.0" y="87.0" text-anchor="middle">X</text>
+<text class="kidx" x="67" y="64" text-anchor="start">0</text>
+<rect class="kcell" x="120" y="50" width="58" height="58" rx="3"/>
+<text class="kval dc" x="149.0" y="87.0" text-anchor="middle">X</text>
+<text class="kidx" x="125" y="64" text-anchor="start">1</text>
+<rect class="kcell" x="236" y="50" width="58" height="58" rx="3"/>
+<text class="kval" x="265.0" y="87.0" text-anchor="middle">1</text>
+<text class="kidx" x="241" y="64" text-anchor="start">2</text>
+<rect class="kcell" x="178" y="50" width="58" height="58" rx="3"/>
+<text class="kval" x="207.0" y="87.0" text-anchor="middle">1</text>
+<text class="kidx" x="183" y="64" text-anchor="start">3</text>
+<rect class="kcell" x="62" y="108" width="58" height="58" rx="3"/>
+<text class="kval dc" x="91.0" y="145.0" text-anchor="middle">X</text>
+<text class="kidx" x="67" y="122" text-anchor="start">4</text>
+<rect class="kcell" x="120" y="108" width="58" height="58" rx="3"/>
+<text class="kval dc" x="149.0" y="145.0" text-anchor="middle">X</text>
+<text class="kidx" x="125" y="122" text-anchor="start">5</text>
+<rect class="kcell" x="236" y="108" width="58" height="58" rx="3"/>
+<text class="kval" x="265.0" y="145.0" text-anchor="middle">1</text>
+<text class="kidx" x="241" y="122" text-anchor="start">6</text>
+<rect class="kcell" x="178" y="108" width="58" height="58" rx="3"/>
+<text class="kval" x="207.0" y="145.0" text-anchor="middle">1</text>
+<text class="kidx" x="183" y="122" text-anchor="start">7</text>
+<rect class="kcell" x="62" y="224" width="58" height="58" rx="3"/>
+<text class="kval zero" x="91.0" y="261.0" text-anchor="middle">0</text>
+<text class="kidx" x="67" y="238" text-anchor="start">8</text>
+<rect class="kcell" x="120" y="224" width="58" height="58" rx="3"/>
+<text class="kval zero" x="149.0" y="261.0" text-anchor="middle">0</text>
+<text class="kidx" x="125" y="238" text-anchor="start">9</text>
+<rect class="kcell" x="236" y="224" width="58" height="58" rx="3"/>
+<text class="kval" x="265.0" y="261.0" text-anchor="middle">1</text>
+<text class="kidx" x="241" y="238" text-anchor="start">10</text>
+<rect class="kcell" x="178" y="224" width="58" height="58" rx="3"/>
+<text class="kval" x="207.0" y="261.0" text-anchor="middle">1</text>
+<text class="kidx" x="183" y="238" text-anchor="start">11</text>
+<rect class="kcell" x="62" y="166" width="58" height="58" rx="3"/>
+<text class="kval zero" x="91.0" y="203.0" text-anchor="middle">0</text>
+<text class="kidx" x="67" y="180" text-anchor="start">12</text>
+<rect class="kcell" x="120" y="166" width="58" height="58" rx="3"/>
+<text class="kval zero" x="149.0" y="203.0" text-anchor="middle">0</text>
+<text class="kidx" x="125" y="180" text-anchor="start">13</text>
+<rect class="kcell" x="236" y="166" width="58" height="58" rx="3"/>
+<text class="kval zero" x="265.0" y="203.0" text-anchor="middle">0</text>
+<text class="kidx" x="241" y="180" text-anchor="start">14</text>
+<rect class="kcell" x="178" y="166" width="58" height="58" rx="3"/>
+<text class="kval zero" x="207.0" y="203.0" text-anchor="middle">0</text>
+<text class="kidx" x="183" y="180" text-anchor="start">15</text>
+<rect class="kgrp grp2" x="67" y="55" width="106" height="222" rx="10"/>
+<rect class="kgrp grp3" x="71" y="175" width="214" height="40" rx="10"/>
+</svg>
+<figcaption>grouping the 0s, with the Xs used as 0s</figcaption></figure>
+<p>Cells 12, 13, 14, 15 are the row where A&nbsp;=&nbsp;1 and B&nbsp;=&nbsp;1, giving AB.
+And cells 8, 9, 12, 13 extend leftward into the Xs at 0, 1, 4 and 5 to make a group of
+eight &mdash; every cell where C&nbsp;=&nbsp;0 &mdash; giving C&prime;. So</p>
+<p style="text-align:center;font-size:1.05rem">
+F&prime; = C&prime; + AB</p>
+<p>Complement each term and turn the sum into a product:</p>
+<p style="text-align:center;font-size:1.05rem">
+F = (C)(A&prime; + B&prime;)</p>
+<p><strong>Grouping the 1s</strong> on the same map, with the Xs now recruited into
+1-groups instead:</p>
+<figure class="fig" style="--figmax:12.0rem">
+<svg viewBox="0 0 312 302" role="img" aria-label="grouping the 1s: F = A&prime; + B&prime;C">
+<text class="kvar" x="66" y="18" text-anchor="start">CD</text>
+<text class="kvar" x="46" y="40" text-anchor="end">AB</text>
+<path class="kslash" d="M18 4L60 26"/>
+<text class="klab" x="91.0" y="38" text-anchor="middle">00</text>
+<text class="klab" x="149.0" y="38" text-anchor="middle">01</text>
+<text class="klab" x="207.0" y="38" text-anchor="middle">11</text>
+<text class="klab" x="265.0" y="38" text-anchor="middle">10</text>
+<text class="klab" x="50" y="84.0" text-anchor="end">00</text>
+<text class="klab" x="50" y="142.0" text-anchor="end">01</text>
+<text class="klab" x="50" y="200.0" text-anchor="end">11</text>
+<text class="klab" x="50" y="258.0" text-anchor="end">10</text>
+<rect class="kcell" x="62" y="50" width="58" height="58" rx="3"/>
+<text class="kval dc" x="91.0" y="87.0" text-anchor="middle">X</text>
+<text class="kidx" x="67" y="64" text-anchor="start">0</text>
+<rect class="kcell" x="120" y="50" width="58" height="58" rx="3"/>
+<text class="kval dc" x="149.0" y="87.0" text-anchor="middle">X</text>
+<text class="kidx" x="125" y="64" text-anchor="start">1</text>
+<rect class="kcell" x="236" y="50" width="58" height="58" rx="3"/>
+<text class="kval" x="265.0" y="87.0" text-anchor="middle">1</text>
+<text class="kidx" x="241" y="64" text-anchor="start">2</text>
+<rect class="kcell" x="178" y="50" width="58" height="58" rx="3"/>
+<text class="kval" x="207.0" y="87.0" text-anchor="middle">1</text>
+<text class="kidx" x="183" y="64" text-anchor="start">3</text>
+<rect class="kcell" x="62" y="108" width="58" height="58" rx="3"/>
+<text class="kval dc" x="91.0" y="145.0" text-anchor="middle">X</text>
+<text class="kidx" x="67" y="122" text-anchor="start">4</text>
+<rect class="kcell" x="120" y="108" width="58" height="58" rx="3"/>
+<text class="kval dc" x="149.0" y="145.0" text-anchor="middle">X</text>
+<text class="kidx" x="125" y="122" text-anchor="start">5</text>
+<rect class="kcell" x="236" y="108" width="58" height="58" rx="3"/>
+<text class="kval" x="265.0" y="145.0" text-anchor="middle">1</text>
+<text class="kidx" x="241" y="122" text-anchor="start">6</text>
+<rect class="kcell" x="178" y="108" width="58" height="58" rx="3"/>
+<text class="kval" x="207.0" y="145.0" text-anchor="middle">1</text>
+<text class="kidx" x="183" y="122" text-anchor="start">7</text>
+<rect class="kcell" x="62" y="224" width="58" height="58" rx="3"/>
+<text class="kval zero" x="91.0" y="261.0" text-anchor="middle">0</text>
+<text class="kidx" x="67" y="238" text-anchor="start">8</text>
+<rect class="kcell" x="120" y="224" width="58" height="58" rx="3"/>
+<text class="kval zero" x="149.0" y="261.0" text-anchor="middle">0</text>
+<text class="kidx" x="125" y="238" text-anchor="start">9</text>
+<rect class="kcell" x="236" y="224" width="58" height="58" rx="3"/>
+<text class="kval" x="265.0" y="261.0" text-anchor="middle">1</text>
+<text class="kidx" x="241" y="238" text-anchor="start">10</text>
+<rect class="kcell" x="178" y="224" width="58" height="58" rx="3"/>
+<text class="kval" x="207.0" y="261.0" text-anchor="middle">1</text>
+<text class="kidx" x="183" y="238" text-anchor="start">11</text>
+<rect class="kcell" x="62" y="166" width="58" height="58" rx="3"/>
+<text class="kval zero" x="91.0" y="203.0" text-anchor="middle">0</text>
+<text class="kidx" x="67" y="180" text-anchor="start">12</text>
+<rect class="kcell" x="120" y="166" width="58" height="58" rx="3"/>
+<text class="kval zero" x="149.0" y="203.0" text-anchor="middle">0</text>
+<text class="kidx" x="125" y="180" text-anchor="start">13</text>
+<rect class="kcell" x="236" y="166" width="58" height="58" rx="3"/>
+<text class="kval zero" x="265.0" y="203.0" text-anchor="middle">0</text>
+<text class="kidx" x="241" y="180" text-anchor="start">14</text>
+<rect class="kcell" x="178" y="166" width="58" height="58" rx="3"/>
+<text class="kval zero" x="207.0" y="203.0" text-anchor="middle">0</text>
+<text class="kidx" x="183" y="180" text-anchor="start">15</text>
+<rect class="kgrp grp0" x="67" y="55" width="222" height="106" rx="10"/>
+<rect class="kgrp grp1" x="187" y="233" width="98" height="40" rx="10"/>
+<rect class="kgrp grp1" x="187" y="59" width="98" height="40" rx="10"/>
+</svg>
+<figcaption>grouping the 1s: F = A&prime; + B&prime;C</figcaption></figure>
+<p style="text-align:center;font-size:1.05rem">
+F = A&prime; + B&prime;C</p>
+<p>Two terms and three literals either way, so on cost there is nothing to choose
+between them.</p>
+<p><strong>But look at cell 0</strong>, which is a don't-care. The SOP answer
+A&prime;&nbsp;+&nbsp;B&prime;C gives A&prime;&nbsp;=&nbsp;1 there, so it outputs
+<strong>1</strong>. The POS answer C(A&prime;&nbsp;+&nbsp;B&prime;) has
+C&nbsp;=&nbsp;0 there, so it outputs <strong>0</strong>.</p>
+<p>The two circuits compute <em>different functions</em> &mdash; and both are correct
+answers to the question. That is what a don't-care means: on those rows the
+specification does not say, and any two circuits that agree everywhere it does say are
+equally valid solutions.</p>
+<p>The practical consequence is one to be careful about. Each X is resolved to a 0 or a
+1 by whichever groups you drew, and the choice is made independently for each form.
+So you cannot check an SOP answer against a POS answer row by row and expect agreement
+&mdash; they will differ on don't-care rows. Compare them only on the rows the
+specification actually pins down, or compare each separately against the original
+&Sigma; and d lists.</p></div></details>
+
+<h3>Zeros, and beyond the map</h3>
+
+<details class="prob"><summary data-label="Exercise 6.20">For F(A,&nbsp;B,&nbsp;C,&nbsp;D) = &Sigma;m(4, 6, 8, 9, 10, 11, 12, 13, 14, 15), find the minimal SOP by grouping the 1s and the minimal POS by grouping the 0s. Which circuit is cheaper?</summary><div class="sol">
+<p><strong>Grouping the 1s.</strong></p>
+<figure class="fig" style="--figmax:12.0rem">
+<svg viewBox="0 0 312 302" role="img" aria-label="grouping the 1s: F = BD&prime; + A">
+<text class="kvar" x="66" y="18" text-anchor="start">CD</text>
+<text class="kvar" x="46" y="40" text-anchor="end">AB</text>
+<path class="kslash" d="M18 4L60 26"/>
+<text class="klab" x="91.0" y="38" text-anchor="middle">00</text>
+<text class="klab" x="149.0" y="38" text-anchor="middle">01</text>
+<text class="klab" x="207.0" y="38" text-anchor="middle">11</text>
+<text class="klab" x="265.0" y="38" text-anchor="middle">10</text>
+<text class="klab" x="50" y="84.0" text-anchor="end">00</text>
+<text class="klab" x="50" y="142.0" text-anchor="end">01</text>
+<text class="klab" x="50" y="200.0" text-anchor="end">11</text>
+<text class="klab" x="50" y="258.0" text-anchor="end">10</text>
+<rect class="kcell" x="62" y="50" width="58" height="58" rx="3"/>
+<text class="kval zero" x="91.0" y="87.0" text-anchor="middle">0</text>
+<text class="kidx" x="67" y="64" text-anchor="start">0</text>
+<rect class="kcell" x="120" y="50" width="58" height="58" rx="3"/>
+<text class="kval zero" x="149.0" y="87.0" text-anchor="middle">0</text>
+<text class="kidx" x="125" y="64" text-anchor="start">1</text>
+<rect class="kcell" x="236" y="50" width="58" height="58" rx="3"/>
+<text class="kval zero" x="265.0" y="87.0" text-anchor="middle">0</text>
+<text class="kidx" x="241" y="64" text-anchor="start">2</text>
+<rect class="kcell" x="178" y="50" width="58" height="58" rx="3"/>
+<text class="kval zero" x="207.0" y="87.0" text-anchor="middle">0</text>
+<text class="kidx" x="183" y="64" text-anchor="start">3</text>
+<rect class="kcell" x="62" y="108" width="58" height="58" rx="3"/>
+<text class="kval" x="91.0" y="145.0" text-anchor="middle">1</text>
+<text class="kidx" x="67" y="122" text-anchor="start">4</text>
+<rect class="kcell" x="120" y="108" width="58" height="58" rx="3"/>
+<text class="kval zero" x="149.0" y="145.0" text-anchor="middle">0</text>
+<text class="kidx" x="125" y="122" text-anchor="start">5</text>
+<rect class="kcell" x="236" y="108" width="58" height="58" rx="3"/>
+<text class="kval" x="265.0" y="145.0" text-anchor="middle">1</text>
+<text class="kidx" x="241" y="122" text-anchor="start">6</text>
+<rect class="kcell" x="178" y="108" width="58" height="58" rx="3"/>
+<text class="kval zero" x="207.0" y="145.0" text-anchor="middle">0</text>
+<text class="kidx" x="183" y="122" text-anchor="start">7</text>
+<rect class="kcell" x="62" y="224" width="58" height="58" rx="3"/>
+<text class="kval" x="91.0" y="261.0" text-anchor="middle">1</text>
+<text class="kidx" x="67" y="238" text-anchor="start">8</text>
+<rect class="kcell" x="120" y="224" width="58" height="58" rx="3"/>
+<text class="kval" x="149.0" y="261.0" text-anchor="middle">1</text>
+<text class="kidx" x="125" y="238" text-anchor="start">9</text>
+<rect class="kcell" x="236" y="224" width="58" height="58" rx="3"/>
+<text class="kval" x="265.0" y="261.0" text-anchor="middle">1</text>
+<text class="kidx" x="241" y="238" text-anchor="start">10</text>
+<rect class="kcell" x="178" y="224" width="58" height="58" rx="3"/>
+<text class="kval" x="207.0" y="261.0" text-anchor="middle">1</text>
+<text class="kidx" x="183" y="238" text-anchor="start">11</text>
+<rect class="kcell" x="62" y="166" width="58" height="58" rx="3"/>
+<text class="kval" x="91.0" y="203.0" text-anchor="middle">1</text>
+<text class="kidx" x="67" y="180" text-anchor="start">12</text>
+<rect class="kcell" x="120" y="166" width="58" height="58" rx="3"/>
+<text class="kval" x="149.0" y="203.0" text-anchor="middle">1</text>
+<text class="kidx" x="125" y="180" text-anchor="start">13</text>
+<rect class="kcell" x="236" y="166" width="58" height="58" rx="3"/>
+<text class="kval" x="265.0" y="203.0" text-anchor="middle">1</text>
+<text class="kidx" x="241" y="180" text-anchor="start">14</text>
+<rect class="kcell" x="178" y="166" width="58" height="58" rx="3"/>
+<text class="kval" x="207.0" y="203.0" text-anchor="middle">1</text>
+<text class="kidx" x="183" y="180" text-anchor="start">15</text>
+<rect class="kgrp grp0" x="241" y="113" width="48" height="106" rx="10"/>
+<rect class="kgrp grp0" x="67" y="113" width="48" height="106" rx="10"/>
+<rect class="kgrp grp1" x="71" y="175" width="214" height="98" rx="10"/>
+</svg>
+<figcaption>grouping the 1s: F = BD&prime; + A</figcaption></figure>
+<p>The whole A&nbsp;=&nbsp;1 half of the map is 1, which is a group of eight giving the
+single literal A. That leaves cells 4 and 6, which pair with each other &mdash; both
+have A&nbsp;=&nbsp;0, B&nbsp;=&nbsp;1, D&nbsp;=&nbsp;0 &mdash; but they also pair
+<em>into</em> the covered half: cells 4 and 12 have B&nbsp;=&nbsp;1, C&nbsp;=&nbsp;0,
+D&nbsp;=&nbsp;0, and 6 and 14 likewise. Taking the largest group containing them gives
+the four cells 4, 6, 12 and 14, where B&nbsp;=&nbsp;1 and D&nbsp;=&nbsp;0.</p>
+<p style="text-align:center;font-size:1.05rem">
+F = BD&prime; + A</p>
+<p>Two terms, three literals. Note that BD&prime; overlaps the A group in cells 12 and
+14, which is free and is what let the group grow from a pair to a quad.</p>
+<p><strong>Grouping the 0s.</strong></p>
+<figure class="fig" style="--figmax:12.0rem">
+<svg viewBox="0 0 312 302" role="img" aria-label="grouping the 0s of the same map">
+<text class="kvar" x="66" y="18" text-anchor="start">CD</text>
+<text class="kvar" x="46" y="40" text-anchor="end">AB</text>
+<path class="kslash" d="M18 4L60 26"/>
+<text class="klab" x="91.0" y="38" text-anchor="middle">00</text>
+<text class="klab" x="149.0" y="38" text-anchor="middle">01</text>
+<text class="klab" x="207.0" y="38" text-anchor="middle">11</text>
+<text class="klab" x="265.0" y="38" text-anchor="middle">10</text>
+<text class="klab" x="50" y="84.0" text-anchor="end">00</text>
+<text class="klab" x="50" y="142.0" text-anchor="end">01</text>
+<text class="klab" x="50" y="200.0" text-anchor="end">11</text>
+<text class="klab" x="50" y="258.0" text-anchor="end">10</text>
+<rect class="kcell" x="62" y="50" width="58" height="58" rx="3"/>
+<text class="kval zero" x="91.0" y="87.0" text-anchor="middle">0</text>
+<text class="kidx" x="67" y="64" text-anchor="start">0</text>
+<rect class="kcell" x="120" y="50" width="58" height="58" rx="3"/>
+<text class="kval zero" x="149.0" y="87.0" text-anchor="middle">0</text>
+<text class="kidx" x="125" y="64" text-anchor="start">1</text>
+<rect class="kcell" x="236" y="50" width="58" height="58" rx="3"/>
+<text class="kval zero" x="265.0" y="87.0" text-anchor="middle">0</text>
+<text class="kidx" x="241" y="64" text-anchor="start">2</text>
+<rect class="kcell" x="178" y="50" width="58" height="58" rx="3"/>
+<text class="kval zero" x="207.0" y="87.0" text-anchor="middle">0</text>
+<text class="kidx" x="183" y="64" text-anchor="start">3</text>
+<rect class="kcell" x="62" y="108" width="58" height="58" rx="3"/>
+<text class="kval" x="91.0" y="145.0" text-anchor="middle">1</text>
+<text class="kidx" x="67" y="122" text-anchor="start">4</text>
+<rect class="kcell" x="120" y="108" width="58" height="58" rx="3"/>
+<text class="kval zero" x="149.0" y="145.0" text-anchor="middle">0</text>
+<text class="kidx" x="125" y="122" text-anchor="start">5</text>
+<rect class="kcell" x="236" y="108" width="58" height="58" rx="3"/>
+<text class="kval" x="265.0" y="145.0" text-anchor="middle">1</text>
+<text class="kidx" x="241" y="122" text-anchor="start">6</text>
+<rect class="kcell" x="178" y="108" width="58" height="58" rx="3"/>
+<text class="kval zero" x="207.0" y="145.0" text-anchor="middle">0</text>
+<text class="kidx" x="183" y="122" text-anchor="start">7</text>
+<rect class="kcell" x="62" y="224" width="58" height="58" rx="3"/>
+<text class="kval" x="91.0" y="261.0" text-anchor="middle">1</text>
+<text class="kidx" x="67" y="238" text-anchor="start">8</text>
+<rect class="kcell" x="120" y="224" width="58" height="58" rx="3"/>
+<text class="kval" x="149.0" y="261.0" text-anchor="middle">1</text>
+<text class="kidx" x="125" y="238" text-anchor="start">9</text>
+<rect class="kcell" x="236" y="224" width="58" height="58" rx="3"/>
+<text class="kval" x="265.0" y="261.0" text-anchor="middle">1</text>
+<text class="kidx" x="241" y="238" text-anchor="start">10</text>
+<rect class="kcell" x="178" y="224" width="58" height="58" rx="3"/>
+<text class="kval" x="207.0" y="261.0" text-anchor="middle">1</text>
+<text class="kidx" x="183" y="238" text-anchor="start">11</text>
+<rect class="kcell" x="62" y="166" width="58" height="58" rx="3"/>
+<text class="kval" x="91.0" y="203.0" text-anchor="middle">1</text>
+<text class="kidx" x="67" y="180" text-anchor="start">12</text>
+<rect class="kcell" x="120" y="166" width="58" height="58" rx="3"/>
+<text class="kval" x="149.0" y="203.0" text-anchor="middle">1</text>
+<text class="kidx" x="125" y="180" text-anchor="start">13</text>
+<rect class="kcell" x="236" y="166" width="58" height="58" rx="3"/>
+<text class="kval" x="265.0" y="203.0" text-anchor="middle">1</text>
+<text class="kidx" x="241" y="180" text-anchor="start">14</text>
+<rect class="kcell" x="178" y="166" width="58" height="58" rx="3"/>
+<text class="kval" x="207.0" y="203.0" text-anchor="middle">1</text>
+<text class="kidx" x="183" y="180" text-anchor="start">15</text>
+<rect class="kgrp grp2" x="67" y="55" width="222" height="48" rx="10"/>
+<rect class="kgrp grp3" x="129" y="59" width="98" height="98" rx="10"/>
+</svg>
+<figcaption>grouping the 0s of the same map</figcaption></figure>
+<p>The 0s are in cells 0, 1, 2, 3, 5, 7. Two groups of four: cells 0, 1, 2 and 3 are the
+top row, where A&nbsp;=&nbsp;0 and B&nbsp;=&nbsp;0; cells 1, 3, 5 and 7 form the block
+where A&nbsp;=&nbsp;0 and D&nbsp;=&nbsp;1. So</p>
+<p style="text-align:center;font-size:1.05rem">
+F&prime; = A&prime;B&prime; + A&prime;D</p>
+<p>Complementing each term and turning the sum into a product:</p>
+<p style="text-align:center;font-size:1.05rem">
+F = (A + B)(A + D&prime;)</p>
+<p><strong>Which is cheaper.</strong> The SOP is 3 literals in 2 terms; the
+POS is 4 literals in 2 terms. The SOP wins, by one gate input.</p>
+<p>It is worth doing both and then choosing, because there is no way to tell in advance
+which will come out ahead &mdash; counting 1s against 0s is a useful hint and not a
+rule. Here the counts are 10 against 6, which would have suggested the POS, and the
+suggestion is wrong.</p>
+<p>Cross-check the two forms on cell 4 (ABCD&nbsp;=&nbsp;0100), which should be 1: the
+SOP gives 0&nbsp;+&nbsp;1&nbsp;&middot;&nbsp;1&nbsp;=&nbsp;1, and the POS gives
+(0&nbsp;+&nbsp;1)(0&nbsp;+&nbsp;1)&nbsp;=&nbsp;1. Agreed.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 6.21">Challenge. Explain why a group on a K-map must contain a power-of-two number of cells. Then explain why the method is not used beyond five or six variables, and say what replaces it.</summary><div class="sol">
+<p><strong>Why powers of two.</strong> Start from the combining law: two terms merge
+into one only when they agree in every variable but one, and the result is the shared
+part with that variable deleted. So merging is always a doubling &mdash; a term
+covering <var>k</var> cells becomes a term covering 2<var>k</var>.</p>
+<p>Build a group by repeated merging, starting from a single cell. After one merge it
+covers 2 cells, after two merges 4, after three 8. A term with <var>n</var>
+&minus;&nbsp;<var>j</var> literals in an <var>n</var>-variable function is 1 on exactly
+2<sup><var>j</var></sup> input combinations, because the <var>j</var> missing variables
+are each free to take either value. There is no product term that is 1 on exactly six
+inputs, and so no legal group of six cells &mdash; not because the rule forbids it, but
+because no expression could be read off it.</p>
+<p>The same argument says why the group must be a <em>rectangle</em> in the map's
+coordinates: the set of cells where a product term is 1 is exactly the set obtained by
+letting the absent variables range freely, which is a subcube, which the Gray ordering
+draws as a rectangle.</p>
+<p><strong>Why the method runs out.</strong> Two reasons, and the first is the one you
+feel immediately. A map for <var>n</var> variables has 2<sup><var>n</var></sup> cells
+&mdash; 16 for four variables, 32 for five, 64 for six &mdash; and each cell has
+<var>n</var> neighbours. A five-variable map is drawn as two four-variable maps with
+cells adjacent between the sheets; a six-variable map needs four. Adjacency stops being
+something you can see, which is the whole reason the map existed.</p>
+<p>The second reason is deeper. Finding a minimum cover is not just visually hard, it
+is computationally hard &mdash; it is the set-covering problem, which is NP-complete,
+so no method is going to stay easy as the number of variables grows. The map is a
+way of solving small instances by eye, not a way of making the problem small.</p>
+<p><strong>What replaces it.</strong> The <em>Quine&ndash;McCluskey</em> algorithm does
+exactly what you have been doing by hand &mdash; find all prime implicants by repeated
+merging, then choose a minimum cover &mdash; but as a tabular procedure a computer can
+follow, with no adjacency to see. It is exact and it is exponential, so it in turn gives
+way to heuristics such as <em>espresso</em>, which produce very good but not provably
+minimal covers on functions with hundreds of inputs. Every logic synthesis tool in use
+today runs some descendant of espresso, and the K-map is what it is doing, scaled up
+past the point where eyes work.</p>
+<div class="box extra"><span class="bt">Worth knowing</span>
+<p>The prime implicants, the essential ones and the minimal covers printed in the
+solutions on this page were generated by a Quine&ndash;McCluskey implementation and
+checked against the truth table row by row. That is a reasonable thing to do for your
+own homework too &mdash; not to find the answer, but to confirm one you have already
+found by hand.</p></div>
+</div></details>
+
+<div class="box extra"><span class="bt">Where this goes next</span>
+<p>You can now get from a specification to a minimal two-level circuit in AND, OR and
+NOT. What a real chip is actually built from is a different matter: one gate type,
+repeated a few billion times. The next set shows that a single kind of gate is enough
+for everything &mdash; and that converting any of the circuits on this page into that
+form is mechanical.</p></div>
+
+    <nav class="pagenav">
+      <a class="prev" href="ex-sop-pos.html"><span>Previous</span>Set 5. SOP, POS and canonical forms</a>
+      <a class="next" href="ex-nand.html"><span>Next</span>Set 7. NAND, NOR and universality</a>
+    </nav>
+    <footer class="site">
+      <em>Computer Organization and Assembly Language</em> &middot; CSCI 240 / 640,
+      Queens College CUNY.
+    </footer>
+  </main>
+</div>
+</body>
+</html>
