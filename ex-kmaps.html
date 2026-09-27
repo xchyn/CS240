@@ -4,6 +4,31 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Set 6 &mdash; Karnaugh maps and don&rsquo;t-cares</title>
+<style>
+/* Light-theme fallback for the diagrams; assets/style.css overrides it. */
+.fig svg{display:block;width:100%;max-width:34rem;height:auto;margin:0 auto}
+.fig figcaption{font:400 .8rem/1.45 system-ui,sans-serif;color:#79828e;
+  margin-top:.45rem}
+.fig{margin:1.5rem 0;text-align:center}
+.fig .wire{fill:none;stroke:#1a1c1f;stroke-width:1.9;stroke-linecap:round;
+  stroke-linejoin:round}
+.fig .gate{fill:#ffffff;stroke:#1a1c1f;stroke-width:1.9;stroke-linejoin:round}
+.fig .gate.open{fill:none}
+.fig .dot{fill:#1a1c1f;stroke:none}
+.fig .lbl{fill:#1a1c1f;stroke:none;font:600 15px system-ui,sans-serif}
+.fig .ann{fill:#79828e;stroke:none;font:400 12.5px ui-monospace,monospace}
+.fig .kcell{fill:#ffffff;stroke:#cfcbc0;stroke-width:1.2}
+.fig .kval{fill:#1a1c1f;stroke:none;font:600 21px ui-monospace,monospace}
+.fig .kval.zero{fill:#79828e;font-weight:400}
+.fig .kval.dc{fill:#8c2d19;font-weight:700}
+.fig .kidx{fill:#79828e;stroke:none;font:400 11px ui-monospace,monospace}
+.fig .klab{fill:#4d5560;stroke:none;font:600 14px ui-monospace,monospace}
+.fig .kvar{fill:#8c2d19;stroke:none;font:700 13px system-ui,sans-serif}
+.fig .kslash{fill:none;stroke:#cfcbc0;stroke-width:1.2}
+.fig .kgrp{fill:none;stroke-width:2.6}
+.fig .grp0{stroke:#8c2d19}.fig .grp1{stroke:#1d6a4f}
+.fig .grp2{stroke:#2a4d8f}.fig .grp3{stroke:#7a5ea8}
+</style>
 <link rel="stylesheet" href="assets/style.css">
 <script src="assets/notes.js" defer></script>
 </head>
