@@ -1,0 +1,1386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Set 9 &mdash; Multiplexers, decoders and the ALU</title>
+<style>
+/* Light-theme fallback for the diagrams; assets/style.css overrides it. */
+.fig svg{display:block;width:100%;max-width:34rem;height:auto;margin:0 auto}
+.fig figcaption{font:400 .8rem/1.45 system-ui,sans-serif;color:#79828e;
+  margin-top:.45rem}
+.fig{margin:1.5rem 0;text-align:center}
+.fig .wire{fill:none;stroke:#1a1c1f;stroke-width:1.9;stroke-linecap:round;
+  stroke-linejoin:round}
+.fig .gate{fill:#ffffff;stroke:#1a1c1f;stroke-width:1.9;stroke-linejoin:round}
+.fig .gate.open{fill:none}
+.fig .dot{fill:#1a1c1f;stroke:none}
+.fig .lbl{fill:#1a1c1f;stroke:none;font:600 15px system-ui,sans-serif}
+.fig .ann{fill:#79828e;stroke:none;font:400 12.5px ui-monospace,monospace}
+.fig .kcell{fill:#ffffff;stroke:#cfcbc0;stroke-width:1.2}
+.fig .kval{fill:#1a1c1f;stroke:none;font:600 21px ui-monospace,monospace}
+.fig .kval.zero{fill:#79828e;font-weight:400}
+.fig .kval.dc{fill:#8c2d19;font-weight:700}
+.fig .kidx{fill:#79828e;stroke:none;font:400 11px ui-monospace,monospace}
+.fig .klab{fill:#4d5560;stroke:none;font:600 14px ui-monospace,monospace}
+.fig .kvar{fill:#8c2d19;stroke:none;font:700 13px system-ui,sans-serif}
+.fig .kslash{fill:none;stroke:#cfcbc0;stroke-width:1.2}
+.fig .kgrp{fill:none;stroke-width:2.6}
+.fig .grp0{stroke:#8c2d19}.fig .grp1{stroke:#1d6a4f}
+.fig .grp2{stroke:#2a4d8f}.fig .grp3{stroke:#7a5ea8}
+.fig .blk{fill:#ffffff;stroke:#1a1c1f;stroke-width:1.9;stroke-linejoin:round}
+.fig .blab{fill:#1a1c1f;stroke:none;font:600 14px system-ui,sans-serif}
+.fig .bsub{fill:#4d5560;stroke:none;font:400 12px system-ui,sans-serif}
+.fig .sub{font-size:.72em}
+</style>
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/notes.js" defer></script>
+</head>
+<body>
+<header class="topbar"><div class="topbar-in">
+  <a class="brand" href="index.html">CSCI 240</a>
+  <span class="crumb">Set 9 &middot; MUX, decoders and the ALU</span>
+  <nav class="topnav">
+    <a href="ex-adder.html">&larr; Prev</a>
+    <a href="index.html">Contents</a>
+    <a href="setup-logisim.html">Next &rarr;</a>
+    <button class="iconbtn" id="themebtn" type="button" title="Light / dark">&#9686;</button>
+  </nav>
+</div></header>
+<div class="wrap">
+  <aside class="toc"><p class="toc-title">On this page</p><ol>
+    <li><a href="#mux"><span class="t">9.1</span>The multiplexer</a></li>
+    <li><a href="#bigger"><span class="t">9.2</span>Bigger multiplexers</a></li>
+    <li><a href="#dec"><span class="t">9.3</span>Decoders</a></li>
+    <li><a href="#univ"><span class="t">9.4</span>Multiplexers are universal</a></li>
+    <li><a href="#alu"><span class="t">9.5</span>A 1-bit ALU</a></li>
+    <li><a href="#sub"><span class="t">9.6</span>Adding and subtracting</a></li>
+    <li><a href="#wide"><span class="t">9.7</span>From 1 bit to 32</a></li>
+    <li><a href="#ref"><span class="t">9.8</span>Reference</a></li>
+    <li><a href="#exercises"><span class="t">9.9</span>Exercises</a></li>
+  </ol></aside>
+  <main>
+
+<div class="chhead">
+  <span class="chpart">Exercise set 9 &middot; after the ALU lecture</span>
+  <span class="chnum">Selecting and computing</span>
+  <h1>One box that does everything</h1>
+  <p class="chsum">The multiplexer and the decoder; building large multiplexers two
+  different ways; and the arithmetic logic unit &mdash; one circuit that performs
+  whichever operation its control wires ask for, assembled from the adder of Set 8.</p>
+</div>
+
+<p>A processor executes a different operation almost every instruction, and it cannot
+afford a separate machine for each one. What it has instead is an
+<strong>arithmetic logic unit</strong>: two operands in, one result out, and a small
+code on the side saying which function to apply. One piece of hardware, told each cycle
+what job to do.</p>
+
+<p>Building one needs a component this course has not met yet &mdash; a circuit that
+<em>chooses</em>. That is the multiplexer, and it turns out to be as fundamental as the
+gates themselves.</p>
+
+<h2 id="mux"><span class="secnum">9.1</span>The multiplexer</h2>
+
+<p>A <strong>multiplexer</strong>, universally shortened to MUX, is a data selector:
+several inputs, one output, and a control value that decides which input reaches the
+output. The smallest one has two data inputs and a single select line.</p>
+
+<figure class="fig" style="--figmax:15rem">
+<svg viewBox="0 0 300 160" role="img" aria-label="S = 0 passes A; S = 1 passes B">
+<path class="blk" d="M150 36.0L196 48.24L196 91.76L150 104.0Z"/>
+<path class="wire" d="M134 53.0L150 53.0"/>
+<path class="wire" d="M134 87.0L150 87.0"/>
+<path class="wire" d="M196 70L212 70"/>
+<path class="wire" d="M169.32 98.492L169.32 120.0"/>
+<text class="lbl" x="126" y="58.0" text-anchor="end">A</text>
+<text class="lbl" x="126" y="92.0" text-anchor="end">B</text>
+<text class="lbl" x="220" y="75" text-anchor="start">F</text>
+<text class="lbl" x="169.32" y="138.0" text-anchor="middle">S</text>
+<text class="bsub" x="175.0" y="74.0" text-anchor="middle">2:1</text>
+</svg>
+<figcaption>S = 0 passes A; S = 1 passes B</figcaption></figure>
+
+<div class="tablewrap"><table class="ttab">
+<thead><tr><th>S</th><th>A</th><th>B</th><th>F</th></tr></thead>
+<tbody><tr><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin hilite">0</td></tr><tr><td class="bin">0</td><td class="bin">0</td><td class="bin">1</td><td class="bin hilite">0</td></tr><tr><td class="bin">0</td><td class="bin">1</td><td class="bin">0</td><td class="bin hilite">1</td></tr><tr><td class="bin">0</td><td class="bin">1</td><td class="bin">1</td><td class="bin hilite">1</td></tr><tr><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin hilite">0</td></tr><tr><td class="bin">1</td><td class="bin">0</td><td class="bin">1</td><td class="bin hilite">1</td></tr><tr><td class="bin">1</td><td class="bin">1</td><td class="bin">0</td><td class="bin hilite">0</td></tr><tr><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td><td class="bin hilite">1</td></tr></tbody></table></div>
+
+<p>The table has eight rows, but the behaviour is better described in two:</p>
+
+<div class="tablewrap"><table class="lawtab">
+<thead><tr><th>S</th><th>F</th></tr></thead>
+<tbody><tr><td class="lawcell">0</td><td class="lawcell">A</td></tr><tr><td class="lawcell">1</td><td class="lawcell">B</td></tr></tbody></table></div>
+
+<p>and as an expression that is</p>
+
+<p style="text-align:center;font-size:1.05rem">
+F = S&prime;A + SB</p>
+
+<p>which reads directly: when S is 0 the first term is A and the second is 0, so F is A;
+when S is 1 the terms swap roles. Three gates and an inverter:</p>
+
+<figure class="fig" style="--figmax:100%">
+<svg viewBox="0 0 520 280" role="img" aria-label="F = S&prime;A + SB">
+<path class="wire" d="M110 200.0H121"/>
+<path class="gate" d="M118 186.0L142 200L118 214.0Z"/>
+<circle class="gate" cx="146" cy="200" r="4"/>
+<path class="wire" d="M150 200H159"/>
+<path class="wire" d="M250 37.5H260M250 52.5H260"/>
+<path class="gate" d="M258 30.0H272A15.0 15.0 0 0 1 272 60.0H258Z"/>
+<path class="wire" d="M287.0 45H296.0"/>
+<path class="wire" d="M250 132.5H260M250 147.5H260"/>
+<path class="gate" d="M258 125.0H272A15.0 15.0 0 0 1 272 155.0H258Z"/>
+<path class="wire" d="M287.0 140H296.0"/>
+<path class="wire" d="M390 87.5H407M390 102.5H407"/>
+<path class="gate" d="M398 80.0C416 80.0 424 87.8 429 95C424 102.2 416 110.0 398 110.0Q407 95 398 80.0Z"/>
+<path class="wire" d="M429 95H438"/>
+<text class="lbl" x="22" y="35" text-anchor="end">A</text>
+<path class="wire" d="M30 30L232 30L232 37.5L250 37.5"/>
+<text class="lbl" x="22" y="115" text-anchor="end">B</text>
+<path class="wire" d="M30 110L226 110L226 147.5L250 147.5"/>
+<text class="lbl" x="22" y="205" text-anchor="end">S</text>
+<path class="wire" d="M30 200L72 200"/>
+<circle class="dot" cx="72" cy="200" r="3.2"/>
+<path class="wire" d="M72 200L110 200"/>
+<path class="wire" d="M72 200L72 250L190 250L190 132.5L250 132.5"/>
+<path class="wire" d="M159 200L210 200L210 52.5L250 52.5"/>
+<path class="wire" d="M296.0 45L352 45L352 87.5L390 87.5"/>
+<path class="wire" d="M296.0 140L358 140L358 102.5L390 102.5"/>
+<path class="wire" d="M438 95L464 95"/>
+<text class="lbl" x="472" y="100" text-anchor="start">F</text>
+<text class="ann" x="161" y="191" text-anchor="start">S&prime;</text>
+<text class="ann" x="298.0" y="36" text-anchor="start">S&prime;A</text>
+<text class="ann" x="298.0" y="159" text-anchor="start">SB</text>
+</svg>
+<figcaption>F = S&prime;A + SB</figcaption></figure>
+
+<p>Notice that the data inputs and the select input play completely different roles even
+though they are all just wires. A and B are <em>data</em> &mdash; the multiplexer does
+not care what they mean. S is <em>control</em>. That distinction is what makes the device
+useful, and it is the same distinction as the control input on the XOR-based conditional
+inverter from Set 4.</p>
+
+<h2 id="bigger"><span class="secnum">9.2</span>Bigger multiplexers</h2>
+
+<p>Four data inputs need two select lines, since two bits are needed to name one of four
+things. In general 2<sup><var>n</var></sup> inputs need <var>n</var> selects.</p>
+
+<figure class="fig" style="--figmax:16rem">
+<svg viewBox="0 0 320 230" role="img" aria-label="four data inputs need two select lines">
+<path class="blk" d="M150 32.0L196 46.0L196 154.0L150 168.0Z"/>
+<path class="wire" d="M134 49.0L150 49.0"/>
+<path class="wire" d="M134 83.0L150 83.0"/>
+<path class="wire" d="M134 117.0L150 117.0"/>
+<path class="wire" d="M134 151.0L150 151.0"/>
+<path class="wire" d="M196 100L212 100"/>
+<path class="wire" d="M169.32 161.7L169.32 184.0"/>
+<text class="lbl" x="126" y="54.0" text-anchor="end">D<tspan class="sub">0</tspan></text>
+<text class="lbl" x="126" y="88.0" text-anchor="end">D<tspan class="sub">1</tspan></text>
+<text class="lbl" x="126" y="122.0" text-anchor="end">D<tspan class="sub">2</tspan></text>
+<text class="lbl" x="126" y="156.0" text-anchor="end">D<tspan class="sub">3</tspan></text>
+<text class="lbl" x="220" y="105" text-anchor="start">F</text>
+<text class="lbl" x="169.32" y="202.0" text-anchor="middle">S<tspan class="sub">1</tspan> S<tspan class="sub">0</tspan></text>
+<text class="bsub" x="175.0" y="104.0" text-anchor="middle">4:1</text>
+</svg>
+<figcaption>four data inputs need two select lines</figcaption></figure>
+
+<div class="tablewrap"><table class="lawtab">
+<thead><tr><th>S<tspan class="sub">1</tspan></th><th>S<tspan class="sub">0</tspan></th><th>F</th></tr></thead>
+<tbody><tr><td class="lawcell">0</td><td class="lawcell">0</td><td class="lawcell">D<tspan class="sub">0</tspan></td></tr><tr><td class="lawcell">0</td><td class="lawcell">1</td><td class="lawcell">D<tspan class="sub">1</tspan></td></tr><tr><td class="lawcell">1</td><td class="lawcell">0</td><td class="lawcell">D<tspan class="sub">2</tspan></td></tr><tr><td class="lawcell">1</td><td class="lawcell">1</td><td class="lawcell">D<tspan class="sub">3</tspan></td></tr></tbody></table></div>
+
+<p>As an expression, one product term per input, each guarded by the select combination
+that chooses it:</p>
+
+<p style="text-align:center;font-size:1.05rem">
+F = S<sub>1</sub>&prime;S<sub>0</sub>&prime;D<sub>0</sub>
++ S<sub>1</sub>&prime;S<sub>0</sub>D<sub>1</sub>
++ S<sub>1</sub>S<sub>0</sub>&prime;D<sub>2</sub>
++ S<sub>1</sub>S<sub>0</sub>D<sub>3</sub></p>
+
+<p>There are two standard ways to build one.</p>
+
+<p><strong>Recursively</strong>, out of smaller multiplexers. Use S<sub>0</sub> to pick
+within each pair, then S<sub>1</sub> to pick between the pairs:</p>
+
+<figure class="fig" style="--figmax:27rem">
+<svg viewBox="0 0 470 320" role="img" aria-label="a 4:1 multiplexer from three 2:1 multiplexers">
+<path class="blk" d="M170 26.0L216 38.24L216 81.76L170 94.0Z"/>
+<path class="wire" d="M154 43.0L170 43.0"/>
+<path class="wire" d="M154 77.0L170 77.0"/>
+<path class="wire" d="M216 60L232 60"/>
+<path class="wire" d="M189.32 88.492L189.32 110.0"/>
+<path class="blk" d="M170 156.0L216 168.24L216 211.76L170 224.0Z"/>
+<path class="wire" d="M154 173.0L170 173.0"/>
+<path class="wire" d="M154 207.0L170 207.0"/>
+<path class="wire" d="M216 190L232 190"/>
+<path class="wire" d="M189.32 218.492L189.32 240.0"/>
+<path class="blk" d="M330 91.0L376 103.24L376 146.76L330 159.0Z"/>
+<path class="wire" d="M314 108.0L330 108.0"/>
+<path class="wire" d="M314 142.0L330 142.0"/>
+<path class="wire" d="M376 125L392 125"/>
+<path class="wire" d="M349.32 153.492L349.32 175.0"/>
+<text class="lbl" x="146" y="48.0" text-anchor="end">D<tspan class="sub">0</tspan></text>
+<text class="lbl" x="146" y="82.0" text-anchor="end">D<tspan class="sub">1</tspan></text>
+<text class="lbl" x="146" y="178.0" text-anchor="end">D<tspan class="sub">2</tspan></text>
+<text class="lbl" x="146" y="212.0" text-anchor="end">D<tspan class="sub">3</tspan></text>
+<path class="wire" d="M232 60L300 60L300 108.0L314 108.0"/>
+<path class="wire" d="M232 190L300 190L300 142.0L314 142.0"/>
+<text class="lbl" x="400" y="130" text-anchor="start">F</text>
+<path class="wire" d="M189.32 110.0L189.32 262"/>
+<path class="wire" d="M189.32 240.0L189.32 262"/>
+<path class="wire" d="M100 262L189.32 262"/>
+<circle class="dot" cx="189.32" cy="262" r="3.2"/>
+<text class="lbl" x="92" y="267" text-anchor="end">S<tspan class="sub">0</tspan></text>
+<path class="wire" d="M349.32 175.0L349.32 295"/>
+<path class="wire" d="M100 295L349.32 295"/>
+<text class="lbl" x="92" y="300" text-anchor="end">S<tspan class="sub">1</tspan></text>
+</svg>
+<figcaption>a 4:1 multiplexer from three 2:1 multiplexers</figcaption></figure>
+
+<p>Three 2:1 multiplexers, and the same idea scales: an 8:1 is two 4:1s and a 2:1, and
+so on upward.</p>
+
+<p><strong>Or from a decoder</strong>, which is &sect;9.3. Both appear in the exercises,
+and they have different costs.</p>
+
+<h2 id="dec"><span class="secnum">9.3</span>Decoders</h2>
+
+<p>A <strong>decoder</strong> takes an <var>n</var>-bit number and raises exactly one of
+its 2<sup><var>n</var></sup> output lines &mdash; the one whose index matches the input.
+It converts a binary code into a position.</p>
+
+<figure class="fig" style="--figmax:17rem">
+<svg viewBox="0 0 330 200" role="img" aria-label="exactly one output is 1">
+<rect class="blk" x="140" y="45.0" width="120" height="130" rx="5"/>
+<path class="wire" d="M124 77.5L140 77.5"/>
+<path class="wire" d="M124 142.5L140 142.5"/>
+<path class="wire" d="M260 61.2L276 61.2"/>
+<path class="wire" d="M260 93.8L276 93.8"/>
+<path class="wire" d="M260 126.2L276 126.2"/>
+<path class="wire" d="M260 158.8L276 158.8"/>
+<text class="blab" x="200.0" y="111" text-anchor="middle">2-to-4</text>
+<text class="bsub" x="200.0" y="127" text-anchor="middle">decoder</text>
+<text class="lbl" x="116" y="82.5" text-anchor="end">S<tspan class="sub">1</tspan></text>
+<text class="lbl" x="116" y="147.5" text-anchor="end">S<tspan class="sub">0</tspan></text>
+<text class="lbl" x="284" y="66.2" text-anchor="start">Y<tspan class="sub">0</tspan></text>
+<text class="lbl" x="284" y="98.8" text-anchor="start">Y<tspan class="sub">1</tspan></text>
+<text class="lbl" x="284" y="131.2" text-anchor="start">Y<tspan class="sub">2</tspan></text>
+<text class="lbl" x="284" y="163.8" text-anchor="start">Y<tspan class="sub">3</tspan></text>
+</svg>
+<figcaption>exactly one output is 1</figcaption></figure>
+
+<div class="tablewrap"><table class="ttab">
+<thead><tr><th>S<tspan class="sub">1</tspan></th><th>S<tspan class="sub">0</tspan></th><th>Y<tspan class="sub">0</tspan></th><th>Y<tspan class="sub">1</tspan></th><th>Y<tspan class="sub">2</tspan></th><th>Y<tspan class="sub">3</tspan></th></tr></thead>
+<tbody><tr><td class="bin">0</td><td class="bin">0</td><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td></tr><tr><td class="bin">0</td><td class="bin">1</td><td class="bin">0</td><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td></tr><tr><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin">1</td><td class="bin">0</td></tr><tr><td class="bin">1</td><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin">1</td></tr></tbody></table></div>
+
+<p>Each output is 1 for exactly one input combination, so each output is a
+<em>minterm</em> of the select inputs &mdash; the same minterms as Set 5, now with one
+AND gate apiece:</p>
+
+<figure class="fig" style="--figmax:27rem">
+<svg viewBox="0 0 420 300" role="img" aria-label="one AND gate per output, each matching a different input combination">
+<path class="wire" d="M150 32.5H160M150 47.5H160"/>
+<path class="gate" d="M158 25.0H172A15.0 15.0 0 0 1 172 55.0H158Z"/>
+<path class="wire" d="M187.0 40H196.0"/>
+<path class="wire" d="M150 102.5H160M150 117.5H160"/>
+<path class="gate" d="M158 95.0H172A15.0 15.0 0 0 1 172 125.0H158Z"/>
+<path class="wire" d="M187.0 110H196.0"/>
+<path class="wire" d="M150 172.5H160M150 187.5H160"/>
+<path class="gate" d="M158 165.0H172A15.0 15.0 0 0 1 172 195.0H158Z"/>
+<path class="wire" d="M187.0 180H196.0"/>
+<path class="wire" d="M150 242.5H160M150 257.5H160"/>
+<path class="gate" d="M158 235.0H172A15.0 15.0 0 0 1 172 265.0H158Z"/>
+<path class="wire" d="M187.0 250H196.0"/>
+<path class="wire" d="M100 32.5L150 32.5"/>
+<text class="lbl" x="96" y="37.5" text-anchor="end">S<tspan class="sub">1</tspan>&prime;</text>
+<path class="wire" d="M100 47.5L150 47.5"/>
+<text class="lbl" x="96" y="52.5" text-anchor="end">S<tspan class="sub">0</tspan>&prime;</text>
+<path class="wire" d="M196.0 40L216.0 40"/>
+<text class="lbl" x="224.0" y="45" text-anchor="start">Y<tspan class="sub">0</tspan> = S<tspan class="sub">1</tspan>&prime;S<tspan class="sub">0</tspan>&prime;</text>
+<path class="wire" d="M100 102.5L150 102.5"/>
+<text class="lbl" x="96" y="107.5" text-anchor="end">S<tspan class="sub">1</tspan>&prime;</text>
+<path class="wire" d="M100 117.5L150 117.5"/>
+<text class="lbl" x="96" y="122.5" text-anchor="end">S<tspan class="sub">0</tspan></text>
+<path class="wire" d="M196.0 110L216.0 110"/>
+<text class="lbl" x="224.0" y="115" text-anchor="start">Y<tspan class="sub">1</tspan> = S<tspan class="sub">1</tspan>&prime;S<tspan class="sub">0</tspan></text>
+<path class="wire" d="M100 172.5L150 172.5"/>
+<text class="lbl" x="96" y="177.5" text-anchor="end">S<tspan class="sub">1</tspan></text>
+<path class="wire" d="M100 187.5L150 187.5"/>
+<text class="lbl" x="96" y="192.5" text-anchor="end">S<tspan class="sub">0</tspan>&prime;</text>
+<path class="wire" d="M196.0 180L216.0 180"/>
+<text class="lbl" x="224.0" y="185" text-anchor="start">Y<tspan class="sub">2</tspan> = S<tspan class="sub">1</tspan>S<tspan class="sub">0</tspan>&prime;</text>
+<path class="wire" d="M100 242.5L150 242.5"/>
+<text class="lbl" x="96" y="247.5" text-anchor="end">S<tspan class="sub">1</tspan></text>
+<path class="wire" d="M100 257.5L150 257.5"/>
+<text class="lbl" x="96" y="262.5" text-anchor="end">S<tspan class="sub">0</tspan></text>
+<path class="wire" d="M196.0 250L216.0 250"/>
+<text class="lbl" x="224.0" y="255" text-anchor="start">Y<tspan class="sub">3</tspan> = S<tspan class="sub">1</tspan>S<tspan class="sub">0</tspan></text>
+</svg>
+<figcaption>one AND gate per output, each matching a different input combination</figcaption></figure>
+
+<p>A pattern with exactly one 1 in it is called <strong>one-hot</strong>, and that is
+what a decoder produces. It is the natural shape for &ldquo;pick one of these&rdquo;:
+one wire per choice, and the wire that is high is the choice.</p>
+
+<p>With one-hot lines available, a multiplexer is easy. AND each data input with its own
+decoder line &mdash; which passes that input through when its line is high and forces 0
+otherwise &mdash; then OR the results, since at most one of them can be non-zero:</p>
+
+<figure class="fig" style="--figmax:100%">
+<svg viewBox="0 0 560 270" role="img" aria-label="the decoder picks one line; the ANDs let only that input through">
+<rect class="blk" x="110" y="55.0" width="104" height="150" rx="5"/>
+<path class="wire" d="M94 92.5L110 92.5"/>
+<path class="wire" d="M94 167.5L110 167.5"/>
+<path class="wire" d="M214 73.8L230 73.8"/>
+<path class="wire" d="M214 111.2L230 111.2"/>
+<path class="wire" d="M214 148.8L230 148.8"/>
+<path class="wire" d="M214 186.2L230 186.2"/>
+<text class="blab" x="162.0" y="131" text-anchor="middle">2-to-4</text>
+<text class="bsub" x="162.0" y="147" text-anchor="middle">decoder</text>
+<path class="wire" d="M310 73.3H320M310 88.3H320"/>
+<path class="gate" d="M318 65.8H332A15.0 15.0 0 0 1 332 95.8H318Z"/>
+<path class="wire" d="M347.0 80.8H356.0"/>
+<path class="wire" d="M310 110.7H320M310 125.7H320"/>
+<path class="gate" d="M318 103.2H332A15.0 15.0 0 0 1 332 133.2H318Z"/>
+<path class="wire" d="M347.0 118.2H356.0"/>
+<path class="wire" d="M310 148.3H320M310 163.3H320"/>
+<path class="gate" d="M318 140.8H332A15.0 15.0 0 0 1 332 170.8H318Z"/>
+<path class="wire" d="M347.0 155.8H356.0"/>
+<path class="wire" d="M310 185.7H320M310 200.7H320"/>
+<path class="gate" d="M318 178.2H332A15.0 15.0 0 0 1 332 208.2H318Z"/>
+<path class="wire" d="M347.0 193.2H356.0"/>
+<path class="wire" d="M440 108.2H457M440 122.8H457M440 137.2H457M440 151.8H457"/>
+<path class="gate" d="M448 101.0C466 101.0 474 116.1 479 130C474 143.9 466 159.0 448 159.0Q457 130 448 101.0Z"/>
+<path class="wire" d="M479 130H488"/>
+<text class="lbl" x="86" y="97.5" text-anchor="end">S<tspan class="sub">1</tspan></text>
+<text class="lbl" x="86" y="172.5" text-anchor="end">S<tspan class="sub">0</tspan></text>
+<path class="wire" d="M230 73.8L310 73.3"/>
+<path class="wire" d="M272 88.3L310 88.3"/>
+<text class="lbl" x="268" y="93.3" text-anchor="end">D<tspan class="sub">0</tspan></text>
+<path class="wire" d="M356.0 80.8L398 80.8L398 108.2L440 108.2"/>
+<path class="wire" d="M230 111.2L310 110.7"/>
+<path class="wire" d="M272 125.7L310 125.7"/>
+<text class="lbl" x="268" y="130.7" text-anchor="end">D<tspan class="sub">1</tspan></text>
+<path class="wire" d="M356.0 118.2L404 118.2L404 122.8L440 122.8"/>
+<path class="wire" d="M230 148.8L310 148.3"/>
+<path class="wire" d="M272 163.3L310 163.3"/>
+<text class="lbl" x="268" y="168.3" text-anchor="end">D<tspan class="sub">2</tspan></text>
+<path class="wire" d="M356.0 155.8L410 155.8L410 137.2L440 137.2"/>
+<path class="wire" d="M230 186.2L310 185.7"/>
+<path class="wire" d="M272 200.7L310 200.7"/>
+<text class="lbl" x="268" y="205.7" text-anchor="end">D<tspan class="sub">3</tspan></text>
+<path class="wire" d="M356.0 193.2L416 193.2L416 151.8L440 151.8"/>
+<path class="wire" d="M488 130L512 130"/>
+<text class="lbl" x="520" y="135" text-anchor="start">F</text>
+</svg>
+<figcaption>the decoder picks one line; the ANDs let only that input through</figcaption></figure>
+
+<div class="box note"><span class="bt">Decoders on their own</span>
+<p>Decoders are not only multiplexer parts. Any time a binary code has to turn into
+&ldquo;activate exactly this one thing&rdquo;, a decoder is the circuit: choosing one
+row of a memory from an address, choosing one register from a register number, or
+choosing which unit acts on an instruction&rsquo;s opcode. The MIPS machinery later in
+the course uses them for all three.</p></div>
+
+<h2 id="univ"><span class="secnum">9.4</span>Multiplexers are universal</h2>
+
+<p>Set 7 showed NAND alone can build any circuit. The multiplexer can too &mdash; which
+is a surprise, since it looks like a routing component rather than a computing one.</p>
+
+<p>The argument is short. Feed a 2:1 multiplexer <em>constants</em> on its data inputs
+and a variable on its select:</p>
+
+<p style="text-align:center;font-size:1.05rem">
+MUX(S = A, &nbsp;0&rarr;1, &nbsp;1&rarr;0) = A&prime;</p>
+
+<p>so it can invert. Exercise 9.9 gets AND and OR the same way, and with NOT, AND and OR
+available, Set 5&rsquo;s sum-of-products construction finishes the job.</p>
+
+<p>More directly: a 2<sup><var>n</var></sup>:1 multiplexer <em>is</em> a truth table. Put
+the <var>n</var> variables on the select lines and the output column on the data inputs,
+and the device looks up the answer. That is Exercise 9.10, and it is the cleanest way to
+see why no function can be out of reach.</p>
+
+<h2 id="alu"><span class="secnum">9.5</span>A 1-bit ALU</h2>
+
+<p>Now the payoff. Compute <em>all</em> the candidate results at once, in parallel, and
+let a multiplexer pick the one that was asked for. Start with two logical operations:</p>
+
+<figure class="fig" style="--figmax:100%">
+<svg viewBox="0 0 560 200" role="img" aria-label="a 1-bit ALU that can do AND and OR">
+<path class="wire" d="M250 37.5H260M250 52.5H260"/>
+<path class="gate" d="M258 30.0H272A15.0 15.0 0 0 1 272 60.0H258Z"/>
+<path class="wire" d="M287.0 45H296.0"/>
+<path class="wire" d="M250 122.5H267M250 137.5H267"/>
+<path class="gate" d="M258 115.0C276 115.0 284 122.8 289 130C284 137.2 276 145.0 258 145.0Q267 130 258 115.0Z"/>
+<path class="wire" d="M289 130H298"/>
+<path class="blk" d="M400 86.0L446 98.24L446 141.76L400 154.0Z"/>
+<path class="wire" d="M384 103.0L400 103.0"/>
+<path class="wire" d="M384 137.0L400 137.0"/>
+<path class="wire" d="M446 120L462 120"/>
+<path class="wire" d="M419.32 148.492L419.32 170.0"/>
+<text class="lbl" x="22" y="31" text-anchor="end">A</text>
+<text class="lbl" x="22" y="97" text-anchor="end">B</text>
+<path class="wire" d="M30 26L150 26"/>
+<circle class="dot" cx="150" cy="26" r="3.2"/>
+<path class="wire" d="M150 26L150 37.5L250 37.5"/>
+<path class="wire" d="M150 26L150 122.5L250 122.5"/>
+<path class="wire" d="M30 92L175 92"/>
+<circle class="dot" cx="175" cy="92" r="3.2"/>
+<path class="wire" d="M175 92L175 52.5L250 52.5"/>
+<path class="wire" d="M175 92L175 137.5L250 137.5"/>
+<path class="wire" d="M296.0 45L360 45L360 103.0L384 103.0"/>
+<path class="wire" d="M298 130L366 130L366 137.0L384 137.0"/>
+<text class="lbl" x="470" y="125" text-anchor="start">Result</text>
+<text class="lbl" x="419.32" y="188.0" text-anchor="middle">operation</text>
+</svg>
+<figcaption>a 1-bit ALU that can do AND and OR</figcaption></figure>
+
+<p>Both gates always run. The AND gate computes A&middot;B whether or not anyone wants
+it, and the multiplexer discards it when the operation code says OR. That feels wasteful
+and is not: the gates are small, they all work simultaneously, and selecting afterwards
+costs one multiplexer delay rather than the time it would take to decide first and then
+compute.</p>
+
+<h2 id="sub"><span class="secnum">9.6</span>Adding and subtracting</h2>
+
+<p>Adding arithmetic means adding a third input to the multiplexer &mdash; which means a
+4:1 &mdash; and wiring the full adder from Set 8 into it:</p>
+
+<figure class="fig" style="--figmax:100%">
+<svg viewBox="0 0 560 330" role="img" aria-label="the same ALU with the adder added, selected by a 4:1 multiplexer">
+<path class="wire" d="M250 37.5H260M250 52.5H260"/>
+<path class="gate" d="M258 30.0H272A15.0 15.0 0 0 1 272 60.0H258Z"/>
+<path class="wire" d="M287.0 45H296.0"/>
+<path class="wire" d="M250 122.5H267M250 137.5H267"/>
+<path class="gate" d="M258 115.0C276 115.0 284 122.8 289 130C284 137.2 276 145.0 258 145.0Q267 130 258 115.0Z"/>
+<path class="wire" d="M289 130H298"/>
+<path class="blk" d="M400 82.0L446 96.0L446 204.0L400 218.0Z"/>
+<path class="wire" d="M384 99.0L400 99.0"/>
+<path class="wire" d="M384 133.0L400 133.0"/>
+<path class="wire" d="M384 167.0L400 167.0"/>
+<path class="wire" d="M384 201.0L400 201.0"/>
+<path class="wire" d="M446 150L462 150"/>
+<path class="wire" d="M419.32 211.7L419.32 234.0"/>
+<text class="lbl" x="22" y="31" text-anchor="end">A</text>
+<text class="lbl" x="22" y="97" text-anchor="end">B</text>
+<path class="wire" d="M30 26L150 26"/>
+<circle class="dot" cx="150" cy="26" r="3.2"/>
+<path class="wire" d="M150 26L150 37.5L250 37.5"/>
+<path class="wire" d="M150 26L150 122.5L250 122.5"/>
+<path class="wire" d="M30 92L175 92"/>
+<circle class="dot" cx="175" cy="92" r="3.2"/>
+<path class="wire" d="M175 92L175 52.5L250 52.5"/>
+<path class="wire" d="M175 92L175 137.5L250 137.5"/>
+<path class="wire" d="M296.0 45L360 45L360 99.0L384 99.0"/>
+<path class="wire" d="M298 130L366 130L366 133.0L384 133.0"/>
+<rect class="blk" x="250" y="215.0" width="104" height="70" rx="5"/>
+<path class="wire" d="M234 232.5L250 232.5"/>
+<path class="wire" d="M234 267.5L250 267.5"/>
+<path class="wire" d="M354 232.5L370 232.5"/>
+<path class="wire" d="M354 267.5L370 267.5"/>
+<text class="blab" x="302.0" y="251" text-anchor="middle">Full</text>
+<text class="bsub" x="302.0" y="267" text-anchor="middle">Adder</text>
+<path class="wire" d="M150 26L150 232.5L234 232.5"/>
+<path class="wire" d="M370 232.5L372 232.5L372 167.0L384 167.0"/>
+<text class="lbl" x="378" y="272.5" text-anchor="start">C<tspan class="sub">out</tspan></text>
+<text class="lbl" x="240" y="201.0" text-anchor="end">C<tspan class="sub">in</tspan></text>
+<path class="wire" d="M244 197.0L270 197.0L270 215.0"/>
+<path class="wire" d="M368 201.0L384 201.0"/>
+<text class="lbl" x="362" y="206.0" text-anchor="end">0</text>
+<path class="wire" d="M175 92L175 267.5L234 267.5"/>
+<text class="lbl" x="470" y="155" text-anchor="start">Result</text>
+<text class="lbl" x="419.32" y="252.0" text-anchor="middle">operation</text>
+</svg>
+<figcaption>the same ALU with the adder added, selected by a 4:1 multiplexer</figcaption></figure>
+
+<div class="tablewrap"><table class="lawtab">
+<thead><tr><th>operation</th><th>what the ALU does</th><th>which MUX input</th></tr></thead>
+<tbody><tr><td class="lawcell">00</td><td class="lawcell">A &middot; B</td><td class="lawcell">D<tspan class="sub">0</tspan></td></tr><tr><td class="lawcell">01</td><td class="lawcell">A + B</td><td class="lawcell">D<tspan class="sub">1</tspan></td></tr><tr><td class="lawcell">10</td><td class="lawcell">A + B + C<tspan class="sub">in</tspan></td><td class="lawcell">D<tspan class="sub">2</tspan></td></tr></tbody></table></div>
+
+<p>And subtraction needs no fourth operation at all. Set 8 ended with the observation
+that A&nbsp;&minus;&nbsp;B is A&nbsp;+&nbsp;B&prime;&nbsp;+&nbsp;1: flip every bit of B,
+and add one. Both halves are already affordable. Put an XOR on the B input, controlled by
+a line called <strong>B invert</strong>, and that XOR passes B through when the line is 0
+and inverts it when the line is 1 &mdash; the conditional inverter of Exercise 4.3. Then
+feed that same control line into the carry in of the lowest bit, and it supplies the
+&ldquo;+1&rdquo;.</p>
+
+<figure class="fig" style="--figmax:100%">
+<svg viewBox="0 0 560 330" role="img" aria-label="one XOR per bit turns B into B&prime;, and the carry in supplies the +1">
+<path class="wire" d="M250 37.5H260M250 52.5H260"/>
+<path class="gate" d="M258 30.0H272A15.0 15.0 0 0 1 272 60.0H258Z"/>
+<path class="wire" d="M287.0 45H296.0"/>
+<path class="wire" d="M250 122.5H267M250 137.5H267"/>
+<path class="gate" d="M258 115.0C276 115.0 284 122.8 289 130C284 137.2 276 145.0 258 145.0Q267 130 258 115.0Z"/>
+<path class="wire" d="M289 130H298"/>
+<path class="blk" d="M400 82.0L446 96.0L446 204.0L400 218.0Z"/>
+<path class="wire" d="M384 99.0L400 99.0"/>
+<path class="wire" d="M384 133.0L400 133.0"/>
+<path class="wire" d="M384 167.0L400 167.0"/>
+<path class="wire" d="M384 201.0L400 201.0"/>
+<path class="wire" d="M446 150L462 150"/>
+<path class="wire" d="M419.32 211.7L419.32 234.0"/>
+<text class="lbl" x="22" y="31" text-anchor="end">A</text>
+<text class="lbl" x="22" y="97" text-anchor="end">B</text>
+<path class="wire" d="M30 26L150 26"/>
+<circle class="dot" cx="150" cy="26" r="3.2"/>
+<path class="wire" d="M150 26L150 37.5L250 37.5"/>
+<path class="wire" d="M150 26L150 122.5L250 122.5"/>
+<path class="wire" d="M296.0 45L360 45L360 99.0L384 99.0"/>
+<path class="wire" d="M298 130L366 130L366 133.0L384 133.0"/>
+<rect class="blk" x="250" y="215.0" width="104" height="70" rx="5"/>
+<path class="wire" d="M234 232.5L250 232.5"/>
+<path class="wire" d="M234 267.5L250 267.5"/>
+<path class="wire" d="M354 232.5L370 232.5"/>
+<path class="wire" d="M354 267.5L370 267.5"/>
+<text class="blab" x="302.0" y="251" text-anchor="middle">Full</text>
+<text class="bsub" x="302.0" y="267" text-anchor="middle">Adder</text>
+<path class="wire" d="M150 26L150 232.5L234 232.5"/>
+<path class="wire" d="M370 232.5L372 232.5L372 167.0L384 167.0"/>
+<text class="lbl" x="378" y="272.5" text-anchor="start">C<tspan class="sub">out</tspan></text>
+<text class="lbl" x="240" y="201.0" text-anchor="end">C<tspan class="sub">in</tspan></text>
+<path class="wire" d="M244 197.0L270 197.0L270 215.0"/>
+<path class="wire" d="M368 201.0L384 201.0"/>
+<text class="lbl" x="362" y="206.0" text-anchor="end">0</text>
+<path class="wire" d="M150 142.5H167M150 157.5H167"/>
+<path class="gate open" d="M152 165.0Q161 150 152 135.0"/>
+<path class="gate" d="M158 135.0C176 135.0 184 142.8 189 150C184 157.2 176 165.0 158 165.0Q167 150 158 135.0Z"/>
+<path class="wire" d="M189 150H198"/>
+<path class="wire" d="M30 92L100 92L100 142.5L150 142.5"/>
+<text class="lbl" x="92" y="215" text-anchor="end">B invert</text>
+<path class="wire" d="M98 210L120 210L120 157.5L150 157.5"/>
+<path class="wire" d="M198 150L205 150"/>
+<circle class="dot" cx="205" cy="150" r="3.2"/>
+<path class="wire" d="M205 150L205 52.5L250 52.5"/>
+<path class="wire" d="M205 150L205 137.5L250 137.5"/>
+<path class="wire" d="M205 150L205 267.5L234 267.5"/>
+<text class="lbl" x="470" y="155" text-anchor="start">Result</text>
+<text class="lbl" x="419.32" y="252.0" text-anchor="middle">operation</text>
+</svg>
+<figcaption>one XOR per bit turns B into B&prime;, and the carry in supplies the +1</figcaption></figure>
+
+<p>So the subtract path costs one XOR per bit and one wire. There is no subtractor
+anywhere in a processor; there is an adder and a control line.</p>
+
+<h2 id="wide"><span class="secnum">9.7</span>From 1 bit to 32</h2>
+
+<p>A 32-bit ALU is 32 copies of the 1-bit one, stacked. Bit <var>k</var> gets
+A<sub><var>k</var></sub> and B<sub><var>k</var></sub> and produces
+Result<sub><var>k</var></sub>.</p>
+
+<figure class="fig" style="--figmax:25rem">
+<svg viewBox="0 0 600 384" role="img" aria-label="a 32-bit ALU is 32 copies of the 1-bit one">
+<rect class="blk" x="190" y="42.0" width="160" height="56" rx="5"/>
+<path class="wire" d="M174 56.0L190 56.0"/>
+<path class="wire" d="M174 84.0L190 84.0"/>
+<path class="wire" d="M350 70.0L366 70.0"/>
+<text class="blab" x="270.0" y="71" text-anchor="middle">ALU</text>
+<text class="bsub" x="270.0" y="87" text-anchor="middle">bit 31</text>
+<text class="lbl" x="168" y="60.0" text-anchor="end">A<tspan class="sub">31</tspan></text>
+<text class="lbl" x="168" y="88.0" text-anchor="end">B<tspan class="sub">31</tspan></text>
+<text class="lbl" x="372" y="74.0" text-anchor="start">Result<tspan class="sub">31</tspan></text>
+<rect class="blk" x="190" y="162.0" width="160" height="56" rx="5"/>
+<path class="wire" d="M174 176.0L190 176.0"/>
+<path class="wire" d="M174 204.0L190 204.0"/>
+<path class="wire" d="M350 190.0L366 190.0"/>
+<text class="blab" x="270.0" y="191" text-anchor="middle">ALU</text>
+<text class="bsub" x="270.0" y="207" text-anchor="middle">bit 1</text>
+<text class="lbl" x="168" y="180.0" text-anchor="end">A<tspan class="sub">1</tspan></text>
+<text class="lbl" x="168" y="208.0" text-anchor="end">B<tspan class="sub">1</tspan></text>
+<text class="lbl" x="372" y="194.0" text-anchor="start">Result<tspan class="sub">1</tspan></text>
+<rect class="blk" x="190" y="242.0" width="160" height="56" rx="5"/>
+<path class="wire" d="M174 256.0L190 256.0"/>
+<path class="wire" d="M174 284.0L190 284.0"/>
+<path class="wire" d="M350 270.0L366 270.0"/>
+<text class="blab" x="270.0" y="271" text-anchor="middle">ALU</text>
+<text class="bsub" x="270.0" y="287" text-anchor="middle">bit 0</text>
+<text class="lbl" x="168" y="260.0" text-anchor="end">A<tspan class="sub">0</tspan></text>
+<text class="lbl" x="168" y="288.0" text-anchor="end">B<tspan class="sub">0</tspan></text>
+<text class="lbl" x="372" y="274.0" text-anchor="start">Result<tspan class="sub">0</tspan></text>
+<path class="wire" d="M218 242.0L218 218.0"/>
+<text class="ann" x="226" y="234.0" text-anchor="start">C<tspan class="sub">1</tspan></text>
+<path class="wire" d="M218 298.0L218 328.0"/>
+<text class="ann" x="226" y="322.0" text-anchor="start">C<tspan class="sub">0</tspan></text>
+<path class="wire" d="M218 42.0L218 12.0"/>
+<text class="ann" x="226" y="24.0" text-anchor="start">C<tspan class="sub">32</tspan></text>
+<path class="wire" d="M218 162.0L218 128.0"/>
+<text class="lbl" x="270" y="150" text-anchor="middle">&middot;&nbsp;&middot;&nbsp;&middot;</text>
+<text class="ann" x="150" y="352" text-anchor="start">the operation code and B invert reach every bit</text>
+<text class="ann" x="150" y="368" text-anchor="start">the carry passes from each bit to the next</text>
+</svg>
+<figcaption>a 32-bit ALU is 32 copies of the 1-bit one</figcaption></figure>
+
+<p>Two things are shared across the whole stack and one is not. The <strong>operation
+code</strong> goes to every bit, since all 32 bits must do the same thing &mdash; and so
+does <strong>B invert</strong>. What is not shared is the <strong>carry</strong>: the
+carry out of bit <var>k</var> becomes the carry in of bit <var>k</var>&nbsp;+&nbsp;1,
+which is the ripple chain of Set 8 running up the stack.</p>
+
+<p>That chain is also the only slow part. The AND, the OR and the multiplexer in each bit
+are a couple of gate delays, all happening at once across the whole width; the carry has
+to travel 32 stages. An ALU&rsquo;s speed is its adder&rsquo;s speed.</p>
+
+<h2 id="ref"><span class="secnum">9.8</span>Reference</h2>
+
+<ul>
+<li><strong>2:1 MUX.</strong> F&nbsp;=&nbsp;S&prime;A&nbsp;+&nbsp;SB. S&nbsp;=&nbsp;0
+selects A.</li>
+<li><strong>2<sup><var>n</var></sup>:1 MUX.</strong> <var>n</var> select lines, one
+product term per data input. Build recursively from 2:1s, or from a decoder plus ANDs
+and an OR.</li>
+<li><strong><var>n</var>-to-2<sup><var>n</var></sup> decoder.</strong> One output per
+input combination, exactly one of them 1 &mdash; one-hot. Each output is a minterm.</li>
+<li><strong>Universality.</strong> A 2<sup><var>n</var></sup>:1 multiplexer with the
+variables on its selects and the output column on its data inputs computes any
+<var>n</var>-variable function.</li>
+<li><strong>1-bit ALU.</strong> Compute every candidate result in parallel; select with
+a multiplexer driven by the operation code.</li>
+<li><strong>Subtraction.</strong> B invert = 1 inverts B through an XOR and supplies the
+carry in of 1, so the adder computes A&nbsp;&minus;&nbsp;B.</li>
+<li><strong>32-bit ALU.</strong> 32 copies; operation and B invert shared; the carry
+chains from each bit to the next.</li>
+</ul>
+
+<h2 id="exercises"><span class="secnum">9.9</span>Exercises</h2>
+
+<p>Throughout, S&nbsp;=&nbsp;0 selects the first data input, and S<sub>1</sub> is the
+more significant of two select lines. Where a question says &ldquo;draw&rdquo;, a block
+diagram is enough unless it asks for gates.</p>
+
+<h3>Multiplexers</h3>
+
+<details class="prob"><summary data-label="Exercise 9.1">Give the truth table of a 2:1 multiplexer with inputs A, B and select S, and write the expression. Why is the table of a 2:1 multiplexer eight rows when the device has only two data inputs?</summary><div class="sol">
+<div class="tablewrap"><table class="ttab">
+<thead><tr><th>S</th><th>A</th><th>B</th><th>F</th></tr></thead>
+<tbody><tr><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin hilite">0</td></tr><tr><td class="bin">0</td><td class="bin">0</td><td class="bin">1</td><td class="bin hilite">0</td></tr><tr><td class="bin">0</td><td class="bin">1</td><td class="bin">0</td><td class="bin hilite">1</td></tr><tr><td class="bin">0</td><td class="bin">1</td><td class="bin">1</td><td class="bin hilite">1</td></tr><tr><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin hilite">0</td></tr><tr><td class="bin">1</td><td class="bin">0</td><td class="bin">1</td><td class="bin hilite">1</td></tr><tr><td class="bin">1</td><td class="bin">1</td><td class="bin">0</td><td class="bin hilite">0</td></tr><tr><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td><td class="bin hilite">1</td></tr></tbody></table></div>
+<p style="text-align:center;font-size:1.05rem">
+F = S&prime;A + SB</p>
+<p><strong>Eight rows</strong> because a truth table has one row per combination of
+<em>all</em> the inputs, and the select line is an input like any other. Three wires in,
+so 2<sup>3</sup>&nbsp;=&nbsp;8 rows. The select is special in what it <em>means</em>, not
+in how the circuit treats it.</p>
+<p>Reading the table in halves makes the behaviour obvious: in the four rows with
+S&nbsp;=&nbsp;0 the F column copies the A column and ignores B; in the four rows with
+S&nbsp;=&nbsp;1 it copies B and ignores A.</p>
+<p>That is also a good check on any multiplexer answer. If F ever disagrees with the
+selected input, something is wired wrong; if F depends on the unselected input,
+something is wired very wrong.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 9.2">Draw a 2:1 multiplexer from AND, OR and NOT gates, and count them. Then say how many gates it costs in pure NAND.</summary><div class="sol">
+<figure class="fig" style="--figmax:100%">
+<svg viewBox="0 0 520 280" role="img" aria-label="F = S&prime;A + SB">
+<path class="wire" d="M110 200.0H121"/>
+<path class="gate" d="M118 186.0L142 200L118 214.0Z"/>
+<circle class="gate" cx="146" cy="200" r="4"/>
+<path class="wire" d="M150 200H159"/>
+<path class="wire" d="M250 37.5H260M250 52.5H260"/>
+<path class="gate" d="M258 30.0H272A15.0 15.0 0 0 1 272 60.0H258Z"/>
+<path class="wire" d="M287.0 45H296.0"/>
+<path class="wire" d="M250 132.5H260M250 147.5H260"/>
+<path class="gate" d="M258 125.0H272A15.0 15.0 0 0 1 272 155.0H258Z"/>
+<path class="wire" d="M287.0 140H296.0"/>
+<path class="wire" d="M390 87.5H407M390 102.5H407"/>
+<path class="gate" d="M398 80.0C416 80.0 424 87.8 429 95C424 102.2 416 110.0 398 110.0Q407 95 398 80.0Z"/>
+<path class="wire" d="M429 95H438"/>
+<text class="lbl" x="22" y="35" text-anchor="end">A</text>
+<path class="wire" d="M30 30L232 30L232 37.5L250 37.5"/>
+<text class="lbl" x="22" y="115" text-anchor="end">B</text>
+<path class="wire" d="M30 110L226 110L226 147.5L250 147.5"/>
+<text class="lbl" x="22" y="205" text-anchor="end">S</text>
+<path class="wire" d="M30 200L72 200"/>
+<circle class="dot" cx="72" cy="200" r="3.2"/>
+<path class="wire" d="M72 200L110 200"/>
+<path class="wire" d="M72 200L72 250L190 250L190 132.5L250 132.5"/>
+<path class="wire" d="M159 200L210 200L210 52.5L250 52.5"/>
+<path class="wire" d="M296.0 45L352 45L352 87.5L390 87.5"/>
+<path class="wire" d="M296.0 140L358 140L358 102.5L390 102.5"/>
+<path class="wire" d="M438 95L464 95"/>
+<text class="lbl" x="472" y="100" text-anchor="start">F</text>
+<text class="ann" x="161" y="191" text-anchor="start">S&prime;</text>
+<text class="ann" x="298.0" y="36" text-anchor="start">S&prime;A</text>
+<text class="ann" x="298.0" y="159" text-anchor="start">SB</text>
+</svg>
+<figcaption>F = S&prime;A + SB</figcaption></figure>
+<p><strong>Four gates:</strong> one inverter for S&prime;, two ANDs to form the two
+product terms, and one OR to collect them. S fans out to the inverter and to the lower
+AND.</p>
+<p>The structure is the two-level AND&ndash;OR shape of Set 5, which is no accident
+&mdash; S&prime;A&nbsp;+&nbsp;SB is a sum of products, and this is its standard
+circuit.</p>
+<p><strong>In pure NAND</strong>, the rule from Exercise 7.13 applies: a <var>k</var>-term
+sum of products costs <var>k</var>&nbsp;+&nbsp;1 NAND gates plus one per complemented
+variable. Here <var>k</var>&nbsp;=&nbsp;2 and one variable appears complemented, so
+2&nbsp;+&nbsp;1&nbsp;+&nbsp;1 = <strong>four NAND gates</strong> &mdash; the same count,
+and in real silicon cheaper, for the reasons in Exercise 7.14.</p>
+<p>Four gates for a device this useful is the reason multiplexers are everywhere in a
+processor rather than being saved for special occasions.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 9.3">Write the expression for a 4:1 multiplexer with data inputs D<sub>0</sub> to D<sub>3</sub>. How many gates does the direct two-level implementation need, and how many inputs does the widest gate have?</summary><div class="sol">
+<p>One product term per data input, each guarded by the select combination that names
+it:</p>
+<p style="text-align:center;font-size:1.05rem">
+F = S<sub>1</sub>&prime;S<sub>0</sub>&prime;D<sub>0</sub>
++ S<sub>1</sub>&prime;S<sub>0</sub>D<sub>1</sub>
++ S<sub>1</sub>S<sub>0</sub>&prime;D<sub>2</sub>
++ S<sub>1</sub>S<sub>0</sub>D<sub>3</sub></p>
+<p><strong>The count.</strong> Two inverters for S<sub>1</sub>&prime; and
+S<sub>0</sub>&prime;, four 3-input ANDs, and one 4-input OR: <strong>seven gates</strong>,
+19 gate inputs.</p>
+<p><strong>The widest gate</strong> is the OR, with four inputs &mdash; one per data
+input. That is the part that does not scale: a 16:1 multiplexer built this way needs a
+16-input OR and sixteen 5-input ANDs, and gates that wide are not available as single
+parts. Exercise 9.4 shows the usual way round it.</p>
+<p>Notice the select terms are exactly the four minterms of S<sub>1</sub> and
+S<sub>0</sub>, each appearing once. That observation is what makes the decoder
+construction of Exercise 9.8 work &mdash; a decoder produces precisely those four
+signals.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 9.4">Build a 4:1 multiplexer out of 2:1 multiplexers. How many do you need, how are the select lines wired, and how many would an 8:1 take?</summary><div class="sol">
+<figure class="fig" style="--figmax:27rem">
+<svg viewBox="0 0 470 320" role="img" aria-label="a 4:1 multiplexer from three 2:1 multiplexers">
+<path class="blk" d="M170 26.0L216 38.24L216 81.76L170 94.0Z"/>
+<path class="wire" d="M154 43.0L170 43.0"/>
+<path class="wire" d="M154 77.0L170 77.0"/>
+<path class="wire" d="M216 60L232 60"/>
+<path class="wire" d="M189.32 88.492L189.32 110.0"/>
+<path class="blk" d="M170 156.0L216 168.24L216 211.76L170 224.0Z"/>
+<path class="wire" d="M154 173.0L170 173.0"/>
+<path class="wire" d="M154 207.0L170 207.0"/>
+<path class="wire" d="M216 190L232 190"/>
+<path class="wire" d="M189.32 218.492L189.32 240.0"/>
+<path class="blk" d="M330 91.0L376 103.24L376 146.76L330 159.0Z"/>
+<path class="wire" d="M314 108.0L330 108.0"/>
+<path class="wire" d="M314 142.0L330 142.0"/>
+<path class="wire" d="M376 125L392 125"/>
+<path class="wire" d="M349.32 153.492L349.32 175.0"/>
+<text class="lbl" x="146" y="48.0" text-anchor="end">D<tspan class="sub">0</tspan></text>
+<text class="lbl" x="146" y="82.0" text-anchor="end">D<tspan class="sub">1</tspan></text>
+<text class="lbl" x="146" y="178.0" text-anchor="end">D<tspan class="sub">2</tspan></text>
+<text class="lbl" x="146" y="212.0" text-anchor="end">D<tspan class="sub">3</tspan></text>
+<path class="wire" d="M232 60L300 60L300 108.0L314 108.0"/>
+<path class="wire" d="M232 190L300 190L300 142.0L314 142.0"/>
+<text class="lbl" x="400" y="130" text-anchor="start">F</text>
+<path class="wire" d="M189.32 110.0L189.32 262"/>
+<path class="wire" d="M189.32 240.0L189.32 262"/>
+<path class="wire" d="M100 262L189.32 262"/>
+<circle class="dot" cx="189.32" cy="262" r="3.2"/>
+<text class="lbl" x="92" y="267" text-anchor="end">S<tspan class="sub">0</tspan></text>
+<path class="wire" d="M349.32 175.0L349.32 295"/>
+<path class="wire" d="M100 295L349.32 295"/>
+<text class="lbl" x="92" y="300" text-anchor="end">S<tspan class="sub">1</tspan></text>
+</svg>
+<figcaption>a 4:1 multiplexer from three 2:1 multiplexers</figcaption></figure>
+<p><strong>Three</strong>, in two layers. The first layer uses S<sub>0</sub> to choose
+within each pair &mdash; one multiplexer picks between D<sub>0</sub> and D<sub>1</sub>,
+the other between D<sub>2</sub> and D<sub>3</sub>. The second layer uses S<sub>1</sub>
+to choose between those two results.</p>
+<p><strong>The select wiring</strong> is the part to get right: S<sub>0</sub> goes to
+<em>both</em> multiplexers in the first layer, and S<sub>1</sub> goes to the one in the
+second. The less significant select chooses within groups; the more significant chooses
+between groups.</p>
+<p>Check it on one case. With S<sub>1</sub>S<sub>0</sub>&nbsp;=&nbsp;10, the first-layer
+multiplexers pass D<sub>0</sub> and D<sub>2</sub> respectively (since S<sub>0</sub> = 0),
+and the second layer picks the lower one because S<sub>1</sub> = 1, giving
+D<sub>2</sub> &mdash; which is right.</p>
+<p><strong>An 8:1</strong> takes <strong>seven</strong>: four in the first layer, two in
+the second, one in the third. In general a 2<sup><var>n</var></sup>:1 needs
+2<sup><var>n</var></sup>&nbsp;&minus;&nbsp;1 of them, the same count as the chained ANDs
+of Exercise 3.8 and for the same reason &mdash; each 2:1 reduces the number of surviving
+candidates by one.</p>
+<p>The cost compared with the direct build: more gates in total, but no gate wider than
+the ones a 2:1 already uses. The delay grows as the number of layers, which is
+<var>n</var>.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 9.5">A 4:1 multiplexer has its data inputs tied to the constants D<sub>0</sub>&nbsp;=&nbsp;0, D<sub>1</sub>&nbsp;=&nbsp;1, D<sub>2</sub>&nbsp;=&nbsp;1, D<sub>3</sub>&nbsp;=&nbsp;0, and its selects driven by two variables. What function of those variables does it compute?</summary><div class="sol">
+<p>Work through the four select combinations. With
+S<sub>1</sub>S<sub>0</sub>&nbsp;=&nbsp;00 the output is D<sub>0</sub>&nbsp;=&nbsp;0; with
+01 it is D<sub>1</sub>&nbsp;=&nbsp;1; with 10 it is 1; with 11 it is 0.</p>
+<p>So the output is 1 exactly when the two selects differ:</p>
+<p style="text-align:center;font-size:1.05rem">
+F = S<sub>1</sub> &oplus; S<sub>0</sub></p>
+<p>The constants on the data inputs <em>are</em> the output column of the truth table,
+read top to bottom, and the selects are the input columns. The multiplexer is doing a
+table lookup.</p>
+<p>That is the whole of Exercise 9.10 in miniature, and it is worth pausing on: nothing
+about the multiplexer knows anything about XOR. Wiring four constants in a particular
+order produced it, and a different four constants would produce a different function
+&mdash; any of the sixteen two-variable functions, one per choice of constants.</p>
+<p>Recall from Exercise 5.13 that XOR is the function two-level minimisation cannot
+shrink, needing five gates as a minimal sum of products. Here it costs a multiplexer and
+four wires tied high or low.</p></div></details>
+
+<h3>Decoders</h3>
+
+<details class="prob"><summary data-label="Exercise 9.6">Give the truth table of a 2-to-4 decoder and the expression for each output. What does &ldquo;one-hot&rdquo; mean, and how many of the 16 possible output patterns can a decoder actually produce?</summary><div class="sol">
+<div class="tablewrap"><table class="ttab">
+<thead><tr><th>S<tspan class="sub">1</tspan></th><th>S<tspan class="sub">0</tspan></th><th>Y<tspan class="sub">0</tspan></th><th>Y<tspan class="sub">1</tspan></th><th>Y<tspan class="sub">2</tspan></th><th>Y<tspan class="sub">3</tspan></th></tr></thead>
+<tbody><tr><td class="bin">0</td><td class="bin">0</td><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td></tr><tr><td class="bin">0</td><td class="bin">1</td><td class="bin">0</td><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td></tr><tr><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin">1</td><td class="bin">0</td></tr><tr><td class="bin">1</td><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin">1</td></tr></tbody></table></div>
+<p>Each output is the minterm of the two inputs that matches its index:</p>
+<p style="text-align:center;font-size:1.05rem">
+Y<sub>0</sub> = S<sub>1</sub>&prime;S<sub>0</sub>&prime; &nbsp;&nbsp;
+Y<sub>1</sub> = S<sub>1</sub>&prime;S<sub>0</sub> &nbsp;&nbsp;
+Y<sub>2</sub> = S<sub>1</sub>S<sub>0</sub>&prime; &nbsp;&nbsp;
+Y<sub>3</sub> = S<sub>1</sub>S<sub>0</sub></p>
+<p><strong>One-hot</strong> means exactly one bit of a group is 1 and all the others are
+0. A decoder&rsquo;s outputs are one-hot by construction, since the input matches exactly
+one index.</p>
+<p><strong>Four patterns</strong> of the sixteen, not sixteen:
+<span class="bin">1000</span>, <span class="bin">0100</span>,
+<span class="bin">0010</span> and <span class="bin">0001</span>. The other twelve &mdash;
+including all-zeros and all-ones &mdash; never appear. That restriction is the point: a
+circuit downstream can rely on exactly one line being active and needs no arbitration.</p>
+<p>The cost of one-hot is width. Representing one of 32 registers takes 5 bits as a
+binary code but 32 wires one-hot, which is why codes are used to <em>carry</em> the
+choice and decoders turn them into one-hot only at the point of use.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 9.7">Draw a 3-to-8 decoder at the gate level. How many gates, how many inputs does each have, and how many outputs are 1 at any moment?</summary><div class="sol">
+<p>Eight outputs, each a minterm of the three inputs, so <strong>eight 3-input AND
+gates</strong> plus <strong>three inverters</strong> to make
+S<sub>2</sub>&prime;, S<sub>1</sub>&prime; and S<sub>0</sub>&prime;. Eleven gates, 27
+gate inputs.</p>
+<p>The wiring follows the index in binary: output Y<sub>5</sub> is 1 for input 101, so
+its AND gate takes S<sub>2</sub>, S<sub>1</sub>&prime;, S<sub>0</sub>. Writing the index
+in binary and reading a plain literal for each 1 and a complemented one for each 0 is the
+whole construction &mdash; and it is the same rule as building a minterm in Set 5.</p>
+<p>The 2-to-4 version shows the shape, with one AND per output and the literals chosen
+by the index:</p>
+<figure class="fig" style="--figmax:27rem">
+<svg viewBox="0 0 420 300" role="img" aria-label="one AND gate per output, each matching a different input combination">
+<path class="wire" d="M150 32.5H160M150 47.5H160"/>
+<path class="gate" d="M158 25.0H172A15.0 15.0 0 0 1 172 55.0H158Z"/>
+<path class="wire" d="M187.0 40H196.0"/>
+<path class="wire" d="M150 102.5H160M150 117.5H160"/>
+<path class="gate" d="M158 95.0H172A15.0 15.0 0 0 1 172 125.0H158Z"/>
+<path class="wire" d="M187.0 110H196.0"/>
+<path class="wire" d="M150 172.5H160M150 187.5H160"/>
+<path class="gate" d="M158 165.0H172A15.0 15.0 0 0 1 172 195.0H158Z"/>
+<path class="wire" d="M187.0 180H196.0"/>
+<path class="wire" d="M150 242.5H160M150 257.5H160"/>
+<path class="gate" d="M158 235.0H172A15.0 15.0 0 0 1 172 265.0H158Z"/>
+<path class="wire" d="M187.0 250H196.0"/>
+<path class="wire" d="M100 32.5L150 32.5"/>
+<text class="lbl" x="96" y="37.5" text-anchor="end">S<tspan class="sub">1</tspan>&prime;</text>
+<path class="wire" d="M100 47.5L150 47.5"/>
+<text class="lbl" x="96" y="52.5" text-anchor="end">S<tspan class="sub">0</tspan>&prime;</text>
+<path class="wire" d="M196.0 40L216.0 40"/>
+<text class="lbl" x="224.0" y="45" text-anchor="start">Y<tspan class="sub">0</tspan> = S<tspan class="sub">1</tspan>&prime;S<tspan class="sub">0</tspan>&prime;</text>
+<path class="wire" d="M100 102.5L150 102.5"/>
+<text class="lbl" x="96" y="107.5" text-anchor="end">S<tspan class="sub">1</tspan>&prime;</text>
+<path class="wire" d="M100 117.5L150 117.5"/>
+<text class="lbl" x="96" y="122.5" text-anchor="end">S<tspan class="sub">0</tspan></text>
+<path class="wire" d="M196.0 110L216.0 110"/>
+<text class="lbl" x="224.0" y="115" text-anchor="start">Y<tspan class="sub">1</tspan> = S<tspan class="sub">1</tspan>&prime;S<tspan class="sub">0</tspan></text>
+<path class="wire" d="M100 172.5L150 172.5"/>
+<text class="lbl" x="96" y="177.5" text-anchor="end">S<tspan class="sub">1</tspan></text>
+<path class="wire" d="M100 187.5L150 187.5"/>
+<text class="lbl" x="96" y="192.5" text-anchor="end">S<tspan class="sub">0</tspan>&prime;</text>
+<path class="wire" d="M196.0 180L216.0 180"/>
+<text class="lbl" x="224.0" y="185" text-anchor="start">Y<tspan class="sub">2</tspan> = S<tspan class="sub">1</tspan>S<tspan class="sub">0</tspan>&prime;</text>
+<path class="wire" d="M100 242.5L150 242.5"/>
+<text class="lbl" x="96" y="247.5" text-anchor="end">S<tspan class="sub">1</tspan></text>
+<path class="wire" d="M100 257.5L150 257.5"/>
+<text class="lbl" x="96" y="262.5" text-anchor="end">S<tspan class="sub">0</tspan></text>
+<path class="wire" d="M196.0 250L216.0 250"/>
+<text class="lbl" x="224.0" y="255" text-anchor="start">Y<tspan class="sub">3</tspan> = S<tspan class="sub">1</tspan>S<tspan class="sub">0</tspan></text>
+</svg>
+<figcaption>one AND gate per output, each matching a different input combination</figcaption></figure>
+<p><strong>Exactly one</strong> output is 1 at any moment, always. The inputs form some
+3-bit number, that number names one output, and no other AND gate can have all three of
+its inputs high at the same time &mdash; any other gate differs from this one in at
+least one literal.</p>
+<p>Note how the cost grows: an <var>n</var>-to-2<sup><var>n</var></sup> decoder needs
+2<sup><var>n</var></sup> gates. A 5-to-32 decoder is 32 gates, which is fine; a 32-bit
+address decoder would need four billion, which is why real memories decode in stages
+rather than all at once.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 9.8">Build a 4:1 multiplexer from a 2-to-4 decoder, some AND gates and an OR gate. Explain why an OR is safe here, and compare the cost with Exercise 9.4.</summary><div class="sol">
+<figure class="fig" style="--figmax:100%">
+<svg viewBox="0 0 560 270" role="img" aria-label="the decoder picks one line; the ANDs let only that input through">
+<rect class="blk" x="110" y="55.0" width="104" height="150" rx="5"/>
+<path class="wire" d="M94 92.5L110 92.5"/>
+<path class="wire" d="M94 167.5L110 167.5"/>
+<path class="wire" d="M214 73.8L230 73.8"/>
+<path class="wire" d="M214 111.2L230 111.2"/>
+<path class="wire" d="M214 148.8L230 148.8"/>
+<path class="wire" d="M214 186.2L230 186.2"/>
+<text class="blab" x="162.0" y="131" text-anchor="middle">2-to-4</text>
+<text class="bsub" x="162.0" y="147" text-anchor="middle">decoder</text>
+<path class="wire" d="M310 73.3H320M310 88.3H320"/>
+<path class="gate" d="M318 65.8H332A15.0 15.0 0 0 1 332 95.8H318Z"/>
+<path class="wire" d="M347.0 80.8H356.0"/>
+<path class="wire" d="M310 110.7H320M310 125.7H320"/>
+<path class="gate" d="M318 103.2H332A15.0 15.0 0 0 1 332 133.2H318Z"/>
+<path class="wire" d="M347.0 118.2H356.0"/>
+<path class="wire" d="M310 148.3H320M310 163.3H320"/>
+<path class="gate" d="M318 140.8H332A15.0 15.0 0 0 1 332 170.8H318Z"/>
+<path class="wire" d="M347.0 155.8H356.0"/>
+<path class="wire" d="M310 185.7H320M310 200.7H320"/>
+<path class="gate" d="M318 178.2H332A15.0 15.0 0 0 1 332 208.2H318Z"/>
+<path class="wire" d="M347.0 193.2H356.0"/>
+<path class="wire" d="M440 108.2H457M440 122.8H457M440 137.2H457M440 151.8H457"/>
+<path class="gate" d="M448 101.0C466 101.0 474 116.1 479 130C474 143.9 466 159.0 448 159.0Q457 130 448 101.0Z"/>
+<path class="wire" d="M479 130H488"/>
+<text class="lbl" x="86" y="97.5" text-anchor="end">S<tspan class="sub">1</tspan></text>
+<text class="lbl" x="86" y="172.5" text-anchor="end">S<tspan class="sub">0</tspan></text>
+<path class="wire" d="M230 73.8L310 73.3"/>
+<path class="wire" d="M272 88.3L310 88.3"/>
+<text class="lbl" x="268" y="93.3" text-anchor="end">D<tspan class="sub">0</tspan></text>
+<path class="wire" d="M356.0 80.8L398 80.8L398 108.2L440 108.2"/>
+<path class="wire" d="M230 111.2L310 110.7"/>
+<path class="wire" d="M272 125.7L310 125.7"/>
+<text class="lbl" x="268" y="130.7" text-anchor="end">D<tspan class="sub">1</tspan></text>
+<path class="wire" d="M356.0 118.2L404 118.2L404 122.8L440 122.8"/>
+<path class="wire" d="M230 148.8L310 148.3"/>
+<path class="wire" d="M272 163.3L310 163.3"/>
+<text class="lbl" x="268" y="168.3" text-anchor="end">D<tspan class="sub">2</tspan></text>
+<path class="wire" d="M356.0 155.8L410 155.8L410 137.2L440 137.2"/>
+<path class="wire" d="M230 186.2L310 185.7"/>
+<path class="wire" d="M272 200.7L310 200.7"/>
+<text class="lbl" x="268" y="205.7" text-anchor="end">D<tspan class="sub">3</tspan></text>
+<path class="wire" d="M356.0 193.2L416 193.2L416 151.8L440 151.8"/>
+<path class="wire" d="M488 130L512 130"/>
+<text class="lbl" x="520" y="135" text-anchor="start">F</text>
+</svg>
+<figcaption>the decoder picks one line; the ANDs let only that input through</figcaption></figure>
+<p>The decoder turns S<sub>1</sub>S<sub>0</sub> into four one-hot lines. Each line is
+ANDed with its own data input, so that AND gate outputs D<sub>k</sub> when its line is
+high and 0 when it is low. The OR then collects the four results.</p>
+<p><strong>Why the OR is safe.</strong> Because the decoder output is one-hot, at most
+one AND gate can be passing anything through; the other three are outputting 0 whatever
+their data inputs are doing. OR-ing a value with three zeros returns the value. There is
+never a case where two inputs compete and the OR has to merge them &mdash; the same
+mutual-exclusion argument as the two carries in Exercise 8.6.</p>
+<p><strong>The cost.</strong> The decoder is 2 inverters and four 2-input ANDs; then four
+more ANDs and a 4-input OR &mdash; eleven gates, against three 2:1 multiplexers (twelve
+gates) for the recursive build. Comparable, and the real difference is in shape: this
+version has a constant delay of three gates regardless of size, but needs an OR as wide
+as the number of inputs, while the recursive version keeps every gate narrow and pays
+with depth.</p>
+<p>Expanding the decoder version gives
+S<sub>1</sub>&prime;S<sub>0</sub>&prime;D<sub>0</sub>&nbsp;+&nbsp;&hellip; &mdash;
+exactly the expression from Exercise 9.3. The decoder is simply a tidy way of generating
+the four select terms once.</p></div></details>
+
+<h3>Multiplexers as computers</h3>
+
+<details class="prob"><summary data-label="Exercise 9.9">Using 2:1 multiplexers and the constants 0 and 1, build NOT, AND and OR. What does this prove?</summary><div class="sol">
+<p>Each one is a single multiplexer with the right things wired to its inputs.</p>
+<p><strong>NOT A</strong> &mdash; put A on the select, 1 on the first data input and 0 on
+the second. When A&nbsp;=&nbsp;0 the output is the first input, 1; when A&nbsp;=&nbsp;1
+it is 0.</p>
+<p style="text-align:center;font-size:1.05rem">
+A&prime; = MUX(S = A; &nbsp;D<sub>0</sub> = 1, &nbsp;D<sub>1</sub> = 0)</p>
+<p><strong>A &middot; B</strong> &mdash; put A on the select, 0 on the first input and B
+on the second. When A is 0 the output is 0, which is right; when A is 1 the output is B,
+also right.</p>
+<p style="text-align:center;font-size:1.05rem">
+AB = MUX(S = A; &nbsp;D<sub>0</sub> = 0, &nbsp;D<sub>1</sub> = B)</p>
+<p><strong>A + B</strong> &mdash; put A on the select, B on the first input and 1 on the
+second. When A is 0 the output is B; when A is 1 the output is 1.</p>
+<p style="text-align:center;font-size:1.05rem">
+A + B = MUX(S = A; &nbsp;D<sub>0</sub> = B, &nbsp;D<sub>1</sub> = 1)</p>
+<p>Each is the function split into its two cases by the value of A &mdash; what the
+algebra calls Shannon expansion, and what the multiplexer does for free.</p>
+<p><strong>What it proves.</strong> Set 5 showed AND, OR and NOT build every function;
+these three constructions build AND, OR and NOT; so a 2:1 multiplexer with constants
+builds every function. The multiplexer is <strong>universal</strong>, exactly as NAND and
+NOR are in Set 7.</p>
+<p>One caveat worth naming, the same one as in Exercise 7.15: the constants are doing
+real work. A multiplexer with no access to 0 and 1 cannot invert, because with all its
+inputs equal to some value the output is that value too.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 9.10">Show how to implement <em>any</em> function of two variables on a single 4:1 multiplexer. Then say how many data inputs a function of five variables would need, and why that approach does not scale.</summary><div class="sol">
+<p>Put the two variables on the select lines and the <strong>output column of the truth
+table</strong> on the data inputs, in order: D<sub>0</sub> gets the output for input 00,
+D<sub>1</sub> for 01, D<sub>2</sub> for 10, D<sub>3</sub> for 11.</p>
+<p>When the variables take some combination, the multiplexer selects exactly the data
+input holding that row&rsquo;s answer. The device is performing a table lookup, and the
+table is the wiring.</p>
+<p>Exercise 9.5 was one instance &mdash; constants 0, 1, 1, 0 gave XOR, because that is
+XOR&rsquo;s output column. Each of the sixteen two-variable functions corresponds to one
+of the sixteen ways of tying four wires high or low.</p>
+<p><strong>Five variables</strong> would need a 32:1 multiplexer &mdash;
+2<sup>5</sup> data inputs, one per row of the table.</p>
+<p><strong>Why it does not scale.</strong> The size is 2<sup><var>n</var></sup>, so it
+doubles with every variable. A 10-variable function would need 1024 data inputs, and the
+count of distinct functions it could express is the same 2<sup>2<sup><var>n</var></sup></sup>
+from Exercise 5.15 &mdash; the method is storing the entire truth table, so it inherits
+the truth table&rsquo;s size.</p>
+<p>What makes minimisation worth doing is exactly this: a Karnaugh map finds the
+<em>structure</em> in a function and produces a circuit proportional to its complexity
+rather than to 2<sup><var>n</var></sup>. The multiplexer lookup is the brute-force
+baseline that always works and is almost never the cheapest.</p>
+<p>Exercise 9.11 shows the standard halving trick, which buys one variable back.</p>
+</div></details>
+
+<details class="prob"><summary data-label="Exercise 9.11">Implement F(A,&nbsp;B,&nbsp;C) = &Sigma;m(1, 2, 6, 7) on a <em>4:1</em> multiplexer, by putting A and B on the selects and allowing each data input to be 0, 1, C or C&prime;.</summary><div class="sol">
+<div class="tablewrap"><table class="ttab">
+<thead><tr><th>A</th><th>B</th><th>C</th><th>F</th></tr></thead>
+<tbody><tr><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin hilite">0</td></tr><tr><td class="bin">0</td><td class="bin">0</td><td class="bin">1</td><td class="bin hilite">1</td></tr><tr><td class="bin">0</td><td class="bin">1</td><td class="bin">0</td><td class="bin hilite">1</td></tr><tr><td class="bin">0</td><td class="bin">1</td><td class="bin">1</td><td class="bin hilite">0</td></tr><tr><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin hilite">0</td></tr><tr><td class="bin">1</td><td class="bin">0</td><td class="bin">1</td><td class="bin hilite">0</td></tr><tr><td class="bin">1</td><td class="bin">1</td><td class="bin">0</td><td class="bin hilite">1</td></tr><tr><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td><td class="bin hilite">1</td></tr></tbody></table></div>
+<p>Group the rows in pairs that share the same A and B, and ask what the output does as
+C changes within each pair:</p>
+<div class="tablewrap"><table class="ttab">
+<thead><tr><th>A</th><th>B</th><th>F when C = 0</th><th>F when C = 1</th><th>so D<tspan class="sub">i</tspan> =</th></tr></thead>
+<tbody><tr><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin">1</td><td class="bin hilite">C</td></tr><tr><td class="bin">0</td><td class="bin">1</td><td class="bin">1</td><td class="bin">0</td><td class="bin hilite">C&prime;</td></tr><tr><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin hilite">0</td></tr><tr><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td><td class="bin hilite">1</td></tr></tbody></table></div>
+<p>If the output is the same for both values of C, the data input is that constant. If it
+follows C, the data input is C; if it is the opposite of C, the data input is
+C&prime;.</p>
+<p>So wire D<sub>0</sub>&nbsp;=&nbsp;C, D<sub>1</sub>&nbsp;=&nbsp;C&prime;,
+D<sub>2</sub>&nbsp;=&nbsp;0, D<sub>3</sub>&nbsp;=&nbsp;1, with A on
+S<sub>1</sub> and B on S<sub>0</sub>. One 4:1 multiplexer and one inverter.</p>
+<p>Check a row: A&nbsp;=&nbsp;0, B&nbsp;=&nbsp;1, C&nbsp;=&nbsp;0 selects D<sub>1</sub> =
+C&prime;, which with C&nbsp;=&nbsp;0 evaluates to 1 &mdash; and row 010 of the table is
+indeed 1.</p>
+<p><strong>Why this is worth knowing.</strong> It halves the multiplexer: an
+<var>n</var>-variable function needs only a 2<sup><var>n</var>&minus;1</sup>:1 part
+instead of 2<sup><var>n</var></sup>:1. One variable is handled by the data inputs rather
+than by the selects, and the only extra hardware is an inverter for C&prime;.</p>
+<p>The idea generalises &mdash; allow arbitrary functions of the remaining variables on
+the data inputs and the multiplexer shrinks further &mdash; but then you are back to
+building those functions, and the saving stops being free.</p></div></details>
+
+<h3>The ALU</h3>
+
+<details class="prob"><summary data-label="Exercise 9.12">Draw a 1-bit ALU that can compute A&middot;B and A&nbsp;+&nbsp;B, selected by one control line. How many gates, and what is the AND gate doing when the control line asks for OR?</summary><div class="sol">
+<figure class="fig" style="--figmax:100%">
+<svg viewBox="0 0 560 200" role="img" aria-label="a 1-bit ALU that can do AND and OR">
+<path class="wire" d="M250 37.5H260M250 52.5H260"/>
+<path class="gate" d="M258 30.0H272A15.0 15.0 0 0 1 272 60.0H258Z"/>
+<path class="wire" d="M287.0 45H296.0"/>
+<path class="wire" d="M250 122.5H267M250 137.5H267"/>
+<path class="gate" d="M258 115.0C276 115.0 284 122.8 289 130C284 137.2 276 145.0 258 145.0Q267 130 258 115.0Z"/>
+<path class="wire" d="M289 130H298"/>
+<path class="blk" d="M400 86.0L446 98.24L446 141.76L400 154.0Z"/>
+<path class="wire" d="M384 103.0L400 103.0"/>
+<path class="wire" d="M384 137.0L400 137.0"/>
+<path class="wire" d="M446 120L462 120"/>
+<path class="wire" d="M419.32 148.492L419.32 170.0"/>
+<text class="lbl" x="22" y="31" text-anchor="end">A</text>
+<text class="lbl" x="22" y="97" text-anchor="end">B</text>
+<path class="wire" d="M30 26L150 26"/>
+<circle class="dot" cx="150" cy="26" r="3.2"/>
+<path class="wire" d="M150 26L150 37.5L250 37.5"/>
+<path class="wire" d="M150 26L150 122.5L250 122.5"/>
+<path class="wire" d="M30 92L175 92"/>
+<circle class="dot" cx="175" cy="92" r="3.2"/>
+<path class="wire" d="M175 92L175 52.5L250 52.5"/>
+<path class="wire" d="M175 92L175 137.5L250 137.5"/>
+<path class="wire" d="M296.0 45L360 45L360 103.0L384 103.0"/>
+<path class="wire" d="M298 130L366 130L366 137.0L384 137.0"/>
+<text class="lbl" x="470" y="125" text-anchor="start">Result</text>
+<text class="lbl" x="419.32" y="188.0" text-anchor="middle">operation</text>
+</svg>
+<figcaption>a 1-bit ALU that can do AND and OR</figcaption></figure>
+<p>An AND gate and an OR gate, both fed the same two operands, with a 2:1 multiplexer
+choosing which result leaves. <strong>Six gates</strong> in all &mdash; the two operation
+gates plus the four that make up the multiplexer.</p>
+<p><strong>The AND gate is still computing A&middot;B</strong>, exactly as it always
+does. Its output simply goes nowhere: the multiplexer ignores that input and passes the
+OR result instead.</p>
+<p>This is the design idea the whole ALU rests on, and it is worth being explicit about
+because it looks wrong at first. The circuit computes <em>every</em> operation on
+<em>every</em> cycle and throws away all but one result.</p>
+<p>The reason it is right: gates work in parallel and cost almost nothing, while
+<em>deciding</em> costs time. An alternative that somehow switched the operands into only
+the needed gate would have to make the decision first and then compute, which is slower
+and needs extra circuitry to do the switching &mdash; circuitry that would itself be
+multiplexers. Computing everything and selecting is both simpler and faster.</p>
+<p>It does cost power, which is why modern processors go to some lengths to stop unused
+blocks from switching. But at the scale of one ALU it is the right trade and has been
+since the beginning.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 9.13">Extend the ALU so it can also add. What size multiplexer is needed, what goes on each data input, and what are the operation codes?</summary><div class="sol">
+<figure class="fig" style="--figmax:100%">
+<svg viewBox="0 0 560 330" role="img" aria-label="the same ALU with the adder added, selected by a 4:1 multiplexer">
+<path class="wire" d="M250 37.5H260M250 52.5H260"/>
+<path class="gate" d="M258 30.0H272A15.0 15.0 0 0 1 272 60.0H258Z"/>
+<path class="wire" d="M287.0 45H296.0"/>
+<path class="wire" d="M250 122.5H267M250 137.5H267"/>
+<path class="gate" d="M258 115.0C276 115.0 284 122.8 289 130C284 137.2 276 145.0 258 145.0Q267 130 258 115.0Z"/>
+<path class="wire" d="M289 130H298"/>
+<path class="blk" d="M400 82.0L446 96.0L446 204.0L400 218.0Z"/>
+<path class="wire" d="M384 99.0L400 99.0"/>
+<path class="wire" d="M384 133.0L400 133.0"/>
+<path class="wire" d="M384 167.0L400 167.0"/>
+<path class="wire" d="M384 201.0L400 201.0"/>
+<path class="wire" d="M446 150L462 150"/>
+<path class="wire" d="M419.32 211.7L419.32 234.0"/>
+<text class="lbl" x="22" y="31" text-anchor="end">A</text>
+<text class="lbl" x="22" y="97" text-anchor="end">B</text>
+<path class="wire" d="M30 26L150 26"/>
+<circle class="dot" cx="150" cy="26" r="3.2"/>
+<path class="wire" d="M150 26L150 37.5L250 37.5"/>
+<path class="wire" d="M150 26L150 122.5L250 122.5"/>
+<path class="wire" d="M30 92L175 92"/>
+<circle class="dot" cx="175" cy="92" r="3.2"/>
+<path class="wire" d="M175 92L175 52.5L250 52.5"/>
+<path class="wire" d="M175 92L175 137.5L250 137.5"/>
+<path class="wire" d="M296.0 45L360 45L360 99.0L384 99.0"/>
+<path class="wire" d="M298 130L366 130L366 133.0L384 133.0"/>
+<rect class="blk" x="250" y="215.0" width="104" height="70" rx="5"/>
+<path class="wire" d="M234 232.5L250 232.5"/>
+<path class="wire" d="M234 267.5L250 267.5"/>
+<path class="wire" d="M354 232.5L370 232.5"/>
+<path class="wire" d="M354 267.5L370 267.5"/>
+<text class="blab" x="302.0" y="251" text-anchor="middle">Full</text>
+<text class="bsub" x="302.0" y="267" text-anchor="middle">Adder</text>
+<path class="wire" d="M150 26L150 232.5L234 232.5"/>
+<path class="wire" d="M370 232.5L372 232.5L372 167.0L384 167.0"/>
+<text class="lbl" x="378" y="272.5" text-anchor="start">C<tspan class="sub">out</tspan></text>
+<text class="lbl" x="240" y="201.0" text-anchor="end">C<tspan class="sub">in</tspan></text>
+<path class="wire" d="M244 197.0L270 197.0L270 215.0"/>
+<path class="wire" d="M368 201.0L384 201.0"/>
+<text class="lbl" x="362" y="206.0" text-anchor="end">0</text>
+<path class="wire" d="M175 92L175 267.5L234 267.5"/>
+<text class="lbl" x="470" y="155" text-anchor="start">Result</text>
+<text class="lbl" x="419.32" y="252.0" text-anchor="middle">operation</text>
+</svg>
+<figcaption>the same ALU with the adder added, selected by a 4:1 multiplexer</figcaption></figure>
+<p>Three operations need three multiplexer inputs, and multiplexers come in powers of
+two, so a <strong>4:1</strong> is used with one input spare.</p>
+<div class="tablewrap"><table class="lawtab">
+<thead><tr><th>operation</th><th>what the ALU does</th><th>which MUX input</th></tr></thead>
+<tbody><tr><td class="lawcell">00</td><td class="lawcell">A &middot; B</td><td class="lawcell">D<tspan class="sub">0</tspan></td></tr><tr><td class="lawcell">01</td><td class="lawcell">A + B</td><td class="lawcell">D<tspan class="sub">1</tspan></td></tr><tr><td class="lawcell">10</td><td class="lawcell">A + B + C<tspan class="sub">in</tspan></td><td class="lawcell">D<tspan class="sub">2</tspan></td></tr></tbody></table></div>
+<p>The fourth input, selected by code 11, is unused &mdash; tie it to 0, or use it for a
+fourth operation when one is needed. Real designs fill it: the MIPS ALU of the textbook
+uses the spare slot for the comparison that implements <code>slt</code>.</p>
+<p><strong>What the full adder needs</strong> that the logic gates do not is a carry in
+and a carry out. The carry in comes from the bit below and the carry out goes to the bit
+above, so the arithmetic input is the only one connected to its neighbours &mdash; which
+is what makes the width of an ALU matter at all.</p>
+<p>Note that the adder also runs on every cycle, including when the operation is AND. Its
+result is discarded, and its carry out is produced and propagated regardless. That costs
+nothing extra in time, since the carry chain is doing its rippling while the logic gates
+idle.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 9.14">The ALU subtracts without a subtractor: an XOR on the B input and a control line called B invert. Explain exactly how A&nbsp;&minus;&nbsp;B comes out, and say what that control line must also be connected to.</summary><div class="sol">
+<figure class="fig" style="--figmax:100%">
+<svg viewBox="0 0 560 330" role="img" aria-label="one XOR per bit turns B into B&prime;, and the carry in supplies the +1">
+<path class="wire" d="M250 37.5H260M250 52.5H260"/>
+<path class="gate" d="M258 30.0H272A15.0 15.0 0 0 1 272 60.0H258Z"/>
+<path class="wire" d="M287.0 45H296.0"/>
+<path class="wire" d="M250 122.5H267M250 137.5H267"/>
+<path class="gate" d="M258 115.0C276 115.0 284 122.8 289 130C284 137.2 276 145.0 258 145.0Q267 130 258 115.0Z"/>
+<path class="wire" d="M289 130H298"/>
+<path class="blk" d="M400 82.0L446 96.0L446 204.0L400 218.0Z"/>
+<path class="wire" d="M384 99.0L400 99.0"/>
+<path class="wire" d="M384 133.0L400 133.0"/>
+<path class="wire" d="M384 167.0L400 167.0"/>
+<path class="wire" d="M384 201.0L400 201.0"/>
+<path class="wire" d="M446 150L462 150"/>
+<path class="wire" d="M419.32 211.7L419.32 234.0"/>
+<text class="lbl" x="22" y="31" text-anchor="end">A</text>
+<text class="lbl" x="22" y="97" text-anchor="end">B</text>
+<path class="wire" d="M30 26L150 26"/>
+<circle class="dot" cx="150" cy="26" r="3.2"/>
+<path class="wire" d="M150 26L150 37.5L250 37.5"/>
+<path class="wire" d="M150 26L150 122.5L250 122.5"/>
+<path class="wire" d="M296.0 45L360 45L360 99.0L384 99.0"/>
+<path class="wire" d="M298 130L366 130L366 133.0L384 133.0"/>
+<rect class="blk" x="250" y="215.0" width="104" height="70" rx="5"/>
+<path class="wire" d="M234 232.5L250 232.5"/>
+<path class="wire" d="M234 267.5L250 267.5"/>
+<path class="wire" d="M354 232.5L370 232.5"/>
+<path class="wire" d="M354 267.5L370 267.5"/>
+<text class="blab" x="302.0" y="251" text-anchor="middle">Full</text>
+<text class="bsub" x="302.0" y="267" text-anchor="middle">Adder</text>
+<path class="wire" d="M150 26L150 232.5L234 232.5"/>
+<path class="wire" d="M370 232.5L372 232.5L372 167.0L384 167.0"/>
+<text class="lbl" x="378" y="272.5" text-anchor="start">C<tspan class="sub">out</tspan></text>
+<text class="lbl" x="240" y="201.0" text-anchor="end">C<tspan class="sub">in</tspan></text>
+<path class="wire" d="M244 197.0L270 197.0L270 215.0"/>
+<path class="wire" d="M368 201.0L384 201.0"/>
+<text class="lbl" x="362" y="206.0" text-anchor="end">0</text>
+<path class="wire" d="M150 142.5H167M150 157.5H167"/>
+<path class="gate open" d="M152 165.0Q161 150 152 135.0"/>
+<path class="gate" d="M158 135.0C176 135.0 184 142.8 189 150C184 157.2 176 165.0 158 165.0Q167 150 158 135.0Z"/>
+<path class="wire" d="M189 150H198"/>
+<path class="wire" d="M30 92L100 92L100 142.5L150 142.5"/>
+<text class="lbl" x="92" y="215" text-anchor="end">B invert</text>
+<path class="wire" d="M98 210L120 210L120 157.5L150 157.5"/>
+<path class="wire" d="M198 150L205 150"/>
+<circle class="dot" cx="205" cy="150" r="3.2"/>
+<path class="wire" d="M205 150L205 52.5L250 52.5"/>
+<path class="wire" d="M205 150L205 137.5L250 137.5"/>
+<path class="wire" d="M205 150L205 267.5L234 267.5"/>
+<text class="lbl" x="470" y="155" text-anchor="start">Result</text>
+<text class="lbl" x="419.32" y="252.0" text-anchor="middle">operation</text>
+</svg>
+<figcaption>one XOR per bit turns B into B&prime;, and the carry in supplies the +1</figcaption></figure>
+<p><strong>The XOR is a conditional inverter</strong>, from Exercise 4.3. With B invert =
+0 the XOR passes B unchanged, so the ALU behaves exactly as before. With B invert = 1 it
+passes B&prime;, so the adder receives A and B&prime; instead of A and B.</p>
+<p><strong>What the adder then computes</strong> is A&nbsp;+&nbsp;B&prime;&nbsp;+&nbsp;C<sub>in</sub>.
+From Set 8, the two&rsquo;s complement of B is B&prime;&nbsp;+&nbsp;1, so what is wanted
+is A&nbsp;+&nbsp;B&prime;&nbsp;+&nbsp;1 &mdash; which is the same expression with
+C<sub>in</sub>&nbsp;=&nbsp;1.</p>
+<p><strong>So B invert must also drive the carry in of the lowest bit.</strong> That is
+the second connection, and it is the whole of the &ldquo;add one&rdquo;. One control line
+does both jobs: it flips the bits and supplies the extra 1, which is exactly the two-part
+negation rule.</p>
+<p>The cost of being able to subtract is therefore <em>one XOR gate per bit</em> plus a
+wire to the bottom carry in. No second adder, no borrow logic, nothing that scales with
+how often subtraction is used.</p>
+<p>And the carry out of the top bit is discarded, exactly as Exercise 8.16 explained. The
+ALU does not need to know whether it is adding or subtracting &mdash; it adds in both
+cases, and the control line changes what it is adding.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 9.15">For the 1-bit ALU above, give the Result when A&nbsp;=&nbsp;1, B&nbsp;=&nbsp;0, carry in = 1 and the operation code is 00, then 01, then 10. Which of these depends on the carry in?</summary><div class="sol">
+<p>Take B invert = 0, so the adder sees B itself.</p>
+<div class="tablewrap"><table class="lawtab">
+<thead><tr><th>operation</th><th>what it computes</th><th>Result</th></tr></thead>
+<tbody><tr><td class="lawcell">00</td><td class="lawcell">A &middot; B = 1 &middot; 0</td><td class="lawcell">0</td></tr><tr><td class="lawcell">01</td><td class="lawcell">A + B = 1 + 0</td><td class="lawcell">1</td></tr><tr><td class="lawcell">10</td><td class="lawcell">A &oplus; B &oplus; C<tspan class="sub">in</tspan> = 1 &oplus; 0 &oplus; 1</td><td class="lawcell">0</td></tr></tbody></table></div>
+<p><strong>Code 00, AND:</strong> 1&middot;0&nbsp;=&nbsp;<strong>0</strong>.</p>
+<p><strong>Code 01, OR:</strong> 1&nbsp;+&nbsp;0&nbsp;=&nbsp;<strong>1</strong>.</p>
+<p><strong>Code 10, add:</strong>
+1&nbsp;&oplus;&nbsp;0&nbsp;&oplus;&nbsp;1&nbsp;=&nbsp;<strong>0</strong>, with a carry out
+of 1 &mdash; the column total is 2, so the sum bit is 0 and the 2 is carried.</p>
+<p><strong>Only the add depends on the carry in.</strong> The AND and OR gates take only
+A and B; nothing from the neighbouring bit reaches them. That is why logical operations
+on a 32-bit ALU complete in a couple of gate delays while arithmetic waits for the
+ripple.</p>
+<p>It is also why the carry out is meaningless after a logical operation. The adder
+produced one, because it runs regardless, but it describes an addition nobody asked for.
+A processor's flags are only updated from the carry out when the instruction was an
+arithmetic one.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 9.16">A 32-bit ALU is built from 32 copies of the 1-bit one. Which signals are shared across all 32 copies and which are not? How long does a 32-bit AND take compared with a 32-bit add?</summary><div class="sol">
+<figure class="fig" style="--figmax:25rem">
+<svg viewBox="0 0 600 384" role="img" aria-label="a 32-bit ALU is 32 copies of the 1-bit one">
+<rect class="blk" x="190" y="42.0" width="160" height="56" rx="5"/>
+<path class="wire" d="M174 56.0L190 56.0"/>
+<path class="wire" d="M174 84.0L190 84.0"/>
+<path class="wire" d="M350 70.0L366 70.0"/>
+<text class="blab" x="270.0" y="71" text-anchor="middle">ALU</text>
+<text class="bsub" x="270.0" y="87" text-anchor="middle">bit 31</text>
+<text class="lbl" x="168" y="60.0" text-anchor="end">A<tspan class="sub">31</tspan></text>
+<text class="lbl" x="168" y="88.0" text-anchor="end">B<tspan class="sub">31</tspan></text>
+<text class="lbl" x="372" y="74.0" text-anchor="start">Result<tspan class="sub">31</tspan></text>
+<rect class="blk" x="190" y="162.0" width="160" height="56" rx="5"/>
+<path class="wire" d="M174 176.0L190 176.0"/>
+<path class="wire" d="M174 204.0L190 204.0"/>
+<path class="wire" d="M350 190.0L366 190.0"/>
+<text class="blab" x="270.0" y="191" text-anchor="middle">ALU</text>
+<text class="bsub" x="270.0" y="207" text-anchor="middle">bit 1</text>
+<text class="lbl" x="168" y="180.0" text-anchor="end">A<tspan class="sub">1</tspan></text>
+<text class="lbl" x="168" y="208.0" text-anchor="end">B<tspan class="sub">1</tspan></text>
+<text class="lbl" x="372" y="194.0" text-anchor="start">Result<tspan class="sub">1</tspan></text>
+<rect class="blk" x="190" y="242.0" width="160" height="56" rx="5"/>
+<path class="wire" d="M174 256.0L190 256.0"/>
+<path class="wire" d="M174 284.0L190 284.0"/>
+<path class="wire" d="M350 270.0L366 270.0"/>
+<text class="blab" x="270.0" y="271" text-anchor="middle">ALU</text>
+<text class="bsub" x="270.0" y="287" text-anchor="middle">bit 0</text>
+<text class="lbl" x="168" y="260.0" text-anchor="end">A<tspan class="sub">0</tspan></text>
+<text class="lbl" x="168" y="288.0" text-anchor="end">B<tspan class="sub">0</tspan></text>
+<text class="lbl" x="372" y="274.0" text-anchor="start">Result<tspan class="sub">0</tspan></text>
+<path class="wire" d="M218 242.0L218 218.0"/>
+<text class="ann" x="226" y="234.0" text-anchor="start">C<tspan class="sub">1</tspan></text>
+<path class="wire" d="M218 298.0L218 328.0"/>
+<text class="ann" x="226" y="322.0" text-anchor="start">C<tspan class="sub">0</tspan></text>
+<path class="wire" d="M218 42.0L218 12.0"/>
+<text class="ann" x="226" y="24.0" text-anchor="start">C<tspan class="sub">32</tspan></text>
+<path class="wire" d="M218 162.0L218 128.0"/>
+<text class="lbl" x="270" y="150" text-anchor="middle">&middot;&nbsp;&middot;&nbsp;&middot;</text>
+<text class="ann" x="150" y="352" text-anchor="start">the operation code and B invert reach every bit</text>
+<text class="ann" x="150" y="368" text-anchor="start">the carry passes from each bit to the next</text>
+</svg>
+<figcaption>a 32-bit ALU is 32 copies of the 1-bit one</figcaption></figure>
+<p><strong>Shared by all 32 bits:</strong> the operation code, since every bit must
+perform the same operation, and the B invert line, since a subtraction inverts the whole
+of B rather than part of it. Both are broadcast.</p>
+<p><strong>Not shared:</strong> the data. Bit <var>k</var> gets its own
+A<sub><var>k</var></sub>, B<sub><var>k</var></sub> and produces its own
+Result<sub><var>k</var></sub>.</p>
+<p><strong>And chained rather than shared:</strong> the carry. The carry out of bit
+<var>k</var> is the carry in of bit <var>k</var>&nbsp;+&nbsp;1, so the bits are not quite
+independent &mdash; a thin thread of dependency runs up the stack.</p>
+<p><strong>The timing.</strong> A 32-bit AND takes the delay of one AND gate plus one
+multiplexer &mdash; perhaps three gate delays &mdash; and all 32 bits do it
+simultaneously, so the width costs nothing at all.</p>
+<p>A 32-bit add takes about <strong>64 gate delays</strong>, by Exercise 8.8, because the
+carry has to ripple through every stage before the top bits are correct. The width costs
+everything.</p>
+<p>Same hardware, same cycle, twenty-fold difference in time &mdash; and since the clock
+must be slow enough for the worst case, the adder sets the clock period and the logical
+operations finish early and wait. That imbalance is why carry-lookahead (Exercise 8.18)
+is worth its considerable extra area.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 9.17">Why is the multiplexer placed <em>inside</em> each 1-bit ALU, rather than building three separate 32-bit units &mdash; an AND unit, an OR unit and an adder &mdash; and selecting between their outputs with one 32-bit-wide multiplexer at the end?</summary><div class="sol">
+<p>Start by noticing the two designs compute the same thing and cost nearly the same in
+gates. The separate-units version needs 32 ANDs, 32 ORs and a 32-bit adder &mdash; the
+same operation gates as before &mdash; plus 32 multiplexers at the end to choose among
+the three results. The per-bit version needs the same gates and the same 32 multiplexers.
+The multiplexers moved; they did not multiply.</p>
+<p><strong>So the answer is not gate count.</strong> It is everything else:</p>
+<ul>
+<li><strong>Layout and wiring.</strong> The per-bit version is one small cell repeated 32
+times, with short wires inside each cell and only the carry crossing between neighbours.
+The separate-unit version sends every intermediate result across the chip to a
+multiplexer bank, which is 96 wires of 32 bits spanning the whole unit. On a chip, wires
+cost area and delay, and a design that keeps signals local wins.</li>
+<li><strong>Regularity.</strong> One cell designed, verified and laid out once, then
+tiled. That is how real ALUs are built, and it is why the 1-bit ALU is the unit of
+design in the first place.</li>
+<li><strong>Extensibility.</strong> Adding a fourth operation means widening one
+multiplexer in one cell and re-tiling. In the other design it means a whole new 32-bit
+unit.</li>
+</ul>
+<p>The delay is the same either way, since one multiplexer sits between the operation
+gates and the output in both.</p>
+<p>The general lesson is one worth carrying into the MIPS chapters: at this scale,
+designs are judged on regularity and wire length as much as on gate count, and
+&ldquo;build one bit well and repeat it&rdquo; is the dominant style.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 9.18">Challenge. Exercise 9.9 built NOT, AND and OR from 2:1 multiplexers with constants. Show that the constants are essential: prove that a circuit built only from 2:1 multiplexers, with its data and select inputs taken from the variables alone, can never compute A&prime;.</summary><div class="sol">
+<p>The argument is the one from Exercise 3.15 and Exercise 7.15, applied to a new
+component: find a property that every circuit of this kind preserves, and show the target
+function does not have it.</p>
+<p><strong>The property.</strong> Set every variable to 0 and consider any multiplexer
+whose three inputs all carry 0. Its output is one of its data inputs &mdash; whichever the
+select picks &mdash; and both of them are 0, so its output is 0 as well, whatever the
+select is doing.</p>
+<p><strong>Propagating it.</strong> Order the multiplexers so that each comes after the
+ones feeding it, which is always possible in a circuit without loops. The variables all
+carry 0 by assumption; so the first multiplexer outputs 0; so every wire feeding the
+second carries 0, and it outputs 0; and so on to the output of the circuit.</p>
+<p>So <strong>any such circuit outputs 0 when all its inputs are 0</strong>. But A&prime;
+must be 1 when A is 0. No circuit of this kind computes it.</p>
+<p>The same argument with every variable set to 1 shows the circuit must output 1 on the
+all-ones input, so the constant functions are unreachable too.</p>
+<p><strong>What the constants add.</strong> A tied-high input is a source of 1 that does
+not depend on the variables, which breaks the property immediately &mdash; and Exercise
+9.9 shows that one such input is all it takes to reach everything.</p>
+<div class="box extra"><span class="bt">The pattern behind all three</span>
+<p>Exercise 3.15 ruled out AND and OR without NOT; Exercise 7.15 narrowed sixteen
+candidate gates to NAND and NOR; this rules out multiplexers without constants. All three
+are the same proof: a circuit made of parts that preserve some property can only ever
+compute functions with that property. The property here is &ldquo;0-preserving&rdquo;, and
+it is the first of the five conditions in Post&rsquo;s theorem mentioned in Set 7.</p>
+<p>Which is why universality claims always come with small print. NAND is universal on its
+own; multiplexers are universal <em>given constants</em>; and whether the constants count
+as free depends on whether your technology hands you a power rail &mdash; which,
+conveniently, it always does.</p></div>
+</div></details>
+
+<div class="box extra"><span class="bt">Where this goes next</span>
+<p>That is the combinational half of the course complete: from a truth table to a minimal
+circuit, to an adder, to a representation that makes subtraction free, to a unit that
+performs whichever operation it is told. What is still missing is anywhere to keep a
+result &mdash; every circuit here forgets everything the moment its inputs change. Storage
+needs feedback, and feedback is where the second half of the course begins; after that,
+the instructions that drive these control lines, which is MIPS.</p></div>
+
+    <nav class="pagenav">
+      <a class="prev" href="ex-adder.html"><span>Previous</span>Set 8. Binary addition and two&rsquo;s complement</a>
+      <a class="next" href="setup-logisim.html"><span>Next</span>Installing Logisim-Evolution</a>
+    </nav>
+    <footer class="site">
+      <em>Computer Organization and Assembly Language</em> &middot; CSCI 240 / 640,
+      Queens College CUNY.
+    </footer>
+  </main>
+</div>
+</body>
+</html>

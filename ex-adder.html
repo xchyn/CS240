@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Set 8 &mdash; Binary addition and two&rsquo;s complement</title>
+<style>
+/* Light-theme fallback for the diagrams; assets/style.css overrides it. */
+.fig svg{display:block;width:100%;max-width:34rem;height:auto;margin:0 auto}
+.fig figcaption{font:400 .8rem/1.45 system-ui,sans-serif;color:#79828e;
+  margin-top:.45rem}
+.fig{margin:1.5rem 0;text-align:center}
+.fig .wire{fill:none;stroke:#1a1c1f;stroke-width:1.9;stroke-linecap:round;
+  stroke-linejoin:round}
+.fig .gate{fill:#ffffff;stroke:#1a1c1f;stroke-width:1.9;stroke-linejoin:round}
+.fig .gate.open{fill:none}
+.fig .dot{fill:#1a1c1f;stroke:none}
+.fig .lbl{fill:#1a1c1f;stroke:none;font:600 15px system-ui,sans-serif}
+.fig .ann{fill:#79828e;stroke:none;font:400 12.5px ui-monospace,monospace}
+.fig .kcell{fill:#ffffff;stroke:#cfcbc0;stroke-width:1.2}
+.fig .kval{fill:#1a1c1f;stroke:none;font:600 21px ui-monospace,monospace}
+.fig .kval.zero{fill:#79828e;font-weight:400}
+.fig .kval.dc{fill:#8c2d19;font-weight:700}
+.fig .kidx{fill:#79828e;stroke:none;font:400 11px ui-monospace,monospace}
+.fig .klab{fill:#4d5560;stroke:none;font:600 14px ui-monospace,monospace}
+.fig .kvar{fill:#8c2d19;stroke:none;font:700 13px system-ui,sans-serif}
+.fig .kslash{fill:none;stroke:#cfcbc0;stroke-width:1.2}
+.fig .kgrp{fill:none;stroke-width:2.6}
+.fig .grp0{stroke:#8c2d19}.fig .grp1{stroke:#1d6a4f}
+.fig .grp2{stroke:#2a4d8f}.fig .grp3{stroke:#7a5ea8}
+.fig .blk{fill:#ffffff;stroke:#1a1c1f;stroke-width:1.9;stroke-linejoin:round}
+.fig .blab{fill:#1a1c1f;stroke:none;font:600 14px system-ui,sans-serif}
+.fig .bsub{fill:#4d5560;stroke:none;font:400 12px system-ui,sans-serif}
+.fig .sub{font-size:.72em}
+</style>
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/notes.js" defer></script>
+</head>
+<body>
+<header class="topbar"><div class="topbar-in">
+  <a class="brand" href="index.html">CSCI 240</a>
+  <span class="crumb">Set 8 &middot; Adders and two&rsquo;s complement</span>
+  <nav class="topnav">
+    <a href="ex-nand.html">&larr; Prev</a>
+    <a href="index.html">Contents</a>
+    <a href="ex-alu.html">Next &rarr;</a>
+    <button class="iconbtn" id="themebtn" type="button" title="Light / dark">&#9686;</button>
+  </nav>
+</div></header>
+<div class="wrap">
+  <aside class="toc"><p class="toc-title">On this page</p><ol>
+    <li><a href="#half"><span class="t">8.1</span>The half adder</a></li>
+    <li><a href="#full"><span class="t">8.2</span>The full adder</a></li>
+    <li><a href="#ripple"><span class="t">8.3</span>The ripple-carry adder</a></li>
+    <li><a href="#neg"><span class="t">8.4</span>Negative numbers</a></li>
+    <li><a href="#sub"><span class="t">8.5</span>Subtraction by addition</a></li>
+    <li><a href="#range"><span class="t">8.6</span>Range, and the discarded carry</a></li>
+    <li><a href="#ref"><span class="t">8.7</span>Reference</a></li>
+    <li><a href="#exercises"><span class="t">8.8</span>Exercises</a></li>
+  </ol></aside>
+  <main>
+
+<div class="chhead">
+  <span class="chpart">Exercise set 8 &middot; after the adder lecture</span>
+  <span class="chnum">Adding and subtracting</span>
+  <h1>Arithmetic out of gates</h1>
+  <p class="chsum">The half adder and the full adder; chaining them into a
+  ripple-carry adder; two&rsquo;s complement as a way of writing negative numbers;
+  and the payoff &mdash; subtraction with no subtracting hardware at all.</p>
+</div>
+
+<p>Everything in Sets 3 to 7 was about building <em>some</em> function from gates.
+This set builds one particular function that the rest of the machine is organised
+around. Addition is the fundamental arithmetic operation: subtraction can be
+simulated with it, multiplication is repeated addition, and division is repeated
+subtraction. Get addition into hardware and the rest follows.</p>
+
+<p>The second half of the set is the trick that makes it pay. Representing negative
+numbers in two&rsquo;s complement means a subtractor is not a new circuit &mdash; it is
+the adder you already built, with one small change on the way in.</p>
+
+<h2 id="half"><span class="secnum">8.1</span>The half adder</h2>
+
+<p>Start with the smallest possible question: add two single bits. There are four
+cases, and the answer needs two bits of output, because 1&nbsp;+&nbsp;1 is 2, which
+is <span class="bin">10</span> in binary. Call the two outputs <strong>Sum</strong>
+and <strong>Carry out</strong>.</p>
+
+<div class="tablewrap"><table class="ttab">
+<thead><tr><th>A</th><th>B</th><th>Carry out</th><th>Sum</th></tr></thead>
+<tbody><tr><td class="bin">0</td><td class="bin">0</td><td class="bin hilite">0</td><td class="bin hilite">0</td></tr><tr><td class="bin">0</td><td class="bin">1</td><td class="bin hilite">0</td><td class="bin hilite">1</td></tr><tr><td class="bin">1</td><td class="bin">0</td><td class="bin hilite">0</td><td class="bin hilite">1</td></tr><tr><td class="bin">1</td><td class="bin">1</td><td class="bin hilite">1</td><td class="bin hilite">0</td></tr></tbody></table></div>
+
+<p>Read the columns and both are familiar. Carry out is 1 only when both inputs are
+1, which is AND. Sum is 1 when the inputs differ, which is XOR. So</p>
+
+<p style="text-align:center;font-size:1.05rem">
+Sum = A &oplus; B &nbsp;&nbsp;&nbsp; Carry out = AB</p>
+
+<figure class="fig" style="--figmax:25rem">
+<svg viewBox="0 0 400 185" role="img" aria-label="Sum = A &oplus; B,&nbsp; Carry out = AB">
+<path class="wire" d="M190 38.5H207M190 53.5H207"/>
+<path class="gate open" d="M192 61.0Q201 46 192 31.0"/>
+<path class="gate" d="M198 31.0C216 31.0 224 38.8 229 46C224 53.2 216 61.0 198 61.0Q207 46 198 31.0Z"/>
+<path class="wire" d="M229 46H238"/>
+<path class="wire" d="M190 132.5H200M190 147.5H200"/>
+<path class="gate" d="M198 125.0H212A15.0 15.0 0 0 1 212 155.0H198Z"/>
+<path class="wire" d="M227.0 140H236.0"/>
+<text class="lbl" x="22" y="35" text-anchor="end">A</text>
+<path class="wire" d="M30 30L120 30"/>
+<text class="lbl" x="22" y="83" text-anchor="end">B</text>
+<path class="wire" d="M30 78L140 78"/>
+<path class="wire" d="M120 30L120 38.5L190 38.5"/>
+<path class="wire" d="M120 30L120 132.5L190 132.5"/>
+<circle class="dot" cx="120" cy="30" r="3.2"/>
+<path class="wire" d="M140 78L140 53.5L190 53.5"/>
+<path class="wire" d="M140 78L140 147.5L190 147.5"/>
+<circle class="dot" cx="140" cy="78" r="3.2"/>
+<path class="wire" d="M238 46L264 46"/>
+<text class="lbl" x="272" y="51" text-anchor="start">Sum</text>
+<path class="wire" d="M236.0 140L262.0 140"/>
+<text class="lbl" x="270.0" y="145" text-anchor="start">Carry out</text>
+</svg>
+<figcaption>Sum = A &oplus; B,&nbsp; Carry out = AB</figcaption></figure>
+
+<p>Two gates. This is the <strong>half</strong> adder, and the name is a complaint:
+it adds two bits, but when you add multi-bit numbers each column also receives a carry
+from the column to its right, and this circuit has nowhere to put it.</p>
+
+<figure class="fig" style="--figmax:21rem">
+<svg viewBox="0 0 360 150" role="img" aria-label="the half adder, as a block">
+<rect class="blk" x="130" y="32.0" width="120" height="76" rx="5"/>
+<path class="wire" d="M114 51.0L130 51.0"/>
+<path class="wire" d="M114 89.0L130 89.0"/>
+<path class="wire" d="M250 51.0L266 51.0"/>
+<path class="wire" d="M250 89.0L266 89.0"/>
+<text class="blab" x="190.0" y="71" text-anchor="middle">1-bit</text>
+<text class="bsub" x="190.0" y="87" text-anchor="middle">Half Adder</text>
+<text class="lbl" x="106" y="56.0" text-anchor="end">A</text>
+<text class="lbl" x="106" y="94.0" text-anchor="end">B</text>
+<text class="lbl" x="274" y="56.0" text-anchor="start">Sum</text>
+<text class="lbl" x="274" y="94.0" text-anchor="start">Carry out</text>
+</svg>
+<figcaption>the half adder, as a block</figcaption></figure>
+
+<h2 id="full"><span class="secnum">8.2</span>The full adder</h2>
+
+<p>The <strong>full adder</strong> fixes exactly that: three inputs &mdash; A, B and a
+<strong>carry in</strong> &mdash; and the same two outputs. Eight rows now:</p>
+
+<div class="tablewrap"><table class="ttab">
+<thead><tr><th>A</th><th>B</th><th>Carry in</th><th>Carry out</th><th>Sum</th></tr></thead>
+<tbody><tr><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin hilite">0</td><td class="bin hilite">0</td></tr><tr><td class="bin">0</td><td class="bin">0</td><td class="bin">1</td><td class="bin hilite">0</td><td class="bin hilite">1</td></tr><tr><td class="bin">0</td><td class="bin">1</td><td class="bin">0</td><td class="bin hilite">0</td><td class="bin hilite">1</td></tr><tr><td class="bin">0</td><td class="bin">1</td><td class="bin">1</td><td class="bin hilite">1</td><td class="bin hilite">0</td></tr><tr><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin hilite">0</td><td class="bin hilite">1</td></tr><tr><td class="bin">1</td><td class="bin">0</td><td class="bin">1</td><td class="bin hilite">1</td><td class="bin hilite">0</td></tr><tr><td class="bin">1</td><td class="bin">1</td><td class="bin">0</td><td class="bin hilite">1</td><td class="bin hilite">0</td></tr><tr><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td><td class="bin hilite">1</td><td class="bin hilite">1</td></tr></tbody></table></div>
+
+<p>Both output columns have a clean description. Sum is 1 when an <em>odd</em> number
+of the three inputs is 1, which from Set 4 is the parity function:</p>
+
+<p style="text-align:center;font-size:1.05rem">
+Sum = A &oplus; B &oplus; C<sub>in</sub></p>
+
+<p>And Carry out is 1 when <em>at least two</em> of the three inputs are 1 &mdash; a
+carry is generated when the column total reaches two. As a sum of products that is</p>
+
+<p style="text-align:center;font-size:1.05rem">
+Carry out = AB + A&middot;C<sub>in</sub> + B&middot;C<sub>in</sub></p>
+
+<p>one term per pair. The circuit that is usually drawn uses a slightly different but
+equivalent form, because it lets the A&nbsp;&oplus;&nbsp;B already computed for the
+Sum be reused:</p>
+
+<figure class="fig" style="--figmax:100%">
+<svg viewBox="0 0 625 285" role="img" aria-label="Sum = (A &oplus; B) &oplus; Carry in,&nbsp; Carry out = AB + Carry in &middot; (A &oplus; B)">
+<path class="wire" d="M160 42.5H177M160 57.5H177"/>
+<path class="gate open" d="M162 65.0Q171 50 162 35.0"/>
+<path class="gate" d="M168 35.0C186 35.0 194 42.8 199 50C194 57.2 186 65.0 168 65.0Q177 50 168 35.0Z"/>
+<path class="wire" d="M199 50H208"/>
+<path class="wire" d="M320 78.5H337M320 93.5H337"/>
+<path class="gate open" d="M322 101.0Q331 86 322 71.0"/>
+<path class="gate" d="M328 71.0C346 71.0 354 78.8 359 86C354 93.2 346 101.0 328 101.0Q337 86 328 71.0Z"/>
+<path class="wire" d="M359 86H368"/>
+<path class="wire" d="M160 207.5H170M160 222.5H170"/>
+<path class="gate" d="M168 200.0H182A15.0 15.0 0 0 1 182 230.0H168Z"/>
+<path class="wire" d="M197.0 215H206.0"/>
+<path class="wire" d="M320 152.5H330M320 167.5H330"/>
+<path class="gate" d="M328 145.0H342A15.0 15.0 0 0 1 342 175.0H328Z"/>
+<path class="wire" d="M357.0 160H366.0"/>
+<path class="wire" d="M450 184.5H467M450 199.5H467"/>
+<path class="gate" d="M458 177.0C476 177.0 484 184.8 489 192C484 199.2 476 207.0 458 207.0Q467 192 458 177.0Z"/>
+<path class="wire" d="M489 192H498"/>
+<text class="lbl" x="22" y="35" text-anchor="end">A</text>
+<path class="wire" d="M30 30L95 30"/>
+<circle class="dot" cx="95" cy="30" r="3.2"/>
+<path class="wire" d="M95 30L95 42.5L160 42.5"/>
+<path class="wire" d="M95 30L95 207.5L160 207.5"/>
+<text class="lbl" x="22" y="83" text-anchor="end">B</text>
+<path class="wire" d="M30 78L118 78"/>
+<circle class="dot" cx="118" cy="78" r="3.2"/>
+<path class="wire" d="M118 78L118 57.5L160 57.5"/>
+<path class="wire" d="M118 78L118 222.5L160 222.5"/>
+<text class="lbl" x="22" y="255" text-anchor="end">C<tspan class="sub">in</tspan></text>
+<path class="wire" d="M30 250L255 250"/>
+<circle class="dot" cx="255" cy="250" r="3.2"/>
+<path class="wire" d="M255 250L255 93.5L320 93.5"/>
+<path class="wire" d="M255 250L255 167.5L320 167.5"/>
+<path class="wire" d="M208 50L230 50"/>
+<circle class="dot" cx="230" cy="50" r="3.2"/>
+<path class="wire" d="M230 50L230 78.5L320 78.5"/>
+<path class="wire" d="M230 50L230 152.5L320 152.5"/>
+<path class="wire" d="M366.0 160L412 160L412 184.5L450 184.5"/>
+<path class="wire" d="M206.0 215L418 215L418 199.5L450 199.5"/>
+<path class="wire" d="M368 86L428 86"/>
+<text class="lbl" x="436" y="91" text-anchor="start">Sum</text>
+<path class="wire" d="M498 192L524 192"/>
+<text class="lbl" x="532" y="197" text-anchor="start">Carry out</text>
+<text class="ann" x="210" y="41" text-anchor="start">A &oplus; B</text>
+</svg>
+<figcaption>Sum = (A &oplus; B) &oplus; Carry in,&nbsp; Carry out = AB + Carry in &middot; (A &oplus; B)</figcaption></figure>
+
+<p>Five gates, and the signal A&nbsp;&oplus;&nbsp;B feeds two of them. Exercise 8.5
+checks that the two expressions for Carry out really are the same function.</p>
+
+<div class="box note"><span class="bt">Two half adders make a full adder</span>
+<p>There is a second way to build it that explains the names. Add A and B with one
+half adder; add its Sum to the carry in with a second; and OR the two carry outputs
+together, since a carry can be produced by either stage but never by both.</p>
+<figure class="fig" style="--figmax:100%">
+<svg viewBox="0 0 600 285" role="img" aria-label="a full adder from two half adders and one OR gate">
+<rect class="blk" x="120" y="25.0" width="104" height="70" rx="5"/>
+<path class="wire" d="M104 42.5L120 42.5"/>
+<path class="wire" d="M104 77.5L120 77.5"/>
+<path class="wire" d="M224 42.5L240 42.5"/>
+<path class="wire" d="M224 77.5L240 77.5"/>
+<text class="blab" x="172.0" y="61" text-anchor="middle">Half</text>
+<text class="bsub" x="172.0" y="77" text-anchor="middle">Adder</text>
+<rect class="blk" x="290" y="75.0" width="104" height="70" rx="5"/>
+<path class="wire" d="M274 92.5L290 92.5"/>
+<path class="wire" d="M274 127.5L290 127.5"/>
+<path class="wire" d="M394 92.5L410 92.5"/>
+<path class="wire" d="M394 127.5L410 127.5"/>
+<text class="blab" x="342.0" y="111" text-anchor="middle">Half</text>
+<text class="bsub" x="342.0" y="127" text-anchor="middle">Adder</text>
+<path class="wire" d="M450 178.5H467M450 193.5H467"/>
+<path class="gate" d="M458 171.0C476 171.0 484 178.8 489 186C484 193.2 476 201.0 458 201.0Q467 186 458 171.0Z"/>
+<path class="wire" d="M489 186H498"/>
+<text class="lbl" x="96" y="47.5" text-anchor="end">A</text>
+<text class="lbl" x="96" y="82.5" text-anchor="end">B</text>
+<text class="lbl" x="22" y="185" text-anchor="end">C<tspan class="sub">in</tspan></text>
+<path class="wire" d="M240 42.5L255 42.5L255 92.5L274 92.5"/>
+<path class="wire" d="M30 180L255 180L255 127.5L274 127.5"/>
+<path class="wire" d="M410 92.5L480 92.5"/>
+<text class="lbl" x="488" y="97.5" text-anchor="start">Sum</text>
+<path class="wire" d="M410 127.5L420 127.5L420 178.5L450 178.5"/>
+<path class="wire" d="M240 77.5L268 77.5L268 250L420 250L420 193.5L450 193.5"/>
+<path class="wire" d="M498 186L524 186"/>
+<text class="lbl" x="532" y="191" text-anchor="start">Carry out</text>
+</svg>
+<figcaption>a full adder from two half adders and one OR gate</figcaption></figure>
+<p>Exercise 8.6 asks you to verify that last claim, which is the only part of this
+construction that is not obvious.</p></div>
+
+<figure class="fig" style="--figmax:23rem">
+<svg viewBox="0 0 390 170" role="img" aria-label="the full adder: three inputs in, two out">
+<rect class="blk" x="140" y="46.0" width="126" height="80" rx="5"/>
+<path class="wire" d="M124 66.0L140 66.0"/>
+<path class="wire" d="M124 106.0L140 106.0"/>
+<path class="wire" d="M266 66.0L282 66.0"/>
+<path class="wire" d="M266 106.0L282 106.0"/>
+<path class="wire" d="M203.0 30.0L203.0 46.0"/>
+<text class="blab" x="203.0" y="87" text-anchor="middle">1-bit</text>
+<text class="bsub" x="203.0" y="103" text-anchor="middle">Full Adder</text>
+<text class="lbl" x="116" y="71.0" text-anchor="end">A</text>
+<text class="lbl" x="116" y="111.0" text-anchor="end">B</text>
+<text class="lbl" x="209.0" y="24.0" text-anchor="start">Carry in</text>
+<text class="lbl" x="290" y="71.0" text-anchor="start">Sum</text>
+<text class="lbl" x="290" y="111.0" text-anchor="start">Carry out</text>
+</svg>
+<figcaption>the full adder: three inputs in, two out</figcaption></figure>
+
+<h2 id="ripple"><span class="secnum">8.3</span>The ripple-carry adder</h2>
+
+<p>Now add <var>n</var>-bit numbers. Column by column, exactly as you would on paper:
+each column adds its two bits plus whatever carry arrived from the column to its right,
+and passes its own carry to the left. That is one full adder per bit, with the carry
+out of each wired to the carry in of the next:</p>
+
+<figure class="fig" style="--figmax:100%">
+<svg viewBox="0 0 760 228" role="img" aria-label="a 4-bit ripple-carry adder: each stage waits for the carry from the stage on its right">
+<rect class="blk" x="82" y="77.0" width="112" height="86" rx="5"/>
+<path class="wire" d="M110.0 61.0L110.0 77.0"/>
+<path class="wire" d="M166.0 61.0L166.0 77.0"/>
+<text class="blab" x="138.0" y="121" text-anchor="middle">Full</text>
+<text class="bsub" x="138.0" y="137" text-anchor="middle">Adder</text>
+<text class="lbl" x="110.0" y="53.0" text-anchor="middle">A<tspan class="sub">3</tspan></text>
+<text class="lbl" x="166.0" y="53.0" text-anchor="middle">B<tspan class="sub">3</tspan></text>
+<path class="wire" d="M138.0 163.0L138.0 189.0"/>
+<text class="lbl" x="138.0" y="207.0" text-anchor="middle">S<tspan class="sub">3</tspan></text>
+<path class="wire" d="M82 120L44 120"/>
+<text class="ann" x="63" y="110" text-anchor="middle">C<tspan class="sub">3</tspan></text>
+<rect class="blk" x="232" y="77.0" width="112" height="86" rx="5"/>
+<path class="wire" d="M260.0 61.0L260.0 77.0"/>
+<path class="wire" d="M316.0 61.0L316.0 77.0"/>
+<text class="blab" x="288.0" y="121" text-anchor="middle">Full</text>
+<text class="bsub" x="288.0" y="137" text-anchor="middle">Adder</text>
+<text class="lbl" x="260.0" y="53.0" text-anchor="middle">A<tspan class="sub">2</tspan></text>
+<text class="lbl" x="316.0" y="53.0" text-anchor="middle">B<tspan class="sub">2</tspan></text>
+<path class="wire" d="M288.0 163.0L288.0 189.0"/>
+<text class="lbl" x="288.0" y="207.0" text-anchor="middle">S<tspan class="sub">2</tspan></text>
+<path class="wire" d="M232 120L194 120"/>
+<text class="ann" x="213" y="110" text-anchor="middle">C<tspan class="sub">2</tspan></text>
+<rect class="blk" x="382" y="77.0" width="112" height="86" rx="5"/>
+<path class="wire" d="M410.0 61.0L410.0 77.0"/>
+<path class="wire" d="M466.0 61.0L466.0 77.0"/>
+<text class="blab" x="438.0" y="121" text-anchor="middle">Full</text>
+<text class="bsub" x="438.0" y="137" text-anchor="middle">Adder</text>
+<text class="lbl" x="410.0" y="53.0" text-anchor="middle">A<tspan class="sub">1</tspan></text>
+<text class="lbl" x="466.0" y="53.0" text-anchor="middle">B<tspan class="sub">1</tspan></text>
+<path class="wire" d="M438.0 163.0L438.0 189.0"/>
+<text class="lbl" x="438.0" y="207.0" text-anchor="middle">S<tspan class="sub">1</tspan></text>
+<path class="wire" d="M382 120L344 120"/>
+<text class="ann" x="363" y="110" text-anchor="middle">C<tspan class="sub">1</tspan></text>
+<rect class="blk" x="532" y="77.0" width="112" height="86" rx="5"/>
+<path class="wire" d="M560.0 61.0L560.0 77.0"/>
+<path class="wire" d="M616.0 61.0L616.0 77.0"/>
+<text class="blab" x="588.0" y="121" text-anchor="middle">Full</text>
+<text class="bsub" x="588.0" y="137" text-anchor="middle">Adder</text>
+<text class="lbl" x="560.0" y="53.0" text-anchor="middle">A<tspan class="sub">0</tspan></text>
+<text class="lbl" x="616.0" y="53.0" text-anchor="middle">B<tspan class="sub">0</tspan></text>
+<path class="wire" d="M588.0 163.0L588.0 189.0"/>
+<text class="lbl" x="588.0" y="207.0" text-anchor="middle">S<tspan class="sub">0</tspan></text>
+<path class="wire" d="M532 120L494 120"/>
+<text class="ann" x="513" y="110" text-anchor="middle">C<tspan class="sub">0</tspan></text>
+<path class="wire" d="M644 120L682 120"/>
+<text class="ann" x="663" y="110" text-anchor="middle">0</text>
+<text class="lbl" x="36" y="125" text-anchor="end">C<tspan class="sub">4</tspan></text>
+</svg>
+<figcaption>a 4-bit ripple-carry adder: each stage waits for the carry from the stage on its right</figcaption></figure>
+
+<p>This is the <strong>ripple-carry adder</strong>, and the name describes how it
+behaves in time. The carry has to travel from the rightmost stage to the leftmost one
+stage at a time, so the top bits of the answer are not correct until the carry has
+rippled all the way along.</p>
+
+<div class="box worked"><span class="bt">Worked example</span>
+<p><span class="bin">0110</span> + <span class="bin">0101</span> in four bits, which is 6 + 5:</p>
+<div class="tablewrap"><table class="lawtab">
+<thead><tr><th></th><th></th></tr></thead>
+<tbody><tr><td class="lawcell">carry in</td><td class="lawcell"><span class="bin">1000</span></td></tr><tr><td class="lawcell">A</td><td class="lawcell"><span class="bin">0110</span></td></tr><tr><td class="lawcell">B</td><td class="lawcell">+&nbsp;<span class="bin">0101</span></td></tr><tr><td class="lawcell">sum</td><td class="lawcell"><span class="bin">1011</span></td></tr><tr><td class="lawcell">carry out</td><td class="lawcell">0</td></tr></tbody></table></div>
+<p>Only one column generates a carry here, the one holding
+<span class="bin">1</span>&nbsp;+&nbsp;<span class="bin">1</span>, and the stage to its
+left receives it. The answer is <span class="bin">1011</span> =
+11, and the carry out of the leftmost stage is 0, so the result fitted in
+four bits.</p></div>
+
+<p>Note what the carry in to the rightmost stage is for ordinary addition: 0. Nothing
+has been carried into the lowest column because there is no column to its right. That
+input looks wasted &mdash; and &sect;8.5 is about to use it.</p>
+
+<h2 id="neg"><span class="secnum">8.4</span>Negative numbers</h2>
+
+<p>The hardware above only knows how to add. Rather than design a subtractor, change
+how negative numbers are <em>written</em> so that subtracting becomes adding.</p>
+
+<p>The idea is visible in decimal first. To work out
+<strong>742&nbsp;&minus;&nbsp;386</strong> without borrowing, note that</p>
+
+<p style="text-align:center;font-size:1.05rem">
+A &minus; B = A + (1000 &minus; B) &minus; 1000</p>
+
+<p>and 1000&nbsp;&minus;&nbsp;B is easy: subtract each digit from 9 and add one.
+So 742&nbsp;&minus;&nbsp;386 becomes 742&nbsp;+&nbsp;614 =
+1356, and then throwing away the leading 1 does the &minus;1000 for free, leaving
+<strong>356</strong>. One addition and one digit crossed out, and no borrowing
+anywhere.</p>
+
+<p>Binary works the same way with powers of two instead of powers of ten, and it is
+even easier: subtracting a bit from 1 is just flipping it. That gives the
+<strong>two&rsquo;s complement</strong> procedure:</p>
+
+<div class="box note"><span class="bt">Writing a number in two&rsquo;s complement</span>
+<ol>
+<li>Choose a width &mdash; a power of two larger than the magnitude you need. If
+|X|&nbsp;&lt;&nbsp;2<sup><var>k</var></sup>, then
+<var>k</var>&nbsp;+&nbsp;1 bits is enough, and every number in the problem uses the
+same width.</li>
+<li>Write |X| in binary, padded with leading zeros to that width.</li>
+<li>If X is positive, stop. That is the answer.</li>
+<li>If X is negative, <strong>flip every bit and add 1</strong>.</li>
+</ol></div>
+
+<p>The leading bit ends up acting as a sign: 0 for positive numbers and 1 for negative
+ones. It is not a separate sign flag, though &mdash; it is an ordinary bit of the
+number, and it carries weight like any other. That is why the arithmetic works out.</p>
+
+<div class="tablewrap"><table class="ttab">
+<thead><tr><th>bits</th><th>unsigned</th><th>two&rsquo;s complement</th></tr></thead>
+<tbody><tr><td class="bin"><span class="bin">0000</span></td><td class="bin">0</td><td class="bin">0</td></tr><tr><td class="bin"><span class="bin">0001</span></td><td class="bin">1</td><td class="bin">1</td></tr><tr><td class="bin"><span class="bin">0110</span></td><td class="bin">6</td><td class="bin">6</td></tr><tr><td class="bin"><span class="bin">0111</span></td><td class="bin">7</td><td class="bin">7</td></tr><tr><td class="bin"><span class="bin">1000</span></td><td class="bin">8</td><td class="bin">-8</td></tr><tr><td class="bin"><span class="bin">1001</span></td><td class="bin">9</td><td class="bin">-7</td></tr><tr><td class="bin"><span class="bin">1110</span></td><td class="bin">14</td><td class="bin">-2</td></tr><tr><td class="bin"><span class="bin">1111</span></td><td class="bin">15</td><td class="bin">-1</td></tr></tbody></table></div>
+
+<h2 id="sub"><span class="secnum">8.5</span>Subtraction by addition</h2>
+
+<p>With negatives written this way, A&nbsp;&minus;&nbsp;B is computed by writing
+&minus;B in two&rsquo;s complement and <em>adding</em>.</p>
+
+<div class="box worked"><span class="bt">Worked example</span>
+<p>27&nbsp;&minus;&nbsp;11 in 6 bits.</p>
+<p><strong>Write both numbers.</strong> 27 = <span class="bin">011011</span>
+and 11 = <span class="bin">001011</span>.</p>
+<p><strong>Negate the second.</strong> Flip every bit of
+<span class="bin">001011</span> to get <span class="bin">110100</span>, then add
+1: &minus;11 = <span class="bin">110101</span>.</p>
+<p><strong>Add.</strong></p>
+<div class="tablewrap"><table class="lawtab">
+<thead><tr><th></th><th></th></tr></thead>
+<tbody><tr><td class="lawcell">carry in</td><td class="lawcell"><span class="bin">111110</span></td></tr><tr><td class="lawcell">27</td><td class="lawcell"><span class="bin">011011</span></td></tr><tr><td class="lawcell">&minus;11</td><td class="lawcell">+&nbsp;<span class="bin">110101</span></td></tr><tr><td class="lawcell">sum</td><td class="lawcell"><span class="bin">010000</span></td></tr><tr><td class="lawcell">carry out</td><td class="lawcell">1</td></tr></tbody></table></div>
+<p>The carry out of the leftmost column is 1, and it is
+<strong>discarded</strong> &mdash; that is the &minus;2<sup><var>n</var></sup> in the
+identity above, happening automatically. What is left is
+<span class="bin">010000</span> = 16, which is
+27&nbsp;&minus;&nbsp;11.</p></div>
+
+<p>So the subtractor is the adder. The only hardware a processor needs in order to
+subtract is a way to turn B into &minus;B on the way in &mdash; flip the bits, and add
+one. Both halves of that are cheap, and the second half is free: remember the carry in
+to the rightmost stage that was sitting at 0. Set it to 1 and it <em>is</em> the
+&ldquo;add one&rdquo;.</p>
+
+<p>That observation is the whole design of the subtract path in an ALU, which is where
+Set 9 goes.</p>
+
+<h2 id="range"><span class="secnum">8.6</span>Range, and the discarded carry</h2>
+
+<p>A fixed width holds a fixed number of patterns, and in two&rsquo;s complement they
+are split almost evenly between negative and non-negative:</p>
+
+<div class="tablewrap"><table class="ttab">
+<thead><tr><th>width <var>n</var></th><th>most negative</th><th>most positive</th><th>how many values</th></tr></thead>
+<tbody><tr><td class="bin">4</td><td class="bin">-8</td><td class="bin">7</td><td class="bin">16</td></tr><tr><td class="bin">6</td><td class="bin">-32</td><td class="bin">31</td><td class="bin">64</td></tr><tr><td class="bin">8</td><td class="bin">-128</td><td class="bin">127</td><td class="bin">256</td></tr><tr><td class="bin">16</td><td class="bin">-32768</td><td class="bin">32767</td><td class="bin">65536</td></tr><tr><td class="bin">32</td><td class="bin">-2147483648</td><td class="bin">2147483647</td><td class="bin">4294967296</td></tr></tbody></table></div>
+
+<p>The range is <strong>asymmetric</strong>: with 4 bits you can write &minus;8 but not
++8. Zero takes up one of the non-negative slots, so there is one more negative value
+than positive one. Exercise 8.13 is about the odd number this creates.</p>
+
+<div class="box warn"><span class="bt">Two different &ldquo;carries&rdquo;</span>
+<p>The carry out of the leftmost stage means different things depending on what you are
+doing, and confusing them is the usual source of trouble.</p>
+<p>When you <em>add two unsigned numbers</em>, a carry out means the answer did not
+fit.</p>
+<p>When you <em>subtract using two&rsquo;s complement</em>, the carry out is the
+&minus;2<sup><var>n</var></sup> term and is simply thrown away &mdash; it says nothing
+about whether the answer is correct.</p>
+<p>Neither of those is the question &ldquo;did this signed answer come out wrong?&rdquo;,
+which is a third thing. Exercise 8.17 takes it up, and it is marked as going beyond what
+the lecture covered.</p></div>
+
+<h2 id="ref"><span class="secnum">8.7</span>Reference</h2>
+
+<ul>
+<li><strong>Half adder.</strong> Sum = A&nbsp;&oplus;&nbsp;B, Carry out = AB. Two
+gates, no carry in.</li>
+<li><strong>Full adder.</strong> Sum = A&nbsp;&oplus;&nbsp;B&nbsp;&oplus;&nbsp;C<sub>in</sub>,
+Carry out = AB&nbsp;+&nbsp;A&middot;C<sub>in</sub>&nbsp;+&nbsp;B&middot;C<sub>in</sub>.
+Sum is odd parity; carry out is &ldquo;at least two of three&rdquo;.</li>
+<li><strong>Ripple-carry adder.</strong> <var>n</var> full adders, carry out to carry
+in. Carry in to the rightmost stage is 0 for addition.</li>
+<li><strong>Two&rsquo;s complement.</strong> Positive: write it in binary. Negative:
+write the magnitude, flip every bit, add 1. Leading bit 1 means negative.</li>
+<li><strong>Negating.</strong> Flip and add one, in either direction.</li>
+<li><strong>Subtracting.</strong> A&nbsp;&minus;&nbsp;B = A&nbsp;+&nbsp;(&minus;B).
+Discard the carry out.</li>
+<li><strong>Range</strong> in <var>n</var> bits:
+&minus;2<sup><var>n</var>&minus;1</sup> to 2<sup><var>n</var>&minus;1</sup>&nbsp;&minus;&nbsp;1.</li>
+</ul>
+
+<h2 id="exercises"><span class="secnum">8.8</span>Exercises</h2>
+
+<p>Write the bits out. Every mistake in this topic is a bookkeeping mistake &mdash; a
+dropped carry, a width that changed halfway through, a flip that missed a bit &mdash;
+and they are all visible on paper and invisible in your head.</p>
+
+<h3>The adders</h3>
+
+<details class="prob"><summary data-label="Exercise 8.1">Build the truth table for adding two single bits, give Sum and Carry out as expressions, and explain what the word &ldquo;half&rdquo; is complaining about.</summary><div class="sol">
+<div class="tablewrap"><table class="ttab">
+<thead><tr><th>A</th><th>B</th><th>Carry out</th><th>Sum</th></tr></thead>
+<tbody><tr><td class="bin">0</td><td class="bin">0</td><td class="bin hilite">0</td><td class="bin hilite">0</td></tr><tr><td class="bin">0</td><td class="bin">1</td><td class="bin hilite">0</td><td class="bin hilite">1</td></tr><tr><td class="bin">1</td><td class="bin">0</td><td class="bin hilite">0</td><td class="bin hilite">1</td></tr><tr><td class="bin">1</td><td class="bin">1</td><td class="bin hilite">1</td><td class="bin hilite">0</td></tr></tbody></table></div>
+<p>Reading the two output columns against the gates of Sets 3 and 4:</p>
+<p style="text-align:center;font-size:1.05rem">
+Sum = A &oplus; B &nbsp;&nbsp;&nbsp; Carry out = AB</p>
+<p>Carry out is 1 only in the row where both inputs are 1, which is AND. Sum is 1 in
+the two rows where the inputs differ, which is XOR &mdash; and the row where both are
+1 gives Sum&nbsp;=&nbsp;0 with the 2 carried, exactly as
+<span class="bin">1</span>&nbsp;+&nbsp;<span class="bin">1</span>&nbsp;=&nbsp;<span class="bin">10</span>
+requires.</p>
+<p><strong>What &ldquo;half&rdquo; means.</strong> Adding two multi-bit numbers means
+adding a column at a time, and every column except the rightmost receives a carry from
+its neighbour. This circuit has two inputs and no way to accept that carry, so it can
+only ever be used for the rightmost column. It does half the job of a real adder stage
+&mdash; hence the name.</p>
+<p>Worth noticing how small it is. The entire arithmetic of a processor is built from
+this, repeated and chained.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 8.2">Draw the half adder as a gate circuit and count the gates. Then say what it costs if you are only allowed AND, OR and NOT.</summary><div class="sol">
+<figure class="fig" style="--figmax:25rem">
+<svg viewBox="0 0 400 185" role="img" aria-label="Sum = A &oplus; B,&nbsp; Carry out = AB">
+<path class="wire" d="M190 38.5H207M190 53.5H207"/>
+<path class="gate open" d="M192 61.0Q201 46 192 31.0"/>
+<path class="gate" d="M198 31.0C216 31.0 224 38.8 229 46C224 53.2 216 61.0 198 61.0Q207 46 198 31.0Z"/>
+<path class="wire" d="M229 46H238"/>
+<path class="wire" d="M190 132.5H200M190 147.5H200"/>
+<path class="gate" d="M198 125.0H212A15.0 15.0 0 0 1 212 155.0H198Z"/>
+<path class="wire" d="M227.0 140H236.0"/>
+<text class="lbl" x="22" y="35" text-anchor="end">A</text>
+<path class="wire" d="M30 30L120 30"/>
+<text class="lbl" x="22" y="83" text-anchor="end">B</text>
+<path class="wire" d="M30 78L140 78"/>
+<path class="wire" d="M120 30L120 38.5L190 38.5"/>
+<path class="wire" d="M120 30L120 132.5L190 132.5"/>
+<circle class="dot" cx="120" cy="30" r="3.2"/>
+<path class="wire" d="M140 78L140 53.5L190 53.5"/>
+<path class="wire" d="M140 78L140 147.5L190 147.5"/>
+<circle class="dot" cx="140" cy="78" r="3.2"/>
+<path class="wire" d="M238 46L264 46"/>
+<text class="lbl" x="272" y="51" text-anchor="start">Sum</text>
+<path class="wire" d="M236.0 140L262.0 140"/>
+<text class="lbl" x="270.0" y="145" text-anchor="start">Carry out</text>
+</svg>
+<figcaption>Sum = A &oplus; B,&nbsp; Carry out = AB</figcaption></figure>
+<p><strong>Two gates</strong>, one XOR and one AND, with both inputs fanning out to
+both gates.</p>
+<p><strong>Without XOR</strong>, Exercise 4.1 built A&nbsp;&oplus;&nbsp;B from five
+gates &mdash; two inverters, two ANDs and an OR &mdash; so the half adder becomes six
+gates in all. The AND that produces the carry can be shared with nothing, because
+A&prime;B and AB&prime; are the terms XOR needs and AB is not one of them.</p>
+<p>This is a good example of why XOR earned its own symbol. A one-bit adder is two
+symbols on paper and six gates in silicon, and the symbol is the useful way to think
+about it.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 8.3">Build the full adder&rsquo;s truth table. Write Carry out as a canonical sum of products, then simplify it with a Karnaugh map.</summary><div class="sol">
+<div class="tablewrap"><table class="ttab">
+<thead><tr><th>A</th><th>B</th><th>Carry in</th><th>Carry out</th><th>Sum</th></tr></thead>
+<tbody><tr><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin hilite">0</td><td class="bin hilite">0</td></tr><tr><td class="bin">0</td><td class="bin">0</td><td class="bin">1</td><td class="bin hilite">0</td><td class="bin hilite">1</td></tr><tr><td class="bin">0</td><td class="bin">1</td><td class="bin">0</td><td class="bin hilite">0</td><td class="bin hilite">1</td></tr><tr><td class="bin">0</td><td class="bin">1</td><td class="bin">1</td><td class="bin hilite">1</td><td class="bin hilite">0</td></tr><tr><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin hilite">0</td><td class="bin hilite">1</td></tr><tr><td class="bin">1</td><td class="bin">0</td><td class="bin">1</td><td class="bin hilite">1</td><td class="bin hilite">0</td></tr><tr><td class="bin">1</td><td class="bin">1</td><td class="bin">0</td><td class="bin hilite">1</td><td class="bin hilite">0</td></tr><tr><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td><td class="bin hilite">1</td><td class="bin hilite">1</td></tr></tbody></table></div>
+<p><strong>Carry out</strong> is 1 in rows 3, 5, 6 and 7, so the canonical sum of
+products is</p>
+<p style="text-align:center;font-size:1.05rem">
+A&prime;BC<sub>in</sub> + AB&prime;C<sub>in</sub> + ABC<sub>in</sub>&prime; +
+ABC<sub>in</sub></p>
+<p><strong>On a map</strong>, with A down the side and B&nbsp;C<sub>in</sub> across the
+top, those four cells form three overlapping pairs:</p>
+<figure class="fig" style="--figmax:12.0rem">
+<svg viewBox="0 0 312 186" role="img" aria-label="the three pairs give AB, A&middot;C and B&middot;C &mdash; C is the carry in">
+<text class="kvar" x="66" y="18" text-anchor="start">BC</text>
+<text class="kvar" x="46" y="40" text-anchor="end">A</text>
+<path class="kslash" d="M18 4L60 26"/>
+<text class="klab" x="91.0" y="38" text-anchor="middle">00</text>
+<text class="klab" x="149.0" y="38" text-anchor="middle">01</text>
+<text class="klab" x="207.0" y="38" text-anchor="middle">11</text>
+<text class="klab" x="265.0" y="38" text-anchor="middle">10</text>
+<text class="klab" x="50" y="84.0" text-anchor="end">0</text>
+<text class="klab" x="50" y="142.0" text-anchor="end">1</text>
+<rect class="kcell" x="62" y="50" width="58" height="58" rx="3"/>
+<text class="kval zero" x="91.0" y="87.0" text-anchor="middle">0</text>
+<text class="kidx" x="67" y="64" text-anchor="start">0</text>
+<rect class="kcell" x="120" y="50" width="58" height="58" rx="3"/>
+<text class="kval zero" x="149.0" y="87.0" text-anchor="middle">0</text>
+<text class="kidx" x="125" y="64" text-anchor="start">1</text>
+<rect class="kcell" x="236" y="50" width="58" height="58" rx="3"/>
+<text class="kval zero" x="265.0" y="87.0" text-anchor="middle">0</text>
+<text class="kidx" x="241" y="64" text-anchor="start">2</text>
+<rect class="kcell" x="178" y="50" width="58" height="58" rx="3"/>
+<text class="kval" x="207.0" y="87.0" text-anchor="middle">1</text>
+<text class="kidx" x="183" y="64" text-anchor="start">3</text>
+<rect class="kcell" x="62" y="108" width="58" height="58" rx="3"/>
+<text class="kval zero" x="91.0" y="145.0" text-anchor="middle">0</text>
+<text class="kidx" x="67" y="122" text-anchor="start">4</text>
+<rect class="kcell" x="120" y="108" width="58" height="58" rx="3"/>
+<text class="kval" x="149.0" y="145.0" text-anchor="middle">1</text>
+<text class="kidx" x="125" y="122" text-anchor="start">5</text>
+<rect class="kcell" x="236" y="108" width="58" height="58" rx="3"/>
+<text class="kval" x="265.0" y="145.0" text-anchor="middle">1</text>
+<text class="kidx" x="241" y="122" text-anchor="start">6</text>
+<rect class="kcell" x="178" y="108" width="58" height="58" rx="3"/>
+<text class="kval" x="207.0" y="145.0" text-anchor="middle">1</text>
+<text class="kidx" x="183" y="122" text-anchor="start">7</text>
+<rect class="kgrp grp0" x="183" y="113" width="106" height="48" rx="10"/>
+<rect class="kgrp grp1" x="129" y="117" width="98" height="40" rx="10"/>
+<rect class="kgrp grp2" x="191" y="63" width="32" height="90" rx="10"/>
+</svg>
+<figcaption>the three pairs give AB, A&middot;C and B&middot;C &mdash; C is the carry in</figcaption></figure>
+<p style="text-align:center;font-size:1.05rem">
+Carry out = AB + A&middot;C<sub>in</sub> + B&middot;C<sub>in</sub></p>
+<p>Three terms, each a pair of inputs, and the symmetry is the point: the carry does
+not care <em>which</em> two of the three inputs are 1, only that two of them are. Cell
+7 &mdash; all three inputs 1 &mdash; is covered three times over, which costs
+nothing.</p>
+<p>None of the three terms is redundant here, so this is minimal. Compare it with the
+consensus pattern of Exercise 4.12, where a third term <em>was</em> redundant: there
+the three terms were XY, X&prime;Z and YZ, with one variable appearing in both
+polarities. Here all three literals are plain, and nothing drops out.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 8.4">Show that the full adder&rsquo;s Sum column equals A&nbsp;&oplus;&nbsp;B&nbsp;&oplus;&nbsp;C<sub>in</sub>, and say why that is the expression you would expect.</summary><div class="sol">
+<p>The Sum column is 1 in rows 1, 2, 4 and 7 &mdash; inputs 001, 010, 100 and 111. Each
+of those has an <strong>odd</strong> number of 1s, and the rows with an even number
+(000, 011, 101, 110) all give 0.</p>
+<p>From Exercise 4.6, a chain of XORs is 1 exactly when an odd number of its inputs are
+1. So the Sum column <em>is</em> the three-input XOR:</p>
+<p style="text-align:center;font-size:1.05rem">
+Sum = A &oplus; B &oplus; C<sub>in</sub></p>
+<p><strong>Why to expect it.</strong> Sum is the low bit of the total
+A&nbsp;+&nbsp;B&nbsp;+&nbsp;C<sub>in</sub>, and the low bit of a total is its parity:
+odd totals end in 1, even totals in 0. The carry out holds the rest. So the two outputs
+are a clean division &mdash; Sum reports the parity and Carry out reports whether the
+total reached two.</p>
+<p>Exercise 5.13 showed that this function&rsquo;s canonical form has four minterms and
+no two of them combine, so as an AND&ndash;OR circuit the Sum output costs five gates.
+With XOR gates it costs two. The adder is the reason that gap matters.</p>
+</div></details>
+
+<details class="prob"><summary data-label="Exercise 8.5">The drawn circuit uses Carry out = AB&nbsp;+&nbsp;C<sub>in</sub>(A&nbsp;&oplus;&nbsp;B) rather than AB&nbsp;+&nbsp;A&middot;C<sub>in</sub>&nbsp;+&nbsp;B&middot;C<sub>in</sub>. Show the two are equal, and say why the circuit prefers the first.</summary><div class="sol">
+<div class="tablewrap"><table class="ttab">
+<thead><tr><th>A</th><th>B</th><th>C<sub>in</sub></th><th>AB</th><th>A&middot;C<sub>in</sub></th><th>B&middot;C<sub>in</sub></th><th>AB + AC<sub>in</sub> + BC<sub>in</sub></th><th>AB + C<sub>in</sub>(A &oplus; B)</th></tr></thead>
+<tbody><tr><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin hilite">0</td><td class="bin hilite">0</td></tr><tr><td class="bin">0</td><td class="bin">0</td><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin hilite">0</td><td class="bin hilite">0</td></tr><tr><td class="bin">0</td><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin hilite">0</td><td class="bin hilite">0</td></tr><tr><td class="bin">0</td><td class="bin">1</td><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin">1</td><td class="bin hilite">1</td><td class="bin hilite">1</td></tr><tr><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin">0</td><td class="bin hilite">0</td><td class="bin hilite">0</td></tr><tr><td class="bin">1</td><td class="bin">0</td><td class="bin">1</td><td class="bin">0</td><td class="bin">1</td><td class="bin">0</td><td class="bin hilite">1</td><td class="bin hilite">1</td></tr><tr><td class="bin">1</td><td class="bin">1</td><td class="bin">0</td><td class="bin">1</td><td class="bin">0</td><td class="bin">0</td><td class="bin hilite">1</td><td class="bin hilite">1</td></tr><tr><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td><td class="bin">1</td><td class="bin hilite">1</td><td class="bin hilite">1</td></tr></tbody></table></div>
+<p>The two shaded columns agree in all eight rows.</p>
+<p><strong>Algebraically</strong>, expand the XOR and distribute:</p>
+<p style="text-align:center;font-size:1.05rem">
+C<sub>in</sub>(A &oplus; B) = C<sub>in</sub>(AB&prime; + A&prime;B)
+= A B&prime; C<sub>in</sub> + A&prime; B C<sub>in</sub></p>
+<p>so the first form is AB&nbsp;+&nbsp;AB&prime;C<sub>in</sub>&nbsp;+&nbsp;A&prime;BC<sub>in</sub>.
+The second form is AB&nbsp;+&nbsp;AC<sub>in</sub>&nbsp;+&nbsp;BC<sub>in</sub>, and
+expanding its last two terms over the missing variable gives
+ABC<sub>in</sub>&nbsp;+&nbsp;AB&prime;C<sub>in</sub> and
+ABC<sub>in</sub>&nbsp;+&nbsp;A&prime;BC<sub>in</sub>. Both collect to minterms 3, 5, 6,
+7 &mdash; the same function.</p>
+<p><strong>Why the circuit prefers it.</strong> A&nbsp;&oplus;&nbsp;B has already been
+built for the Sum output. Reusing that signal means the carry path costs one AND and one
+OR on top of it, rather than three fresh AND gates. Five gates in total rather than
+six.</p>
+<p>Sharing a sub-expression between two outputs is the same move that saved a gate in
+the four-NAND XOR of Exercise 7.11, and it is the main thing hand optimisation of a
+multi-output circuit consists of.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 8.6">A full adder can be built from two half adders and one OR gate. Explain why an OR is enough to combine the two carries &mdash; that is, show the two half adders can never both produce a carry.</summary><div class="sol">
+<figure class="fig" style="--figmax:100%">
+<svg viewBox="0 0 600 285" role="img" aria-label="a full adder from two half adders and one OR gate">
+<rect class="blk" x="120" y="25.0" width="104" height="70" rx="5"/>
+<path class="wire" d="M104 42.5L120 42.5"/>
+<path class="wire" d="M104 77.5L120 77.5"/>
+<path class="wire" d="M224 42.5L240 42.5"/>
+<path class="wire" d="M224 77.5L240 77.5"/>
+<text class="blab" x="172.0" y="61" text-anchor="middle">Half</text>
+<text class="bsub" x="172.0" y="77" text-anchor="middle">Adder</text>
+<rect class="blk" x="290" y="75.0" width="104" height="70" rx="5"/>
+<path class="wire" d="M274 92.5L290 92.5"/>
+<path class="wire" d="M274 127.5L290 127.5"/>
+<path class="wire" d="M394 92.5L410 92.5"/>
+<path class="wire" d="M394 127.5L410 127.5"/>
+<text class="blab" x="342.0" y="111" text-anchor="middle">Half</text>
+<text class="bsub" x="342.0" y="127" text-anchor="middle">Adder</text>
+<path class="wire" d="M450 178.5H467M450 193.5H467"/>
+<path class="gate" d="M458 171.0C476 171.0 484 178.8 489 186C484 193.2 476 201.0 458 201.0Q467 186 458 171.0Z"/>
+<path class="wire" d="M489 186H498"/>
+<text class="lbl" x="96" y="47.5" text-anchor="end">A</text>
+<text class="lbl" x="96" y="82.5" text-anchor="end">B</text>
+<text class="lbl" x="22" y="185" text-anchor="end">C<tspan class="sub">in</tspan></text>
+<path class="wire" d="M240 42.5L255 42.5L255 92.5L274 92.5"/>
+<path class="wire" d="M30 180L255 180L255 127.5L274 127.5"/>
+<path class="wire" d="M410 92.5L480 92.5"/>
+<text class="lbl" x="488" y="97.5" text-anchor="start">Sum</text>
+<path class="wire" d="M410 127.5L420 127.5L420 178.5L450 178.5"/>
+<path class="wire" d="M240 77.5L268 77.5L268 250L420 250L420 193.5L450 193.5"/>
+<path class="wire" d="M498 186L524 186"/>
+<text class="lbl" x="532" y="191" text-anchor="start">Carry out</text>
+</svg>
+<figcaption>a full adder from two half adders and one OR gate</figcaption></figure>
+<p>The first half adder adds A and B, producing
+<var>s</var><sub>1</sub>&nbsp;=&nbsp;A&nbsp;&oplus;&nbsp;B and
+<var>c</var><sub>1</sub>&nbsp;=&nbsp;AB. The second adds
+<var>s</var><sub>1</sub> to C<sub>in</sub>, producing the final Sum
+<var>s</var><sub>1</sub>&nbsp;&oplus;&nbsp;C<sub>in</sub>&nbsp;=&nbsp;A&nbsp;&oplus;&nbsp;B&nbsp;&oplus;&nbsp;C<sub>in</sub>
+&mdash; which is right &mdash; and a second carry
+<var>c</var><sub>2</sub>&nbsp;=&nbsp;<var>s</var><sub>1</sub>C<sub>in</sub>.</p>
+<p><strong>They can never both be 1.</strong> Suppose
+<var>c</var><sub>1</sub>&nbsp;=&nbsp;1. Then A and B are both 1, so
+<var>s</var><sub>1</sub>&nbsp;=&nbsp;A&nbsp;&oplus;&nbsp;B&nbsp;=&nbsp;0, and therefore
+<var>c</var><sub>2</sub>&nbsp;=&nbsp;<var>s</var><sub>1</sub>C<sub>in</sub>&nbsp;=&nbsp;0.
+The two carries are mutually exclusive, so OR-ing them loses nothing &mdash; there is
+never a case where OR would have to report &ldquo;two carries&rdquo; and cannot.</p>
+<p>In arithmetic terms: the column total is at most 3, which is
+<span class="bin">11</span>, so it needs only one carry bit. Two carries at once would
+mean a total of at least 4, which three single bits cannot reach.</p>
+<p>The gate count comes out the same either way &mdash; two XORs, two ANDs and an OR
+&mdash; because a half adder <em>is</em> an XOR and an AND. The construction is worth
+knowing for the explanation it gives, not for any saving.</p></div></details>
+
+<h3>Ripple carry</h3>
+
+<details class="prob"><summary data-label="Exercise 8.7">Add <span class="bin">1001</span> and <span class="bin">0111</span> on a 4-bit ripple-carry adder. Show the carry into and out of every stage. Treating the inputs as unsigned, is the answer right?</summary><div class="sol">
+<div class="tablewrap"><table class="lawtab">
+<thead><tr><th></th><th></th></tr></thead>
+<tbody><tr><td class="lawcell">carry in</td><td class="lawcell"><span class="bin">1110</span></td></tr><tr><td class="lawcell">A</td><td class="lawcell"><span class="bin">1001</span></td></tr><tr><td class="lawcell">B</td><td class="lawcell">+&nbsp;<span class="bin">0111</span></td></tr><tr><td class="lawcell">sum</td><td class="lawcell"><span class="bin">0000</span></td></tr><tr><td class="lawcell">carry out</td><td class="lawcell">1</td></tr></tbody></table></div>
+<p>Stage by stage, from the right, with C<sub>0</sub>&nbsp;=&nbsp;0:</p>
+<ul>
+<li><strong>Bit 0:</strong> 1&nbsp;+&nbsp;1&nbsp;+&nbsp;0 = 2, so Sum 0, carry 1.</li>
+<li><strong>Bit 1:</strong> 0&nbsp;+&nbsp;1&nbsp;+&nbsp;1 = 2, so Sum 0, carry 1.</li>
+<li><strong>Bit 2:</strong> 0&nbsp;+&nbsp;1&nbsp;+&nbsp;1 = 2, so Sum 0, carry 1.</li>
+<li><strong>Bit 3:</strong> 1&nbsp;+&nbsp;0&nbsp;+&nbsp;1 = 2, so Sum 0, carry 1.</li>
+</ul>
+<p>The four sum bits are <span class="bin">0000</span> and the carry out is
+<strong>1</strong>.</p>
+<p><strong>Unsigned, the answer is wrong</strong> &mdash; or rather, incomplete.
+<span class="bin">1001</span> is 9 and <span class="bin">0111</span> is 7, so the total
+is 16, and 16 does not fit in four bits. The real answer is
+<span class="bin">10000</span>, five bits wide; the adder kept the low four and handed
+you the fifth as the carry out. A carry out of 1 from an unsigned addition is exactly
+the signal &ldquo;this did not fit&rdquo;.</p>
+<p>This is also the worst case for the ripple: every stage generated a carry, so the
+leftmost stage could not produce its output until the carry had travelled through all
+four. Exercise 8.8 puts a number on that.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 8.8">A full adder takes 2 gate delays to produce its carry out once its inputs are stable. How long does a 32-bit ripple-carry adder take to produce a correct answer? Which output bit settles last, and why is this the adder&rsquo;s central weakness?</summary><div class="sol">
+<p>The carry enters stage 0 at time 0. Stage 0&rsquo;s carry out is ready at 2 delays,
+stage 1&rsquo;s at 4, and so on: stage <var>k</var>&rsquo;s carry out is ready at
+2(<var>k</var>&nbsp;+&nbsp;1) delays.</p>
+<p>For 32 bits the last carry, out of stage 31, is ready after
+<strong>64 gate delays</strong>, and the top sum bit needs a further delay or two after
+its carry in arrives. The answer is not trustworthy until then.</p>
+<p><strong>The last bit to settle is the most significant one</strong>, because it is
+at the far end of the chain. Every other stage is waiting on its right-hand
+neighbour.</p>
+<p><strong>Why it matters.</strong> The delay grows <em>linearly</em> with the width.
+Doubling from 32 to 64 bits doubles the time, and since a processor cannot start the
+next operation until this one is finished, that delay sets a ceiling on the clock
+speed. Everything else in a one-bit stage is fast; it is the carry chain, and only the
+carry chain, that is slow.</p>
+<p>Note what is <em>not</em> the problem: gate count. A 32-bit ripple adder is 32
+identical small circuits, which is cheap and easy to lay out. It is time, not area,
+that forces the issue &mdash; which is the subject of Exercise 8.18.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 8.9">What is wired to the carry in of the rightmost stage when the adder is used for ordinary addition? What would the circuit compute if you set that input to 1 instead?</summary><div class="sol">
+<p>For ordinary addition it is tied to <strong>0</strong>. The rightmost column has no
+column to its right, so nothing can have been carried into it.</p>
+<p><strong>Setting it to 1 computes A&nbsp;+&nbsp;B&nbsp;+&nbsp;1.</strong> The 1 enters
+the lowest column and propagates upward like any other carry, so the whole result is one
+larger.</p>
+<p>That looks like a strange thing to want until you put it beside the two&rsquo;s
+complement rule from &sect;8.4. Negating B means flipping every bit of B
+<em>and adding 1</em>. The flip can be done with one inverter per bit; the
+&ldquo;add 1&rdquo; needs an adder &mdash; except that the adder already has an unused
+input sitting at 0 that does exactly this.</p>
+<p>So the complete subtractor is: invert every bit of B, set the carry in to 1, and the
+existing adder produces A&nbsp;&minus;&nbsp;B. No second circuit, and the cost of the
+subtract capability is one inverter per bit plus a wire. Set 9 builds precisely
+this.</p>
+<p>It is worth appreciating how fortunate this is. The carry in exists because stages in
+the middle of the chain need one; the rightmost stage inherits it for free; and that
+free input turns out to be exactly the piece two&rsquo;s complement was missing.</p>
+</div></details>
+
+<h3>Two&rsquo;s complement</h3>
+
+<details class="prob"><summary data-label="Exercise 8.10">Write the 4-bit two&rsquo;s complement representation of +5, &minus;5, &minus;1 and &minus;8.</summary><div class="sol">
+<p><strong>+5.</strong> Positive, so write it in binary and stop:
+<span class="bin">0101</span>.</p>
+<p><strong>&minus;5.</strong> Start from
+<span class="bin">0101</span>, flip every bit to get
+<span class="bin">1010</span>, then add 1:
+<span class="bin">1011</span>.</p>
+<p><strong>&minus;1.</strong> From <span class="bin">0001</span>, flip to
+<span class="bin">1110</span>, add 1: <span class="bin">1111</span>. All ones is
+always &minus;1, whatever the width &mdash; worth memorising, because it comes up
+constantly.</p>
+<p><strong>&minus;8.</strong> From <span class="bin">1000</span> &mdash; which is 8 in
+plain binary &mdash; flip to <span class="bin">0111</span> and add 1, giving
+<span class="bin">1000</span>, back where you started. That is not an error: see
+Exercise 8.13.</p>
+<p>Check each with the place values, remembering that in two&rsquo;s complement the
+leading bit carries weight &minus;8 rather than +8:
+<span class="bin">1011</span> is &minus;8&nbsp;+&nbsp;2&nbsp;+&nbsp;1 = &minus;5,
+and <span class="bin">1111</span> is &minus;8&nbsp;+&nbsp;4&nbsp;+&nbsp;2&nbsp;+&nbsp;1
+= &minus;1. That reading &mdash; the top bit is negative, the rest are normal &mdash;
+is the fastest way to convert back, and it is Exercise 8.11.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 8.11">These are 8-bit two&rsquo;s complement patterns. What decimal numbers are they? <span class="bin">00101100</span>, <span class="bin">11111001</span>, <span class="bin">10000000</span>.</summary><div class="sol">
+<p>The leading bit tells you the sign immediately, and the quickest route for a negative
+one is to read the top bit as a negative weight.</p>
+<p><strong><span class="bin">00101100</span></strong> starts with 0, so it is positive
+and reads as ordinary binary: 32&nbsp;+&nbsp;8&nbsp;+&nbsp;4 = <strong>44</strong>.</p>
+<p><strong><span class="bin">11111001</span></strong> starts with 1, so it is negative.
+Weighting the top bit &minus;128 and the rest normally:
+&minus;128&nbsp;+&nbsp;64&nbsp;+&nbsp;32&nbsp;+&nbsp;16&nbsp;+&nbsp;8&nbsp;+&nbsp;1 =
+<strong>&minus;7</strong>.</p>
+<p>The other route is to negate and read: flip <span class="bin">11111001</span> to
+<span class="bin">00000110</span>, add 1 to get <span class="bin">00000111</span> = 7,
+so the original was &minus;7. Both work; the first is fewer steps.</p>
+<p><strong><span class="bin">10000000</span></strong> is &minus;128, the most negative
+8-bit value. Negating it gives itself back, which is the special case of Exercise
+8.13.</p>
+<p>A sanity check worth doing every time: a pattern of mostly 1s is a <em>small</em>
+negative number, not a large one. <span class="bin">11111001</span> being &minus;7 rather
+than &minus;249 surprises people, and the surprise goes away once you think of the
+leading 1s as &ldquo;no extra magnitude, just sign&rdquo;.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 8.12">What range of values does <var>n</var>-bit two&rsquo;s complement cover? Why is the range asymmetric, and what are the ranges for 8, 16 and 32 bits?</summary><div class="sol">
+<p><var>n</var> bits give 2<sup><var>n</var></sup> patterns. Those with a leading 0 are
+the non-negative values and those with a leading 1 are the negatives, splitting the
+patterns exactly in half:</p>
+<p style="text-align:center;font-size:1.05rem">
+&minus;2<sup><var>n</var>&minus;1</sup> &hellip; 2<sup><var>n</var>&minus;1</sup> &minus; 1</p>
+<div class="tablewrap"><table class="ttab">
+<thead><tr><th>width <var>n</var></th><th>most negative</th><th>most positive</th><th>how many values</th></tr></thead>
+<tbody><tr><td class="bin">4</td><td class="bin">-8</td><td class="bin">7</td><td class="bin">16</td></tr><tr><td class="bin">6</td><td class="bin">-32</td><td class="bin">31</td><td class="bin">64</td></tr><tr><td class="bin">8</td><td class="bin">-128</td><td class="bin">127</td><td class="bin">256</td></tr><tr><td class="bin">16</td><td class="bin">-32768</td><td class="bin">32767</td><td class="bin">65536</td></tr><tr><td class="bin">32</td><td class="bin">-2147483648</td><td class="bin">2147483647</td><td class="bin">4294967296</td></tr></tbody></table></div>
+<p><strong>Why asymmetric.</strong> Zero has to live somewhere, and its pattern
+(all 0s) has a leading 0, so it is counted among the non-negatives. That leaves
+2<sup><var>n</var>&minus;1</sup> patterns for the negatives but only
+2<sup><var>n</var>&minus;1</sup>&nbsp;&minus;&nbsp;1 for the positives. One more
+negative value than positive.</p>
+<p>This is the practical consequence of two&rsquo;s complement having exactly one
+representation for zero &mdash; which is the property that makes the arithmetic work.
+Representations that keep the range symmetric, such as sign-and-magnitude, pay for it
+with two different patterns for zero and with addition hardware that has to test signs.
+The asymmetry is the price of the adder being simple, and it is a bargain.</p>
+<p>The familiar numbers follow: an 8-bit byte holds &minus;128 to 127, a 16-bit value
+&minus;32,768 to 32,767, and a 32-bit word about &plusmn;2.1 billion. The last of those
+is why a signed 32-bit counter of seconds runs out in 2038.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 8.13">Negate &minus;6 in 4 bits and check you get +6 back. Then try to negate &minus;8 in 4 bits. What happens, and why?</summary><div class="sol">
+<p><strong>&minus;6</strong> in 4 bits is <span class="bin">1010</span>. Flip:
+<span class="bin">0101</span>. Add 1: <span class="bin">0110</span>, which is
++6. Negation undoes itself, as it must.</p>
+<p><strong>&minus;8</strong> is <span class="bin">1000</span>. Flip:
+<span class="bin">0111</span>. Add 1: <span class="bin">1000</span> &mdash; the same
+pattern, still &minus;8.</p>
+<p><strong>Why.</strong> Negating should produce +8, and +8 is not representable in 4
+bits: the range stops at +7. The hardware cannot report a number it has no pattern for,
+so it returns the only thing it can, which is the input. The asymmetry of Exercise 8.12
+has to show up somewhere, and this is where.</p>
+<p>The same holds at every width: &minus;128 in 8 bits and
+&minus;2,147,483,648 in 32 bits are their own negatives. It is a genuine edge case in
+real software &mdash; taking the absolute value of the most negative integer gives a
+negative answer, and in C that is undefined behaviour rather than a wrong number.</p>
+<p>A useful way to see it: negation pairs each value with another, and there are an
+even number of patterns. Zero pairs with itself, so one other value must also pair with
+itself for the count to work out, and that value is the most negative one.</p>
+</div></details>
+
+<details class="prob"><summary data-label="Exercise 8.14">Here is a shortcut for negating: copy the bits from the right up to and including the rightmost 1, then flip everything to the left of it. Check it against flip-and-add-one on <span class="bin">01011000</span>, and explain why it works.</summary><div class="sol">
+<p><strong>The shortcut</strong> on <span class="bin">01011000</span>: the rightmost
+1 is in position 3, so copy that bit and the zeros to its right
+unchanged, and flip the rest. That gives
+<span class="bin">10101000</span>.</p>
+<p><strong>The long way</strong>: flip <span class="bin">01011000</span> to
+<span class="bin">10100111</span>, then add 1, which gives
+<span class="bin">10101000</span>. Same answer.</p>
+<p><strong>Why it works.</strong> Look at what adding 1 does to the flipped number.
+The original ends in the rightmost 1 followed by some zeros; flipping turns that tail
+into a 0 followed by some ones. Adding 1 to a string of ones makes them all 0 and
+carries, and that carry stops at the first 0 it meets &mdash; which is exactly the
+flipped copy of the original&rsquo;s rightmost 1, turning it back into a 1.</p>
+<p>So the carry ripples through precisely the tail and dies there. Everything to the
+left of the rightmost 1 is flipped and never touched by the carry; everything from the
+rightmost 1 rightward ends up back where it started.</p>
+<p>This is the method to use by hand, and it is also why negation is fast in hardware:
+one inverter per bit and a carry that, despite appearances, usually dies within a bit or
+two.</p></div></details>
+
+<h3>Subtraction</h3>
+
+<details class="prob"><summary data-label="Exercise 8.15">Compute 21&nbsp;&minus;&nbsp;13 and 13&nbsp;&minus;&nbsp;21 in 6-bit two&rsquo;s complement. Show the negation and the addition for each, and state what happens to the carry out.</summary><div class="sol">
+<p><strong>21&nbsp;&minus;&nbsp;13.</strong> In 6 bits,
+21 = <span class="bin">010101</span> and
+13 = <span class="bin">001101</span>. Negate the second: flip to
+<span class="bin">110010</span>, add 1, giving
+&minus;13 = <span class="bin">110011</span>. Add:</p>
+<div class="tablewrap"><table class="lawtab">
+<thead><tr><th></th><th></th></tr></thead>
+<tbody><tr><td class="lawcell">carry in</td><td class="lawcell"><span class="bin">101110</span></td></tr><tr><td class="lawcell">21</td><td class="lawcell"><span class="bin">010101</span></td></tr><tr><td class="lawcell">&minus;13</td><td class="lawcell">+&nbsp;<span class="bin">110011</span></td></tr><tr><td class="lawcell">sum</td><td class="lawcell"><span class="bin">001000</span></td></tr><tr><td class="lawcell">carry out</td><td class="lawcell">1</td></tr></tbody></table></div>
+<p>The carry out is 1 and is discarded. The result
+<span class="bin">001000</span> has a leading 0, so it is positive, and it reads as
+<strong>8</strong>.</p>
+<p><strong>13&nbsp;&minus;&nbsp;21.</strong> Now negate 21:
+flip <span class="bin">010101</span> to <span class="bin">101010</span>, add
+1, giving <span class="bin">101011</span>. Add:</p>
+<div class="tablewrap"><table class="lawtab">
+<thead><tr><th></th><th></th></tr></thead>
+<tbody><tr><td class="lawcell">carry in</td><td class="lawcell"><span class="bin">011110</span></td></tr><tr><td class="lawcell">13</td><td class="lawcell"><span class="bin">001101</span></td></tr><tr><td class="lawcell">&minus;21</td><td class="lawcell">+&nbsp;<span class="bin">101011</span></td></tr><tr><td class="lawcell">sum</td><td class="lawcell"><span class="bin">111000</span></td></tr><tr><td class="lawcell">carry out</td><td class="lawcell">0</td></tr></tbody></table></div>
+<p>This time the carry out is 0. The result
+<span class="bin">111000</span> has a leading 1, so it is negative; reading the top
+bit as a negative weight, or negating and reading, gives
+<strong>-8</strong>.</p>
+<p>Two things to take from the pair. The same hardware handled both, with no test of
+which number was larger &mdash; that is the whole point of the representation. And the
+carry out differed between them (1 against 0) while both answers
+were correct, which is Exercise 8.16.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 8.16">In the subtraction above, the carry out of the leftmost column is thrown away. Why is that legitimate rather than losing information?</summary><div class="sol">
+<p>Work through what the hardware actually computed. Writing &minus;B in <var>n</var>-bit
+two&rsquo;s complement means writing the pattern for
+2<sup><var>n</var></sup>&nbsp;&minus;&nbsp;B. So adding gives</p>
+<p style="text-align:center;font-size:1.05rem">
+A + (2<sup><var>n</var></sup> &minus; B) = (A &minus; B) + 2<sup><var>n</var></sup></p>
+<p>which is the answer you wanted plus one extra 2<sup><var>n</var></sup>. And
+2<sup><var>n</var></sup> in binary is a 1 followed by <var>n</var> zeros &mdash; a bit
+sitting one place to the left of everything the adder keeps. Discarding the carry out
+subtracts that 2<sup><var>n</var></sup> back off, which is the
+&ldquo;&nbsp;&minus;&nbsp;1000&nbsp;&rdquo; from the decimal version in &sect;8.4
+happening by itself.</p>
+<p><strong>Why no information is lost.</strong> That bit is not part of the answer; it
+is an artefact of how &minus;B was written. The <var>n</var> bits the adder keeps are
+the complete result, assuming it fits in <var>n</var> bits.</p>
+<p>Which is also why the carry out says nothing useful here. In Exercise 8.15 the first
+subtraction produced a carry and the second did not, and both answers were right. For a
+two&rsquo;s complement subtraction the carry out is noise &mdash; it reflects the
+borrowing pattern, not the correctness of the result. Reading it as an error flag is a
+common and costly mistake.</p>
+<p>Compare Exercise 8.7, where the inputs were unsigned and a carry out <em>did</em>
+mean the answer had not fitted. Same wire, opposite meaning, and only the
+<em>interpretation</em> of the input bits decides which.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 8.17">Beyond this lecture. Add 5 and 6 as 4-bit two&rsquo;s complement numbers. The answer is wrong &mdash; explain why, and find a rule that detects this from the bits alone.</summary><div class="sol">
+<div class="box warn"><span class="bt">Not covered in class</span>
+<p>This exercise goes past what the adder lecture covered, which stopped at the carry
+being discarded. It is here because the question comes up the moment you use the
+circuit, not because it is examinable.</p></div>
+<p>5 is <span class="bin">0101</span> and 6 is
+<span class="bin">0110</span>. Adding:</p>
+<div class="tablewrap"><table class="lawtab">
+<thead><tr><th></th><th></th></tr></thead>
+<tbody><tr><td class="lawcell">carry in</td><td class="lawcell"><span class="bin">1000</span></td></tr><tr><td class="lawcell">5</td><td class="lawcell"><span class="bin">0101</span></td></tr><tr><td class="lawcell">6</td><td class="lawcell">+&nbsp;<span class="bin">0110</span></td></tr><tr><td class="lawcell">sum</td><td class="lawcell"><span class="bin">1011</span></td></tr><tr><td class="lawcell">carry out</td><td class="lawcell">0</td></tr></tbody></table></div>
+<p>The four-bit result is <span class="bin">1011</span>, which as a two&rsquo;s
+complement number is <strong>-5</strong> &mdash; but
+5&nbsp;+&nbsp;6 is 11. Two positive numbers have added to give a
+negative one.</p>
+<p><strong>What went wrong.</strong> 11 is outside the 4-bit range, which stops
+at +7. The correct answer needs a bit that does not exist, and the sum has spilled into
+the position that holds the sign.</p>
+<p><strong>The rule.</strong> Two numbers of the <em>same</em> sign that produce a
+result of the <em>opposite</em> sign have overflowed. Adding numbers of opposite signs
+can never overflow, since the result lies between them in magnitude and both already
+fit.</p>
+<p>In hardware this is detected without comparing signs at all: <strong>overflow has
+occurred exactly when the carry into the leftmost stage differs from the carry out of
+it</strong>. Check it here &mdash; the carry into the top stage is 1 and the
+carry out is 0, and they differ. A single XOR gate on two wires the adder
+already has.</p>
+<p>Note how different this is from the carry out on its own. The carry out means
+&ldquo;did not fit&rdquo; for unsigned addition, means nothing for two&rsquo;s complement
+subtraction, and is half of the overflow test for signed addition. Processors compute
+both flags on every operation and let the instruction decide which to look at.</p>
+</div></details>
+
+<details class="prob"><summary data-label="Exercise 8.18">Challenge. Exercise 8.8 showed a 32-bit ripple-carry adder takes 64 gate delays. Work out what the carry into stage <var>k</var> depends on, and explain how that lets a faster adder be built.</summary><div class="sol">
+<p><strong>Where the time goes.</strong> The ripple adder is slow for one reason: stage
+<var>k</var> cannot start until stage <var>k</var>&nbsp;&minus;&nbsp;1 has finished. But
+that is a property of the <em>circuit</em>, not of the problem. The carry into stage
+<var>k</var> is a function of the original inputs
+A<sub>0</sub>&hellip;A<sub><var>k</var>&minus;1</sub> and
+B<sub>0</sub>&hellip;B<sub><var>k</var>&minus;1</sub>, all of which are available at time
+zero. Nothing forces it to be computed one stage at a time.</p>
+<p><strong>Two signals per stage.</strong> Look at when a stage sends a carry
+leftward:</p>
+<ul>
+<li>It <strong>generates</strong> a carry when A and B are both 1, regardless of what
+arrives from the right. Call that
+<var>g</var><sub><var>k</var></sub>&nbsp;=&nbsp;A<sub><var>k</var></sub>B<sub><var>k</var></sub>.</li>
+<li>It <strong>propagates</strong> a carry &mdash; passes one along if it receives one
+&mdash; when exactly one of A and B is 1. Call that
+<var>p</var><sub><var>k</var></sub>&nbsp;=&nbsp;A<sub><var>k</var></sub>&nbsp;&oplus;&nbsp;B<sub><var>k</var></sub>.</li>
+</ul>
+<p>Both are computable immediately from the inputs, in one gate delay, for every stage
+at once. And the carry out of stage <var>k</var> is</p>
+<p style="text-align:center;font-size:1.05rem">
+<var>c</var><sub><var>k</var>+1</sub> = <var>g</var><sub><var>k</var></sub>
++ <var>p</var><sub><var>k</var></sub><var>c</var><sub><var>k</var></sub></p>
+<p>which is the Carry out expression from &sect;8.2 written in these terms. Expanding it
+down to the inputs:</p>
+<p style="text-align:center;font-size:1.05rem">
+<var>c</var><sub>2</sub> = <var>g</var><sub>1</sub> + <var>p</var><sub>1</sub><var>g</var><sub>0</sub>
++ <var>p</var><sub>1</sub><var>p</var><sub>0</sub><var>c</var><sub>0</sub></p>
+<p>&mdash; a sum of products of signals that are all ready at once, so it can be
+computed in two more gate delays rather than waiting for the ripple. Every carry has
+such an expression, and in principle every one of them can be computed in parallel.</p>
+<p><strong>What that buys.</strong> A <em>carry-lookahead</em> adder computes the carries
+this way and gets the whole addition down to a handful of gate delays rather than
+2<var>n</var>. The catch is in the expansion: the formula for
+<var>c</var><sub><var>k</var></sub> has <var>k</var>&nbsp;+&nbsp;1 terms and the longest
+needs a gate with <var>k</var>&nbsp;+&nbsp;1 inputs, so a full 32-bit lookahead is
+unbuildable. Real designs use lookahead in blocks &mdash; four bits at a time, say, with
+the blocks themselves connected by a second level of the same trick &mdash; which gives
+a delay growing like log&nbsp;<var>n</var> instead of <var>n</var>.</p>
+<div class="box extra"><span class="bt">Worth knowing</span>
+<p>The trade is area for time, and it is the same trade as the balanced AND tree back in
+Exercise 3.8: a chain of <var>n</var>&nbsp;&minus;&nbsp;1 gates is as cheap as it gets and
+as slow as it gets, and spending more gates to shorten the longest path is the standard
+move. The adder is just the most valuable place to make it, since almost every
+instruction a processor executes waits on one.</p></div>
+</div></details>
+
+<div class="box extra"><span class="bt">Where this goes next</span>
+<p>You now have a circuit that adds, and a representation that turns subtraction into
+addition. What a processor actually contains is one unit that does both of those plus
+the logical operations, with a few control wires choosing between them on each
+instruction. Building that &mdash; and the selector circuit that makes the choosing
+possible &mdash; is the next set.</p></div>
+
+    <nav class="pagenav">
+      <a class="prev" href="ex-nand.html"><span>Previous</span>Set 7. NAND, NOR and universality</a>
+      <a class="next" href="ex-alu.html"><span>Next</span>Set 9. Multiplexers, decoders and the ALU</a>
+    </nav>
+    <footer class="site">
+      <em>Computer Organization and Assembly Language</em> &middot; CSCI 240 / 640,
+      Queens College CUNY.
+    </footer>
+  </main>
+</div>
+</body>
+</html>
