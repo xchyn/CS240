@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Set 10 &mdash; Fixed-point and floating-point</title>
+<style>
+/* Light-theme fallback for the diagrams; assets/style.css overrides it. */
+.fig svg{display:block;width:100%;max-width:34rem;height:auto;margin:0 auto}
+.fig figcaption{font:400 .8rem/1.45 system-ui,sans-serif;color:#79828e;
+  margin-top:.45rem}
+.fig{margin:1.5rem 0;text-align:center}
+.fig .wire{fill:none;stroke:#1a1c1f;stroke-width:1.9;stroke-linecap:round;
+  stroke-linejoin:round}
+.fig .gate{fill:#ffffff;stroke:#1a1c1f;stroke-width:1.9;stroke-linejoin:round}
+.fig .gate.open{fill:none}
+.fig .dot{fill:#1a1c1f;stroke:none}
+.fig .lbl{fill:#1a1c1f;stroke:none;font:600 15px system-ui,sans-serif}
+.fig .ann{fill:#79828e;stroke:none;font:400 12.5px ui-monospace,monospace}
+.fig .kcell{fill:#ffffff;stroke:#cfcbc0;stroke-width:1.2}
+.fig .kval{fill:#1a1c1f;stroke:none;font:600 21px ui-monospace,monospace}
+.fig .kval.zero{fill:#79828e;font-weight:400}
+.fig .kval.dc{fill:#8c2d19;font-weight:700}
+.fig .kidx{fill:#79828e;stroke:none;font:400 11px ui-monospace,monospace}
+.fig .klab{fill:#4d5560;stroke:none;font:600 14px ui-monospace,monospace}
+.fig .kvar{fill:#8c2d19;stroke:none;font:700 13px system-ui,sans-serif}
+.fig .kslash{fill:none;stroke:#cfcbc0;stroke-width:1.2}
+.fig .kgrp{fill:none;stroke-width:2.6}
+.fig .grp0{stroke:#8c2d19}.fig .grp1{stroke:#1d6a4f}
+.fig .grp2{stroke:#2a4d8f}.fig .grp3{stroke:#7a5ea8}
+.fig .blk{fill:#ffffff;stroke:#1a1c1f;stroke-width:1.9;stroke-linejoin:round}
+.fig .blab{fill:#1a1c1f;stroke:none;font:600 14px system-ui,sans-serif}
+.fig .bsub{fill:#4d5560;stroke:none;font:400 12px system-ui,sans-serif}
+.fig .sub{font-size:.72em}
+</style>
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/notes.js" defer></script>
+</head>
+<body>
+<header class="topbar"><div class="topbar-in">
+  <a class="brand" href="index.html">CSCI 240</a>
+  <span class="crumb">Set 10 &middot; Fractional binary</span>
+  <nav class="topnav">
+    <a href="ex-alu.html">&larr; Prev</a>
+    <a href="index.html">Contents</a>
+    <a href="setup-logisim.html">Next &rarr;</a>
+    <button class="iconbtn" id="themebtn" type="button" title="Light / dark">&#9686;</button>
+  </nav>
+</div></header>
+<div class="wrap">
+  <aside class="toc"><p class="toc-title">On this page</p><ol>
+    <li><a href="#frac"><span class="t">10.1</span>Binary fractions</a></li>
+    <li><a href="#conv"><span class="t">10.2</span>Converting across the point</a></li>
+    <li><a href="#fixed"><span class="t">10.3</span>Fixed&lt;w, b&gt;</a></li>
+    <li><a href="#why"><span class="t">10.4</span>Where fixed point runs out</a></li>
+    <li><a href="#ieee"><span class="t">10.5</span>IEEE 754</a></li>
+    <li><a href="#bias"><span class="t">10.6</span>The bias and the hidden 1</a></li>
+    <li><a href="#special"><span class="t">10.7</span>Special values</a></li>
+    <li><a href="#ref"><span class="t">10.8</span>Reference</a></li>
+    <li><a href="#exercises"><span class="t">10.9</span>Exercises</a></li>
+  </ol></aside>
+  <main>
+
+<div class="chhead">
+  <span class="chpart">Exercise set 10 &middot; after the fractional binary lecture</span>
+  <span class="chnum">Fractions in binary</span>
+  <h1>Numbers that are not whole</h1>
+  <p class="chsum">Place values on the right of the binary point; converting each half
+  of a number with its own algorithm; the Fixed&lt;w,&nbsp;b&gt; notation; and IEEE 754
+  floating point &mdash; sign, exponent and mantissa, the bias, the hidden 1, and the
+  patterns reserved for zero, infinity and NaN.</p>
+</div>
+
+<p>Every number in this course so far has been a whole one. Set 2 counted in various
+bases, Set 8 made some of them negative, and all of it stopped at the units place. Real
+computation does not: 3.14159, 2.71828, 1.41421.</p>
+
+<p>There are two ways to store such a number, and the difference between them is simply
+<em>where the point goes</em>. Fix it in one place and you get fixed point, which is
+simple and limited. Let it move, and store where it went, and you get floating point
+&mdash; which is what every machine actually uses.</p>
+
+<h2 id="frac"><span class="secnum">10.1</span>Binary fractions</h2>
+
+<p>The place values continue to the right of the point exactly as you would guess. Each
+step left multiplies by two, so each step right divides by two:</p>
+
+<div class="tablewrap"><table class="lawtab">
+<thead><tr><th>place</th><th>2<sup>3</sup></th><th>2<sup>2</sup></th><th>2<sup>1</sup></th><th>2<sup>0</sup></th><th>2<sup>&minus;1</sup></th><th>2<sup>&minus;2</sup></th><th>2<sup>&minus;3</sup></th><th>2<sup>&minus;4</sup></th></tr></thead>
+<tbody><tr><td class="lawcell">worth</td><td class="lawcell">8</td><td class="lawcell">4</td><td class="lawcell">2</td><td class="lawcell">1</td><td class="lawcell">0.5</td><td class="lawcell">0.25</td><td class="lawcell">0.125</td><td class="lawcell">0.0625</td></tr></tbody></table></div>
+
+<p>and a number is read by adding up the places that hold a 1, on both sides of the
+point at once:</p>
+
+<figure class="fig" style="--figmax:100%">
+<svg viewBox="0 0 560 148" role="img" aria-label="each place is worth half the one to its left, across the point as well as before it">
+<rect class="kcell" x="50" y="54" width="54" height="46" rx="3"/>
+<text class="kval" x="77.0" y="87" text-anchor="middle">1</text>
+<text class="klab" x="77.0" y="44" text-anchor="middle">8</text>
+<rect class="kcell" x="104" y="54" width="54" height="46" rx="3"/>
+<text class="kval" x="131.0" y="87" text-anchor="middle">0</text>
+<text class="klab" x="131.0" y="44" text-anchor="middle">4</text>
+<rect class="kcell" x="158" y="54" width="54" height="46" rx="3"/>
+<text class="kval" x="185.0" y="87" text-anchor="middle">1</text>
+<text class="klab" x="185.0" y="44" text-anchor="middle">2</text>
+<rect class="kcell" x="212" y="54" width="54" height="46" rx="3"/>
+<text class="kval" x="239.0" y="87" text-anchor="middle">1</text>
+<text class="klab" x="239.0" y="44" text-anchor="middle">1</text>
+<text class="kval" x="275" y="92" text-anchor="middle">.</text>
+<rect class="kcell" x="286" y="54" width="54" height="46" rx="3"/>
+<text class="kval" x="313.0" y="87" text-anchor="middle">0</text>
+<text class="klab" x="313.0" y="44" text-anchor="middle">&frac12;</text>
+<rect class="kcell" x="340" y="54" width="54" height="46" rx="3"/>
+<text class="kval" x="367.0" y="87" text-anchor="middle">1</text>
+<text class="klab" x="367.0" y="44" text-anchor="middle">&frac14;</text>
+<rect class="kcell" x="394" y="54" width="54" height="46" rx="3"/>
+<text class="kval" x="421.0" y="87" text-anchor="middle">1</text>
+<text class="klab" x="421.0" y="44" text-anchor="middle">&#8539;</text>
+<text class="blab" x="249.0" y="128" text-anchor="middle">8 + 2 + 1 + &frac14; + &#8539; = 11.375</text>
+</svg>
+<figcaption>each place is worth half the one to its left, across the point as well as before it</figcaption></figure>
+
+<p>That is the whole of reading a binary fraction. The only new thing compared with
+Set 2 is that the places keep going.</p>
+
+<div class="box note"><span class="bt">Which fractions can be written exactly</span>
+<p>Only those whose denominator is a power of two. A quarter is
+<span class="bin">0.01</span> and three eighths is <span class="bin">0.011</span>, but
+one third and one fifth have expansions that repeat forever, exactly as one third does
+in decimal. Exercise 10.4 works one out, and the consequences run all the way to
+Exercise 10.29.</p></div>
+
+<h2 id="conv"><span class="secnum">10.2</span>Converting across the point</h2>
+
+<p>The rule that keeps this painless:</p>
+
+<p style="text-align:center;font-size:1.05rem">
+<strong>Split the number at the point and convert each half with its own algorithm,
+then put them back together.</strong></p>
+
+<p>Never try to convert the whole thing at once. The two halves use different
+procedures, and mixing them is the main way this goes wrong.</p>
+
+<p><strong>The integer part</strong> uses repeated <em>division</em>, exactly as in
+Set 2: divide by 2, record the remainder, repeat, and read the remainders bottom to
+top.</p>
+
+<p><strong>The fractional part</strong> uses repeated <em>multiplication</em>: multiply
+by 2, record the integer part of the result as the next bit, keep the leftover
+fraction, and repeat until the fraction becomes 0 or you have enough bits.</p>
+
+<div class="box warn"><span class="bt">The digits come out in opposite orders</span>
+<p>Repeated division produces the integer bits <em>least</em> significant first, so they
+must be reversed at the end.</p>
+<p>Repeated multiplication produces the fraction bits <strong>most significant
+first</strong> &mdash; the first bit you get is the one immediately after the point.
+<strong>No reversing.</strong> Reversing them anyway is the single most common mistake
+on this topic.</p></div>
+
+<div class="box worked"><span class="bt">Worked example</span>
+<p>Convert 9.6875 to binary.</p>
+<p><strong>The integer part, 9</strong>, by repeated division:
+9 &rarr; 4 r1, 4 &rarr; 2 r0, 2 &rarr; 1 r0, 1 &rarr; 0 r1 &mdash; reading the remainders bottom to top gives
+<span class="bin">1001</span>.</p>
+<p><strong>The fractional part, 0.6875</strong>, by repeated
+multiplication:</p>
+<div class="tablewrap"><table class="lawtab">
+<thead><tr><th></th><th>=</th><th>bit</th><th>keep</th></tr></thead>
+<tbody><tr><td class="lawcell">0.6875 &times; 2</td><td class="lawcell">1.375</td><td class="lawcell">1</td><td class="lawcell">0.375</td></tr><tr><td class="lawcell">0.375 &times; 2</td><td class="lawcell">0.75</td><td class="lawcell">0</td><td class="lawcell">0.75</td></tr><tr><td class="lawcell">0.75 &times; 2</td><td class="lawcell">1.5</td><td class="lawcell">1</td><td class="lawcell">0.5</td></tr><tr><td class="lawcell">0.5 &times; 2</td><td class="lawcell">1</td><td class="lawcell">1</td><td class="lawcell">0 &mdash; stop</td></tr></tbody></table></div>
+<p>The fraction hit 0, so the expansion terminates. Reading the recorded bits
+<em>downward</em> &mdash; in the order they came out &mdash; gives
+<span class="bin">1011</span>.</p>
+<p><strong>Putting the halves back together:</strong></p>
+<p style="text-align:center;font-size:1.05rem">
+9.6875 = <span class="bin">1001.1011</span></p>
+<p>Check it by place values: 8 + 1 + &frac12; + &#8539; + <sup>1</sup>&frasl;<sub>16</sub> = 9.6875.</p></div>
+
+<p>Going the other way, from binary back to decimal, the place-value sum always works.
+The lecture's alternative processes the fraction bits <em>right to left</em>, starting
+from 0 and applying</p>
+
+<p style="text-align:center;font-size:1.05rem">
+Result &larr; (Result + digit) &divide; 2</p>
+
+<p>once per bit. It needs no powers of two and is easier to do in your head; Exercise
+10.5 runs it and checks it against the place-value sum.</p>
+
+<h2 id="fixed"><span class="secnum">10.3</span>Fixed&lt;w, b&gt;</h2>
+
+<p>So far the point has been written on the page. A machine does not have that luxury
+&mdash; a register holds bits and nothing else. <strong>Fixed point</strong> is the
+agreement that the point sits in a particular place and everybody remembers where.</p>
+
+<div class="box note"><span class="bt">The notation</span>
+<ul>
+<li><strong>Fixed&lt;w,&nbsp;b&gt;</strong> means <var>w</var> bits in total, of which
+the rightmost <var>b</var> sit to the right of an implied binary point.</li>
+<li>The value is <strong>the ordinary two&rsquo;s complement integer divided by
+2<sup><var>b</var></sup></strong>.</li>
+<li>The binary point is <strong>not stored anywhere</strong>. It exists only in the
+interpretation.</li>
+</ul></div>
+
+<p>That last point is the one to hold on to. The same eight bits are a different number
+under a different agreement, and nothing in the bits says which agreement is in force
+&mdash; Exercise 10.6 reads one pattern three ways.</p>
+
+<p>The payoff is that fixed-point arithmetic needs no new hardware. Two values with the
+<em>same</em> <var>b</var> can be added by the integer adder of Set 8, unchanged, and
+the result is correct in the same format. Exercise 10.11 subtracts two values that way
+and Exercise 10.12 is about why it works, and about what happens when the two
+<var>b</var>s differ.</p>
+
+<p>Negative values need no new machinery either. The stored integer is two&rsquo;s
+complement, so a negative fixed-point number is read, written and negated by exactly the
+rules of Set 8 &mdash; including the one value that cannot be negated. Exercises 10.8 to
+10.11 work through all of it.</p>
+
+<h2 id="why"><span class="secnum">10.4</span>Where fixed point runs out</h2>
+
+<p>Fixed point spends its bits at a fixed resolution across a fixed range, and the two
+pull against each other. In Fixed&lt;8,&nbsp;4&gt; the smallest step is
+<sup>1</sup>&frasl;<sub>16</sub> and the largest value is just under 8. Moving the point
+right buys precision and loses range; moving it left does the reverse. With 8 bits you
+cannot have both.</p>
+
+<p>Scientific notation is how people solve this on paper. Rather than writing
+0.0000000000667, write 6.67&nbsp;&times;&nbsp;10<sup>&minus;11</sup> &mdash; a few
+significant digits, plus a separate exponent saying where the point belongs. The digits
+give precision and the exponent gives range, and they are stored separately so they do
+not compete.</p>
+
+<p><strong>Floating point is that idea in binary.</strong> Write the number as</p>
+
+<p style="text-align:center;font-size:1.15rem">
+1.xxxxxxx<sub>2</sub> &times; 2<sup><var>yyyy</var></sup></p>
+
+<p>and store the two parts: the digits after the point, called the
+<strong>mantissa</strong>, and the exponent. Rewriting a number into this shape &mdash;
+one non-zero digit before the point &mdash; is called <strong>normalising</strong> it,
+and in binary that leading digit is always 1, which turns out to matter.</p>
+
+<h2 id="ieee"><span class="secnum">10.5</span>IEEE 754</h2>
+
+<p>The standard that every processor follows is IEEE 754, from the Institute of
+Electrical and Electronics Engineers. It fixes how the three pieces are packed into a
+word.</p>
+
+<figure class="fig" style="--figmax:100%">
+<svg viewBox="0 0 620 120" role="img" aria-label="single precision: 32 bits">
+<rect class="blk" x="20.0" y="34" width="18.1" height="40" rx="3"/>
+<text class="blab" x="29.0625" y="94" text-anchor="middle">sign</text>
+<text class="bsub" x="29.0625" y="110" text-anchor="middle">1 bit</text>
+<rect class="blk" x="38.1" y="34" width="145.0" height="40" rx="3"/>
+<text class="blab" x="110.625" y="94" text-anchor="middle">exponent</text>
+<text class="bsub" x="110.625" y="110" text-anchor="middle">8 bits, bias 127</text>
+<text class="klab" x="110.625" y="24" text-anchor="middle">8 bits</text>
+<rect class="blk" x="183.1" y="34" width="416.9" height="40" rx="3"/>
+<text class="blab" x="391.5625" y="94" text-anchor="middle">mantissa</text>
+<text class="bsub" x="391.5625" y="110" text-anchor="middle">23 bits &mdash; what follows 1.</text>
+<text class="klab" x="391.5625" y="24" text-anchor="middle">23 bits</text>
+</svg>
+<figcaption>single precision: 32 bits</figcaption></figure>
+
+<figure class="fig" style="--figmax:100%">
+<svg viewBox="0 0 620 120" role="img" aria-label="double precision: 64 bits">
+<rect class="blk" x="20.0" y="34" width="9.1" height="40" rx="3"/>
+<text class="blab" x="24.53125" y="94" text-anchor="middle">sign</text>
+<text class="bsub" x="24.53125" y="110" text-anchor="middle"></text>
+<rect class="blk" x="29.1" y="34" width="99.7" height="40" rx="3"/>
+<text class="blab" x="78.90625" y="94" text-anchor="middle">exponent</text>
+<text class="bsub" x="78.90625" y="110" text-anchor="middle">11 bits, bias 1023</text>
+<text class="klab" x="78.90625" y="24" text-anchor="middle">11 bits</text>
+<rect class="blk" x="128.8" y="34" width="471.2" height="40" rx="3"/>
+<text class="blab" x="364.375" y="94" text-anchor="middle">mantissa</text>
+<text class="bsub" x="364.375" y="110" text-anchor="middle">52 bits</text>
+<text class="klab" x="364.375" y="24" text-anchor="middle">52 bits</text>
+</svg>
+<figcaption>double precision: 64 bits</figcaption></figure>
+
+<p>The sign bit is 0 for positive and 1 for negative, and it is the sign of the whole
+number &mdash; this is <em>not</em> two&rsquo;s complement, and negating a float means
+flipping one bit rather than complementing anything.</p>
+
+<p>That one decision has consequences in every direction, which Exercises 10.17 to 10.19
+and 10.24 pick apart: negation becomes free, the range becomes symmetric, zero acquires
+a second bit pattern, and comparison stops being a plain unsigned compare. Keep the two
+signs apart as you read on &mdash; the sign <em>of the number</em> lives in the sign bit,
+and the sign <em>of the exponent</em> is a separate matter handled by the bias
+below.</p>
+
+<h2 id="bias"><span class="secnum">10.6</span>The bias and the hidden 1</h2>
+
+<p>Two pieces of cleverness make the format work, and both are worth understanding
+rather than memorising.</p>
+
+<p><strong>The bias.</strong> Eight bits read as an ordinary binary number give 0 to
+255, all non-negative &mdash; but exponents need to go negative, for numbers below 1.
+So the stored pattern is shifted:</p>
+
+<figure class="fig" style="--figmax:100%">
+<svg viewBox="0 0 600 150" role="img" aria-label="the 8 bits hold 0 to 255; subtracting 127 slides the range so it straddles zero">
+<path class="wire" d="M60 70L540 70"/>
+<path class="wire" d="M60 62L60 78"/>
+<text class="klab" x="60" y="54" text-anchor="middle">00000000</text>
+<text class="blab" x="60" y="100" text-anchor="middle">&minus;127</text>
+<path class="wire" d="M299.05882352941177 62L299.05882352941177 78"/>
+<text class="klab" x="299.05882352941177" y="54" text-anchor="middle">01111111</text>
+<text class="blab" x="299.05882352941177" y="100" text-anchor="middle">0</text>
+<path class="wire" d="M540 62L540 78"/>
+<text class="klab" x="540" y="54" text-anchor="middle">11111111</text>
+<text class="blab" x="540" y="100" text-anchor="middle">+128</text>
+<text class="bsub" x="300.0" y="128" text-anchor="middle">stored pattern &minus; 127 = exponent</text>
+</svg>
+<figcaption>the 8 bits hold 0 to 255; subtracting 127 slides the range so it straddles zero</figcaption></figure>
+
+<p style="text-align:center;font-size:1.05rem">
+stored pattern &minus; 127 = the actual exponent</p>
+
+<p>An exponent of 3 is stored as 130, and an exponent of &minus;6 is stored as 121. For
+double precision the same trick uses a bias of 1023. Exercise 10.20 asks why a bias is
+used rather than, say, two&rsquo;s complement in the exponent field.</p>
+
+<p><strong>The hidden 1.</strong> A normalised binary number always looks like
+1.something &mdash; the leading digit cannot be 0, or it would not be normalised, and in
+binary the only other option is 1. A bit that is always the same carries no information,
+so it is <em>not stored</em>. The 23 stored bits are the ones after the point, and the
+leading 1 is put back when the number is read.</p>
+
+<p>The mantissa field therefore holds 23 bits but delivers <strong>24 bits of
+precision</strong>, which is a whole bit of accuracy for free. The values it can express
+run from <span class="bin">1.000&hellip;</span> to
+<span class="bin">1.111&hellip;</span>, that is from 1 up to just under 2.</p>
+
+<h2 id="special"><span class="secnum">10.7</span>Special values</h2>
+
+<p>The hidden 1 creates a problem: if every number starts with an invisible 1, how do
+you write <strong>zero</strong>? It cannot be done &mdash; so two exponent patterns are
+reserved, and what they mean depends on the mantissa:</p>
+
+<div class="tablewrap"><table class="lawtab">
+<thead><tr><th></th><th>mantissa = 0</th><th>mantissa &ne; 0</th></tr></thead>
+<tbody><tr><td class="lawcell">exponent all 0s</td><td class="lawcell">&plusmn;0</td><td class="lawcell">subnormal (very close to 0)</td></tr><tr><td class="lawcell">exponent all 1s</td><td class="lawcell">&plusmn;&infin;</td><td class="lawcell">NaN</td></tr></tbody></table></div>
+
+<p>An all-zero exponent with an all-zero mantissa is zero &mdash; and because the sign
+bit is separate, there are two of them, +0 and &minus;0, which compare as equal.
+An all-ones exponent with an all-zero mantissa is infinity, which is what overflow and
+division by zero produce. And an all-ones exponent with anything else is
+<strong>NaN</strong>, Not a Number, the result of something genuinely undefined like
+0&nbsp;&divide;&nbsp;0 or the square root of a negative.</p>
+
+<p>The remaining corner, an all-zero exponent with a non-zero mantissa, is a
+<strong>subnormal</strong> number: the hidden 1 is taken to be 0 instead, which gives
+up precision in exchange for representing values even closer to zero.</p>
+
+<h2 id="ref"><span class="secnum">10.8</span>Reference</h2>
+
+<ul>
+<li><strong>Place values</strong> right of the point:
+<sup>1</sup>&frasl;<sub>2</sub>, <sup>1</sup>&frasl;<sub>4</sub>,
+<sup>1</sup>&frasl;<sub>8</sub>, <sup>1</sup>&frasl;<sub>16</sub>&hellip;</li>
+<li><strong>Decimal to binary:</strong> integer part by repeated division, remainders
+read bottom to top; fraction part by repeated multiplication, bits read
+<em>top to bottom</em>.</li>
+<li><strong>Fixed&lt;w,&nbsp;b&gt;:</strong> <var>w</var> bits total, <var>b</var> after
+an implied point; value = two&rsquo;s complement integer &divide;
+2<sup><var>b</var></sup>; the point is never stored. Range
+&minus;2<sup><var>w</var>&minus;1</sup>&frasl;2<sup><var>b</var></sup> to
+(2<sup><var>w</var>&minus;1</sup>&nbsp;&minus;&nbsp;1)&frasl;2<sup><var>b</var></sup>
+&mdash; asymmetric, as in Set 8.</li>
+<li><strong>Negating:</strong> in fixed point, flip all <var>w</var> bits and add 1
+(the most negative value returns itself); in IEEE 754, flip the sign bit alone.</li>
+<li><strong>IEEE 754 single:</strong> 1 sign + 8 exponent (bias 127) + 23 mantissa =
+32 bits, 24 bits of precision.</li>
+<li><strong>IEEE 754 double:</strong> 1 + 11 (bias 1023) + 52 = 64 bits, 53 bits of
+precision.</li>
+<li><strong>Value</strong> of a normal number:
+(&minus;1)<sup>sign</sup> &times; 1.mantissa &times;
+2<sup>(exponent field &minus; bias)</sup>.</li>
+<li><strong>Reserved:</strong> exponent all 0s &rarr; zero or subnormal; all 1s &rarr;
+infinity or NaN.</li>
+</ul>
+
+<h2 id="exercises"><span class="secnum">10.9</span>Exercises</h2>
+
+<p>Keep the two halves of a number separate on the page, and label which algorithm you
+are running. Most errors here are not arithmetic &mdash; they are a reversed fraction or
+a division where a multiplication belonged.</p>
+
+<h3>Binary fractions</h3>
+
+<details class="prob"><summary data-label="Exercise 10.1">Convert these to decimal: <span class="bin">0.1101</span>, <span class="bin">1010.011</span>, <span class="bin">0.0001</span>.</summary><div class="sol">
+<p>Add up the places that hold a 1.</p>
+<p><strong><span class="bin">0.1101</span></strong> has 1s in the
+<sup>1</sup>&frasl;<sub>2</sub>, <sup>1</sup>&frasl;<sub>4</sub> and
+<sup>1</sup>&frasl;<sub>16</sub> places:
+0.5&nbsp;+&nbsp;0.25&nbsp;+&nbsp;0.0625 = <strong>0.8125</strong>.</p>
+<p><strong><span class="bin">1010.011</span></strong> splits at the point. The integer
+part <span class="bin">1010</span> is 8&nbsp;+&nbsp;2 = 10; the fraction
+<span class="bin">011</span> is 0.25&nbsp;+&nbsp;0.125 = 0.375. Together
+<strong>10.375</strong>.</p>
+<p><strong><span class="bin">0.0001</span></strong> has a single 1 in the
+<sup>1</sup>&frasl;<sub>16</sub> place: <strong>0.0625</strong>.</p>
+<p>Two habits worth forming. A binary fraction is always a sum of distinct powers of
+one half, so the answer is always a multiple of the smallest place shown &mdash; here a
+multiple of <sup>1</sup>&frasl;<sub>16</sub>, which 0.8125 and 0.0625 both are. And the
+value of <span class="bin">0.xxxx</span> is always less than 1, so if your answer
+exceeds 1 you have read a place wrongly.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 10.2">Convert 0.84375 and 0.28125 to binary by repeated multiplication. Show every step.</summary><div class="sol">
+<p><strong>0.84375</strong>:</p>
+<div class="tablewrap"><table class="lawtab">
+<thead><tr><th></th><th>=</th><th>bit</th><th>keep</th></tr></thead>
+<tbody><tr><td class="lawcell">0.84375 &times; 2</td><td class="lawcell">1.6875</td><td class="lawcell">1</td><td class="lawcell">0.6875</td></tr><tr><td class="lawcell">0.6875 &times; 2</td><td class="lawcell">1.375</td><td class="lawcell">1</td><td class="lawcell">0.375</td></tr><tr><td class="lawcell">0.375 &times; 2</td><td class="lawcell">0.75</td><td class="lawcell">0</td><td class="lawcell">0.75</td></tr><tr><td class="lawcell">0.75 &times; 2</td><td class="lawcell">1.5</td><td class="lawcell">1</td><td class="lawcell">0.5</td></tr><tr><td class="lawcell">0.5 &times; 2</td><td class="lawcell">1</td><td class="lawcell">1</td><td class="lawcell">0 &mdash; stop</td></tr></tbody></table></div>
+<p>The fraction reached 0, so the expansion stops. Reading the recorded bits
+<em>downward</em>: <span class="bin">0.11011</span>.</p>
+<p><strong>0.28125</strong>:</p>
+<div class="tablewrap"><table class="lawtab">
+<thead><tr><th></th><th>=</th><th>bit</th><th>keep</th></tr></thead>
+<tbody><tr><td class="lawcell">0.28125 &times; 2</td><td class="lawcell">0.5625</td><td class="lawcell">0</td><td class="lawcell">0.5625</td></tr><tr><td class="lawcell">0.5625 &times; 2</td><td class="lawcell">1.125</td><td class="lawcell">1</td><td class="lawcell">0.125</td></tr><tr><td class="lawcell">0.125 &times; 2</td><td class="lawcell">0.25</td><td class="lawcell">0</td><td class="lawcell">0.25</td></tr><tr><td class="lawcell">0.25 &times; 2</td><td class="lawcell">0.5</td><td class="lawcell">0</td><td class="lawcell">0.5</td></tr><tr><td class="lawcell">0.5 &times; 2</td><td class="lawcell">1</td><td class="lawcell">1</td><td class="lawcell">0 &mdash; stop</td></tr></tbody></table></div>
+<p>which gives <span class="bin">0.01001</span>.</p>
+<p>Check both by place value. <span class="bin">0.11011</span> is
+&frac12; + &frac14; + <sup>1</sup>&frasl;<sub>16</sub> + <sup>1</sup>&frasl;<sub>32</sub> = 0.84375, and <span class="bin">0.01001</span> is
+&frac14; + <sup>1</sup>&frasl;<sub>32</sub> = 0.28125.</p>
+<p>The order is the thing to be careful about. The first bit produced is the first bit
+<em>after the point</em> &mdash; the <sup>1</sup>&frasl;<sub>2</sub> place. Writing the
+bits in the order they appear is correct; reversing them, as you would for the integer
+half, produces a different and wrong number.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 10.3">Convert 13.25 to binary, showing the two halves separately.</summary><div class="sol">
+<p><strong>Integer part 13</strong>, repeated division by 2:
+13 &rarr; 6 r1, 6 &rarr; 3 r0, 3 &rarr; 1 r1, 1 &rarr; 0 r1. Remainders bottom to top: <span class="bin">1101</span>.</p>
+<p><strong>Fractional part 0.25</strong>, repeated multiplication by 2:</p>
+<div class="tablewrap"><table class="lawtab">
+<thead><tr><th></th><th>=</th><th>bit</th><th>keep</th></tr></thead>
+<tbody><tr><td class="lawcell">0.25 &times; 2</td><td class="lawcell">0.5</td><td class="lawcell">0</td><td class="lawcell">0.5</td></tr><tr><td class="lawcell">0.5 &times; 2</td><td class="lawcell">1</td><td class="lawcell">1</td><td class="lawcell">0 &mdash; stop</td></tr></tbody></table></div>
+<p>Bits top to bottom: <span class="bin">01</span>.</p>
+<p style="text-align:center;font-size:1.05rem">
+13.25 = <span class="bin">1101.01</span></p>
+<p>Check: 8 + 4 + 1 + &frac14; = 13.25.</p>
+<p>Notice the two halves never interact. The division chain knows nothing about the
+fraction and the multiplication chain knows nothing about the integer &mdash; which is
+exactly why the rule says to split first. A single procedure attempting both at once has
+no well-defined thing to do with the carry between them.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 10.4">Convert 0.2 to binary. What happens, and what does it tell you about which decimal fractions can be stored exactly?</summary><div class="sol">
+<p>Repeated multiplication:</p>
+<div class="tablewrap"><table class="lawtab">
+<thead><tr><th></th><th>=</th><th>bit</th><th>keep</th></tr></thead>
+<tbody><tr><td class="lawcell">0.2 &times; 2</td><td class="lawcell">0.4</td><td class="lawcell">0</td><td class="lawcell">0.4</td></tr><tr><td class="lawcell">0.4 &times; 2</td><td class="lawcell">0.8</td><td class="lawcell">0</td><td class="lawcell">0.8</td></tr><tr><td class="lawcell">0.8 &times; 2</td><td class="lawcell">1.6</td><td class="lawcell">1</td><td class="lawcell">0.6</td></tr><tr><td class="lawcell">0.6 &times; 2</td><td class="lawcell">1.2</td><td class="lawcell">1</td><td class="lawcell">0.2</td></tr><tr><td class="lawcell">&hellip;</td><td class="lawcell">&hellip;</td><td class="lawcell">&hellip;</td><td class="lawcell">back to 0.2 &mdash; it repeats</td></tr></tbody></table></div>
+<p>The fraction 0.2 has come back, so the whole block repeats forever:</p>
+<p style="text-align:center;font-size:1.05rem">
+0.2 = <span class="bin">0.0011 0011 0011 0011&hellip;</span></p>
+<p>The pattern <span class="bin">0011</span> repeats without end, exactly as
+<sup>1</sup>&frasl;<sub>3</sub> = 0.333&hellip; does in decimal.</p>
+<p><strong>Which fractions terminate.</strong> A fraction terminates in binary exactly
+when, in lowest terms, its denominator is a <em>power of two</em>. One fifth is
+<sup>1</sup>&frasl;<sub>5</sub> and 5 is not a power of two, so it cannot. The same test
+in decimal asks for a denominator built from 2s and 5s, which is why
+<sup>1</sup>&frasl;<sub>5</sub> is fine in decimal and <sup>1</sup>&frasl;<sub>3</sub>
+is not.</p>
+<p><strong>The consequence.</strong> Any binary format with finitely many bits must cut
+this expansion off somewhere, so 0.2 is <em>never</em> stored exactly &mdash; not in
+fixed point, not in floating point, not in any width. What is stored is the nearest
+representable value, which is close but not equal.</p>
+<p>That is not a defect of a particular machine; it follows from the choice of base.
+And it is the root of the behaviour in Exercise 10.29, which you may already have run
+into when a program printed something ending in &hellip;0004.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 10.5">Convert <span class="bin">0.1011</span> to decimal using the lecture&rsquo;s right-to-left method, Result &larr; (Result + digit) &divide; 2, then check with place values.</summary><div class="sol">
+<p>Take the fraction bits <strong>right to left</strong> &mdash; 1, 1, 0, 1 &mdash;
+starting with Result = 0:</p>
+<div class="tablewrap"><table class="lawtab">
+<thead><tr><th>taking</th><th>compute</th><th>Result</th></tr></thead>
+<tbody><tr><td class="lawcell">digit 1</td><td class="lawcell">(previous + 1) &divide; 2</td><td class="lawcell">0.5</td></tr><tr><td class="lawcell">digit 1</td><td class="lawcell">(previous + 1) &divide; 2</td><td class="lawcell">0.75</td></tr><tr><td class="lawcell">digit 0</td><td class="lawcell">(previous + 0) &divide; 2</td><td class="lawcell">0.375</td></tr><tr><td class="lawcell">digit 1</td><td class="lawcell">(previous + 1) &divide; 2</td><td class="lawcell">0.6875</td></tr></tbody></table></div>
+<p>so <span class="bin">0.1011</span> = <strong>0.6875</strong>.</p>
+<p><strong>Check by place values:</strong> &frac12; + &#8539; + <sup>1</sup>&frasl;<sub>16</sub> = 0.6875. They agree.</p>
+<p><strong>Why it works.</strong> Each division by 2 shifts everything one place right,
+making room for the bit that is one place more significant. Running right to left means
+the earliest bit gets divided the most times, ending up with the smallest weight &mdash;
+which is right, since it is the least significant.</p>
+<p>The practical advantage is that it needs no powers of two and no addition of
+fractions: just halve, add a bit, halve again. For a long mantissa it is considerably
+less error-prone than summing eight separate place values.</p></div></details>
+
+<h3>Fixed point</h3>
+
+<details class="prob"><summary data-label="Exercise 10.6">The eight bits <span class="bin">10110100</span> are read as Fixed&lt;8,&nbsp;0&gt;, then Fixed&lt;8,&nbsp;3&gt;, then Fixed&lt;8,&nbsp;8&gt;. Give the three values.</summary><div class="sol">
+<p>In every case the bits are first read as an ordinary <strong>two&rsquo;s
+complement</strong> 8-bit integer. The leading bit is 1, so the value is negative:
+<span class="bin">10110100</span> as an integer is &minus;76.</p>
+<p>Then divide by 2<sup><var>b</var></sup>:</p>
+<div class="tablewrap"><table class="lawtab">
+<thead><tr><th>read as</th><th>value</th><th>decimal</th></tr></thead>
+<tbody><tr><td class="lawcell">Fixed&lt;8,&nbsp;0&gt;</td><td class="lawcell">&minus;76 &divide; 2<sup>0</sup></td><td class="lawcell">&minus;76</td></tr><tr><td class="lawcell">Fixed&lt;8,&nbsp;3&gt;</td><td class="lawcell">&minus;76 &divide; 2<sup>3</sup></td><td class="lawcell">&minus;9.5</td></tr><tr><td class="lawcell">Fixed&lt;8,&nbsp;8&gt;</td><td class="lawcell">&minus;76 &divide; 2<sup>8</sup></td><td class="lawcell">&minus;0.296875</td></tr></tbody></table></div>
+<p>Same bits, three different numbers &mdash; and nothing in the bits distinguishes the
+cases. The format has to be known from elsewhere: the type of the variable, the
+specification of the hardware, the agreement between the two ends of a wire.</p>
+<p>The pattern is worth noticing. Increasing <var>b</var> by one halves the value,
+because the point has moved one place left over bits that did not move at all. A
+fixed-point &ldquo;conversion&rdquo; between scalings is therefore a shift, not a
+computation.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 10.7">For signed Fixed&lt;8,&nbsp;4&gt;: what is the smallest step between values, what are the largest and smallest numbers representable, and how many distinct values are there?</summary><div class="sol">
+<p>The underlying integer is an 8-bit two&rsquo;s complement number, so it runs from
+&minus;128 to 127, and every value is that integer divided by
+2<sup>4</sup>&nbsp;=&nbsp;16.</p>
+<p><strong>The step</strong> is one unit in the last place:
+<sup>1</sup>&frasl;<sub>16</sub> = <strong>0.0625</strong>. Nothing between two adjacent
+values can be represented.</p>
+<p><strong>The range</strong> is &minus;128&frasl;16 to 127&frasl;16, that is
+<strong>&minus;8 to 7.9375</strong> &mdash; the same asymmetry as Set 8&rsquo;s integer
+range, for the same reason.</p>
+<p><strong>How many values:</strong> <strong>256</strong>, one per bit pattern. That
+number does not change with <var>b</var>, which is the whole point of the trade: 8 bits
+give 256 values and <var>b</var> decides only <em>where</em> they are placed. With
+<var>b</var>&nbsp;=&nbsp;0 they are spread one apart from &minus;128 to 127; with
+<var>b</var>&nbsp;=&nbsp;8 they are packed <sup>1</sup>&frasl;<sub>256</sub> apart
+between &minus;0.5 and just under 0.5.</p>
+<p>That fixed spacing is what distinguishes fixed point from floating point. Here the
+gap between neighbours is the same everywhere; in floating point it grows with the size
+of the number, which Exercise 10.28 takes up.</p></div></details>
+
+<h3>Negative values in fixed point</h3>
+
+<p>Everything in this group rests on one sentence: a Fixed&lt;<var>w</var>,&nbsp;<var>b</var>&gt;
+number <em>is</em> a <var>w</var>-bit two&rsquo;s complement integer, and the point is
+something you say about it rather than something stored. So every rule from Set 8
+survives unchanged &mdash; and so does every trap.</p>
+
+<details class="prob"><summary data-label="Exercise 10.8">What is <span class="bin">11110110</span> as Fixed&lt;8,&nbsp;2&gt;? Show the two&rsquo;s complement step explicitly.</summary><div class="sol">
+<p>The leading bit is 1, so this is negative. Negate it to find the magnitude: flip
+<span class="bin">11110110</span> to <span class="bin">00001001</span>, add 1, giving
+<span class="bin">00001010</span> = 10. So the integer is
+<strong>&minus;10</strong>.</p>
+<p>Divide by 2<sup>2</sup>&nbsp;=&nbsp;4:</p>
+<p style="text-align:center;font-size:1.05rem">
+&minus;10 &divide; 4 = <strong>&minus;2.5</strong></p>
+<p>The shortcut, if you prefer: write the bits with the point in place,
+<span class="bin">111101.10</span>, and read the leading bit with its negative weight
+&mdash; &minus;32 here, since it is the 2<sup>5</sup> place once the point has moved two
+positions. Then
+&minus;32 + 16 + 8 + 4 + 1 + &frac12; = &minus;2.5, which agrees.</p>
+<p>Both routes work; the first is safer when you are tired, because it reuses the
+negation rule you already trust from Set 8 rather than asking you to work out the weight
+of the sign bit under an arbitrary scaling.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 10.9">Encode &minus;6.375 as Fixed&lt;8,&nbsp;3&gt;. Give the eight bits.</summary><div class="sol">
+<p>Work with the <strong>magnitude</strong> first and negate at the very end. Doing it
+the other way round &mdash; negating the integer half and the fraction half separately
+&mdash; is the standard way to get this wrong.</p>
+<p><strong>Step 1, the magnitude in binary.</strong> 6.375 is
+<span class="bin">00110.011</span>: the integer part and the fraction part by the
+two methods of Exercise 10.3.</p>
+<p><strong>Step 2, scale it to an integer.</strong> Fixed&lt;8,&nbsp;3&gt; stores
+the value times 2<sup>3</sup>&nbsp;=&nbsp;8, so the stored integer for
+the magnitude is</p>
+<p style="text-align:center;font-size:1.05rem">
+6.375 &times; 8 = 51 =
+<span class="bin">00110011</span></p>
+<p>Notice that <span class="bin">00110011</span> is
+<span class="bin">00110.011</span> with the point rubbed out. Scaling by a power of
+two never changes a single bit; it only changes where you claim the point is.</p>
+<p><strong>Step 3, negate the whole eight bits.</strong> Flip
+<span class="bin">00110011</span> to <span class="bin">11001100</span> and add
+1:</p>
+<p style="text-align:center;font-size:1.05rem">
+&minus;6.375 = <span class="bin">11001101</span></p>
+<p><strong>Check</strong> by running Exercise 10.8 backwards: the leading bit is 1, so
+negate <span class="bin">11001101</span> to recover 51, and
+51&nbsp;&divide;&nbsp;8 = 6.375. With the sign restored,
+&minus;6.375. &#10003;</p>
+<p>With the point written in, the pattern is
+<span class="bin">11001.101</span> &mdash; but nothing in the hardware holds that point,
+and the same eight bits under a different <var>b</var> are a different number, exactly as
+in Exercise 10.6.</p>
+<div class="box warn"><span class="bt">Check the range first</span>
+<p>Fixed&lt;8,&nbsp;3&gt; runs from &minus;16 to 15.875, so &minus;6.375 fits. A
+value outside that range cannot be encoded at all, and the scaling step will quietly
+produce an integer that does not fit in eight bits &mdash; which looks like an answer but
+is not one.</p></div></div></details>
+
+<details class="prob"><summary data-label="Exercise 10.10">In Fixed&lt;8,&nbsp;3&gt;, what value is <span class="bin">10000000</span>? Now negate it, and say what happens. What does this say about the range?</summary><div class="sol">
+<p><strong>The value.</strong> <span class="bin">10000000</span> is the most negative
+8-bit two&rsquo;s complement integer, &minus;128, so as
+Fixed&lt;8,&nbsp;3&gt; it is</p>
+<p style="text-align:center;font-size:1.05rem">
+&minus;128 &divide; 8 = <strong>&minus;16</strong></p>
+<p><strong>Negating it.</strong> Flip <span class="bin">10000000</span> to
+<span class="bin">01111111</span>, add 1, and the carry runs the whole way along:</p>
+<p style="text-align:center;font-size:1.05rem">
+<span class="bin">01111111</span> + 1 = <span class="bin">10000000</span></p>
+<p>You get the same pattern back. Negation has failed &mdash; and it has failed
+<em>silently</em>, which is the dangerous part.</p>
+<p><strong>Why.</strong> The answer would be +16, which needs a stored integer
+of +128, and an 8-bit two&rsquo;s complement integer stops at 127. So the positive
+counterpart of &minus;16 is simply not in the format: the largest value is
+15.875, one step short.</p>
+<p><strong>The range is asymmetric</strong> &mdash; &minus;16 to 15.875, with one
+more negative value than positive. This is exactly the asymmetry of Set 8, because it
+<em>is</em> the asymmetry of Set 8: scaling by 2<sup>&minus;3</sup> multiplies
+both ends by the same factor and cannot make a lopsided range symmetric.</p>
+<p>The practical rule: whenever you negate or subtract in fixed point, the most negative
+value is a special case, and code that negates a user-supplied value has to test for it.
+Floating point does not have this problem &mdash; Exercise 10.26 shows why.</p></div></details>
+
+<h3>Fixed-point arithmetic</h3>
+
+<details class="prob"><summary data-label="Exercise 10.11">Compute 3.25 &minus; 5.5 in Fixed&lt;8,&nbsp;4&gt; using an ordinary 8-bit integer adder and nothing else. Check the result.</summary><div class="sol">
+<p>The adder cannot subtract, so do what Set 8 did: <strong>add the negation</strong>.
+And do not convert anything to decimal along the way &mdash; the whole claim being tested
+is that the integer hardware needs no help.</p>
+<p><strong>Scale both operands.</strong> Fixed&lt;8,&nbsp;4&gt; multiplies by
+16, so 3.25 is stored as 52 =
+<span class="bin">00110100</span> and 5.5 as 88 =
+<span class="bin">01011000</span>.</p>
+<p><strong>Negate the second.</strong> Flip <span class="bin">01011000</span> to
+<span class="bin">10100111</span>, add 1, giving
+<span class="bin">10101000</span>.</p>
+<p><strong>Add.</strong></p>
+<div class="tablewrap"><table class="lawtab">
+<thead><tr><th>bits</th><th>meaning</th></tr></thead>
+<tbody><tr><td class="lawcell"><span class="bin">00110100</span></td><td class="lawcell">3.25 &times; 16 = 52</td></tr><tr><td class="lawcell"><span class="bin">10101000</span></td><td class="lawcell">&minus;88, two&rsquo;s complement of <span class="bin">01011000</span></td></tr><tr><td class="lawcell"><span class="bin">11011100</span></td><td class="lawcell">sum, carry out 0 discarded</td></tr></tbody></table></div>
+<p><strong>Read the answer.</strong> The leading bit of
+<span class="bin">11011100</span> is 1, so negate to get the magnitude: flip to
+<span class="bin">00100011</span>, add 1, giving
+<span class="bin">00100100</span> = 36. The stored integer is therefore
+&minus;36, and</p>
+<p style="text-align:center;font-size:1.05rem">
+&minus;36 &divide; 16 = <strong>&minus;2.25</strong></p>
+<p><strong>Check:</strong> 3.25&nbsp;&minus;&nbsp;5.5 = &minus;2.25.
+&#10003; With the point written in, the result is
+<span class="bin">1101.1100</span>.</p>
+<p>Three things the adder did <em>not</em> do: it did not look at the point, it did not
+know which bits were fractional, and it did not treat the negative operand differently
+from the positive one. That is the entire argument for fixed point.</p>
+<div class="box note"><span class="bt">Overflow</span>
+<p>The carry out of the top bit was 0 and is discarded &mdash; in
+two&rsquo;s complement it is not an error indicator. The real test, from Set 8, is the
+sign: here a positive and a negative operand were added, and that combination can never
+overflow, since the result lies between them. Overflow is possible only when both
+operands share a sign, and in fixed point it means the same thing it always did &mdash;
+the true answer is outside &minus;8 to 7.9375.</p></div></div></details>
+
+<details class="prob"><summary data-label="Exercise 10.12">Two Fixed&lt;16,&nbsp;8&gt; values are added using an ordinary 16-bit integer adder, with no changes. Explain why the answer is correct. What goes wrong if one value is Fixed&lt;16,&nbsp;8&gt; and the other Fixed&lt;16,&nbsp;4&gt;?</summary><div class="sol">
+<p><strong>Why it works.</strong> Write the two values as <var>p</var>&frasl;2<sup>8</sup>
+and <var>q</var>&frasl;2<sup>8</sup>, where <var>p</var> and <var>q</var> are the stored
+integers. Their sum is</p>
+<p style="text-align:center;font-size:1.05rem">
+<var>p</var>&frasl;2<sup>8</sup> + <var>q</var>&frasl;2<sup>8</sup>
+= (<var>p</var> + <var>q</var>)&frasl;2<sup>8</sup></p>
+<p>so adding the stored integers and interpreting the result with the same
+<var>b</var> gives exactly the right value. The common factor
+2<sup>&minus;8</sup> comes out of the sum, and the adder never needs to know it is
+there.</p>
+<p>This is the practical attraction of fixed point. No new hardware, no new
+instructions &mdash; a fixed-point add is an integer add, and so is a subtract.</p>
+<p><strong>Mixed scalings break it.</strong> With <var>p</var>&frasl;2<sup>8</sup> and
+<var>q</var>&frasl;2<sup>4</sup> there is no common factor to extract, and
+<var>p</var>&nbsp;+&nbsp;<var>q</var> means nothing: the adder lines up bit 0 with bit 0,
+but those bits are worth <sup>1</sup>&frasl;<sub>256</sub> in one operand and
+<sup>1</sup>&frasl;<sub>16</sub> in the other. It is adding sixteenths to two-hundred-
+fifty-sixths as though they were the same unit.</p>
+<p>The fix is to rescale first: shift the Fixed&lt;16,&nbsp;4&gt; value left by 4 so
+both are Fixed&lt;16,&nbsp;8&gt;, then add. Which is the same discipline as keeping
+units straight in physics, and it is enforced by nothing but the programmer&rsquo;s
+care &mdash; the bits will not complain.</p>
+<p>Multiplication is different again: multiplying Fixed&lt;<var>w</var>,&nbsp;<var>b</var>&gt;
+by Fixed&lt;<var>w</var>,&nbsp;<var>b</var>&gt; gives a result scaled by
+2<sup>2<var>b</var></sup>, so the product has to be shifted right by <var>b</var> to get
+back into the original format.</p></div></details>
+
+<h3>Floating point</h3>
+
+<details class="prob"><summary data-label="Exercise 10.13">Normalise these into the form 1.xxx &times; 2<sup><var>e</var></sup>: <span class="bin">1011.01</span>, <span class="bin">0.000110</span>, <span class="bin">1.1101</span>.</summary><div class="sol">
+<p>Normalising means sliding the point until exactly one 1 sits to its left, and
+counting how far it moved. Moving left is a positive exponent; moving right is a
+negative one.</p>
+<p><strong><span class="bin">1011.01</span></strong> &mdash; the point moves 3 places
+left: <span class="bin">1.01101</span> &times; 2<sup>3</sup>.</p>
+<p><strong><span class="bin">0.000110</span></strong> &mdash; the first 1 is four places
+after the point, so the point moves 4 places right:
+<span class="bin">1.10</span> &times; 2<sup>&minus;4</sup>.</p>
+<p><strong><span class="bin">1.1101</span></strong> is already normalised:
+<span class="bin">1.1101</span> &times; 2<sup>0</sup>.</p>
+<p>Check one by value. <span class="bin">1011.01</span> is 11.25, and
+<span class="bin">1.01101</span> is 1.40625, and
+1.40625&nbsp;&times;&nbsp;8&nbsp;=&nbsp;11.25.</p>
+<p>Two things to carry into the next exercises. The digits never change when you
+normalise &mdash; only the position of the point and the exponent &mdash; so the
+mantissa is just the original bit string with its leading zeros and its point removed.
+And every normalised number begins with 1, which is what makes the hidden bit
+possible.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 10.14">Convert 6.5 to IEEE 754 single precision. Give the 32 bits.</summary><div class="sol">
+<p><strong>Write it in binary.</strong> 6.5 = <span class="bin">110.1</span>.</p>
+<p><strong>Normalise.</strong> <span class="bin">110.1</span> =
+<span class="bin">1.101</span> &times; 2<sup>2</sup>.</p>
+<p><strong>Sign.</strong> Positive, so <strong>0</strong>.</p>
+<p><strong>Exponent.</strong> The actual exponent is 2, and the field stores it
+biased: 2&nbsp;+&nbsp;127 = 129 =
+<span class="bin">10000001</span>.</p>
+<p><strong>Mantissa.</strong> The bits after the leading 1 are
+<span class="bin">101</span>, padded with zeros to 23 bits.</p>
+<p style="text-align:center;font-size:1.05rem"><span class="bin">0 10000001 1010 0000 0000 0000 0000 000</span></p>
+<p>The leading 1 of <span class="bin">1.101</span> is nowhere in the stored
+pattern, which is correct &mdash; it is the hidden bit, and putting it in the mantissa
+field is the commonest error on this conversion.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 10.15">Convert 40.75 and &minus;0.375 to IEEE 754 single precision. The second has a negative exponent.</summary><div class="sol">
+<p><strong>40.75.</strong> In binary, <span class="bin">101000.11</span>, which
+normalises to <span class="bin">1.0100011</span> &times; 2<sup>5</sup>.
+Sign 0; exponent field 5&nbsp;+&nbsp;127 = 132 =
+<span class="bin">10000100</span>; mantissa
+<span class="bin">0100011</span> padded to 23 bits.</p>
+<p style="text-align:center;font-size:1.05rem"><span class="bin">0 10000100 0100 0110 0000 0000 0000 000</span></p>
+<p><strong>&minus;0.375.</strong> The magnitude is 0.375 =
+<span class="bin">0.011</span>, whose first 1 sits 2 places after the
+point, so it normalises to <span class="bin">1.1</span> &times;
+2<sup>&minus;2</sup>.</p>
+<p>Sign is <strong>1</strong>, since the number is negative. The exponent field is
+&minus;2&nbsp;+&nbsp;127 = 125 =
+<span class="bin">01111101</span> &mdash; still a perfectly ordinary non-negative
+pattern, which is exactly what the bias is for.</p>
+<p style="text-align:center;font-size:1.05rem"><span class="bin">1 01111101 1000 0000 0000 0000 0000 000</span></p>
+<p>Note that the sign bit is the <em>only</em> difference between this and the encoding
+of +0.375. Floating point does not use two&rsquo;s complement, so negating a number
+never touches the exponent or the mantissa.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 10.16">Convert &minus;45.25 and &minus;0.40625 to IEEE 754 single precision.</summary><div class="sol">
+<p>Both are negative, and in both cases the sign is dealt with <em>first and
+separately</em>: set the sign bit, then forget the sign entirely and encode the
+magnitude. Nothing else in the format knows about it.</p>
+<p><strong>&minus;45.25.</strong> The magnitude 45.25 is
+<span class="bin">101101.01</span>, which normalises to
+<span class="bin">1.0110101</span> &times; 2<sup>5</sup> &mdash; the point
+moves 5 places left.</p>
+<p>Sign <strong>1</strong>. Exponent field
+5&nbsp;+&nbsp;127 = 132 =
+<span class="bin">10000100</span>. Mantissa
+<span class="bin">0110101</span>, padded to 23 bits.</p>
+<p style="text-align:center;font-size:1.05rem"><span class="bin">1 10000100 0110 1010 0000 0000 0000 000</span></p>
+<p><strong>&minus;0.40625.</strong> The magnitude 0.40625 is
+<span class="bin">0.01101</span>. Its first 1 lies 2 places after the
+point, so the point moves 2 places <em>right</em> and the exponent is
+<strong>&minus;2</strong>:
+<span class="bin">1.101</span> &times; 2<sup>&minus;2</sup>.</p>
+<p>Sign <strong>1</strong>. Exponent field
+&minus;2&nbsp;+&nbsp;127 = 125 =
+<span class="bin">01111101</span>. Mantissa
+<span class="bin">101</span>, padded to 23 bits.</p>
+<p style="text-align:center;font-size:1.05rem"><span class="bin">1 01111101 1010 0000 0000 0000 0000 000</span></p>
+<p><strong>Two signs, and they are unrelated.</strong> &minus;0.40625 is a negative number with
+a negative exponent, and the two facts live in different fields: the sign bit says
+negative, the exponent field <span class="bin">01111101</span> is a perfectly
+ordinary positive pattern that happens to be below 127. A number can be negative with a
+positive exponent (&minus;45.25), positive with a negative exponent (as in Exercise 10.13), or
+either combination of the two. Confusing them is the most common error on this
+page.</p>
+<div class="box warn"><span class="bt">The bias is not two&rsquo;s complement</span>
+<p>The exponent &minus;2 is stored as 125, not as a two&rsquo;s complement &minus;2. You
+add 127 and write the result as a plain unsigned 8-bit number &mdash; no flipping, no
+adding 1. Exercise 10.20 is about why the format was built this way.</p></div></div></details>
+
+<h3>Negative values in floating point</h3>
+
+<p>Floating point does not use two&rsquo;s complement. The sign lives in one bit and the
+magnitude in the other 31, so negation is a single bit flip and nothing else moves. That
+one design choice is behind everything in this group &mdash; the good parts and the two
+awkward ones.</p>
+
+<details class="prob"><summary data-label="Exercise 10.17">Decode this single-precision pattern: <span class="bin">1 10000010 1010 1000 0000 0000 0000 000</span></summary><div class="sol">
+<p><strong>Split the fields.</strong> Sign <span class="bin">1</span>, exponent
+<span class="bin">10000010</span>, mantissa <span class="bin">10101000000000000000000</span>.</p>
+<p><strong>Sign.</strong> 1, so the number is negative.</p>
+<p><strong>Exponent.</strong> <span class="bin">10000010</span> as an ordinary binary
+number is 130, and the actual exponent is
+130&nbsp;&minus;&nbsp;127 = <strong>3</strong>.</p>
+<p><strong>Mantissa.</strong> Put the hidden 1 back:
+<span class="bin">1.10101</span>.</p>
+<p style="text-align:center;font-size:1.05rem">
+&minus;<span class="bin">1.10101</span> &times; 2<sup>3</sup>
+= &minus;<span class="bin">1101.01</span> = <strong>&minus;13.25</strong></p>
+<p>Multiplying by 2<sup>3</sup> moves the point 3 places right, which
+is why the shifted form appears directly. Reading it off:
+8 + 4 + 1 + &frac14; = 13.25.</p>
+<p>A check that costs nothing: the exponent field was neither all 0s nor all 1s, so this
+is an ordinary normal number and the hidden 1 really is a 1. Had the field been all
+zeros, the rules of &sect;10.7 would apply instead.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 10.18">Decode this single-precision pattern: <span class="bin">1 01111100 0110 0000 0000 0000 0000 000</span></summary><div class="sol">
+<p><strong>Split the fields.</strong> Sign <span class="bin">1</span>, exponent
+<span class="bin">01111100</span>, mantissa <span class="bin">01100000000000000000000</span>.</p>
+<p><strong>Sign</strong> 1: negative.</p>
+<p><strong>Exponent.</strong> <span class="bin">01111100</span> is 124 as an
+unsigned binary number, so the actual exponent is
+124&nbsp;&minus;&nbsp;127 = <strong>&minus;3</strong>. The field is
+<em>smaller</em> than 127, which is how a biased field says &ldquo;negative
+exponent&rdquo;.</p>
+<p><strong>Mantissa.</strong> Restore the hidden 1:
+<span class="bin">1.011</span>.</p>
+<p><strong>Put it together.</strong> Multiplying by 2<sup>&minus;3</sup> moves the
+point 3 places <em>right</em>, so leading zeros appear:</p>
+<p style="text-align:center;font-size:1.05rem">
+&minus;<span class="bin">1.011</span> &times; 2<sup>&minus;3</sup>
+= &minus;<span class="bin">0.001011</span> = <strong>&minus;0.171875</strong></p>
+<p>Reading the places: &#8539; + <sup>1</sup>&frasl;<sub>32</sub> + <sup>1</sup>&frasl;<sub>64</sub> = 0.171875, and the sign bit makes it
+&minus;0.171875.</p>
+<p><strong>Two negatives, two meanings.</strong> This number is negative
+<em>and</em> has a negative exponent, and the two are independent facts read from
+different fields. Compare the pattern in Exercise 10.17: also negative, but with a
+<em>positive</em> exponent, so its point moved left and it is a number larger than 1 in
+magnitude. The sign bit tells you which side of zero; the exponent tells you how far
+from zero.</p>
+<div class="box note"><span class="bt">A sanity check worth doing every time</span>
+<p>If the exponent field is below <span class="bin">01111111</span> (127), the magnitude
+is less than 1. If it is above, the magnitude is more than 1. Here the field is
+124, so the answer had to come out as a fraction &mdash; and it did. An answer
+of &minus;11 would have failed this check instantly.</p></div></div></details>
+
+<details class="prob"><summary data-label="Exercise 10.19">Here is 7.25 in single precision: <span class="bin">0 10000001 1101 0000 0000 0000 0000 000</span>. Write down &minus;7.25 without redoing any of the conversion. Then compare with how Set 8 negates an integer: which system makes negation cheaper, and what does each pay for it?</summary><div class="sol">
+<p><strong>Flip the sign bit. That is the whole answer.</strong></p>
+<p style="text-align:center;font-size:1.05rem">
+7.25 &nbsp;=&nbsp; <span class="bin">0 10000001 1101 0000 0000 0000 0000 000</span><br>
+&minus;7.25 &nbsp;=&nbsp; <span class="bin">1 10000001 1101 0000 0000 0000 0000 000</span></p>
+<p>The exponent field <span class="bin">10000001</span> and the mantissa
+<span class="bin">1101</span>&hellip; are untouched, because they describe the
+<em>magnitude</em> and the magnitude did not change. This is
+<strong>sign-and-magnitude</strong>, and it is what IEEE 754 uses for the sign &mdash;
+not two&rsquo;s complement.</p>
+<p><strong>Set 8 negates differently.</strong> To negate an 8-bit two&rsquo;s complement
+integer you flip all eight bits and add 1, and the carry can propagate the whole way
+along. Every bit may change, and the operation needs an adder.</p>
+<p><strong>Which is cheaper.</strong> Floating point, by a wide margin: one inverter on
+one wire, constant time, no carry, and it works on every value without exception
+&mdash; including zero, infinity and NaN.</p>
+<p><strong>What each pays.</strong></p>
+<div class="tablewrap"><table class="lawtab">
+<thead><tr><th></th><th>Two&rsquo;s complement (Set 8)</th><th>IEEE 754 sign bit</th></tr></thead>
+<tbody><tr><td class="lawcell">negate</td><td class="lawcell">flip all bits, add 1</td><td class="lawcell">flip one bit</td></tr><tr><td class="lawcell">zero</td><td class="lawcell">one pattern</td><td class="lawcell"><strong>two</strong> patterns, +0 and &minus;0</td></tr><tr><td class="lawcell">range</td><td class="lawcell">asymmetric &mdash; one value cannot be negated</td><td class="lawcell">symmetric</td></tr><tr><td class="lawcell">add / subtract</td><td class="lawcell">one circuit handles both signs</td><td class="lawcell">signs must be compared first</td></tr><tr><td class="lawcell">compare</td><td class="lawcell">ordinary signed compare</td><td class="lawcell">sign needs separate handling</td></tr></tbody></table></div>
+<p>So the bill arrives elsewhere. Adding two floats of opposite sign means comparing
+magnitudes and actually subtracting, which is why a floating-point adder is a far larger
+circuit than Set 8&rsquo;s. And the symmetry that Exercise 10.10 found missing in fixed
+point is bought with a second zero, which Exercise 10.24 takes up.</p></div></details>
+
+<h3>Inside the format</h3>
+
+<details class="prob"><summary data-label="Exercise 10.20">The exponent field stores the exponent plus 127 rather than the exponent itself. Why bias it, rather than storing it in two&rsquo;s complement? What range of actual exponents does an 8-bit field with bias 127 give, once the reserved patterns are removed?</summary><div class="sol">
+<p><strong>Why a bias.</strong> Because it makes floating-point numbers compare in the
+same order as the integers with the same bit patterns. With a biased exponent, a larger
+number has a larger exponent field, which has a larger unsigned value &mdash; so for
+positive floats, comparing the 32 bits as if they were an unsigned integer gives the
+right answer. Hardware can sort or compare floats with integer circuitry.</p>
+<p>Two&rsquo;s complement would break that. A small negative exponent would begin with a
+1 bit and so would look <em>larger</em> than a big positive exponent, and every
+comparison would need special handling.</p>
+<p><strong>The range.</strong> The field holds 0 to 255, which would give exponents
+&minus;127 to +128. But both ends are reserved &mdash; 00000000 for zero and subnormals,
+11111111 for infinity and NaN &mdash; so the usable field values are 1 to 254, giving
+actual exponents</p>
+<p style="text-align:center;font-size:1.05rem">
+&minus;126 to +127</p>
+<p>which is where the familiar limits of about 10<sup>&plusmn;38</sup> come from.</p>
+<p>For double precision the same reasoning with 11 bits and bias 1023 gives exponents
+&minus;1022 to +1023, and a range of roughly 10<sup>&plusmn;308</sup>.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 10.21">Exercise 10.20 claimed the bias lets floats be compared as though their bits were unsigned integers. Test the claim on 1, 2, &minus;1 and &minus;2 by reading each 32-bit pattern as an unsigned integer. Where does it hold, where does it fail, and what has to be done about it?</summary><div class="sol">
+<p>Encode the four, and read the same bits a second time as a plain unsigned integer:</p>
+<div class="tablewrap"><table class="lawtab">
+<thead><tr><th>value</th><th>32 bits</th><th>as an unsigned integer</th></tr></thead>
+<tbody><tr><td class="lawcell">1</td><td class="lawcell"><span class="bin">0 01111111 0000 0000 0000 0000 0000 000</span></td><td class="lawcell">1,065,353,216</td></tr><tr><td class="lawcell">2</td><td class="lawcell"><span class="bin">0 10000000 0000 0000 0000 0000 0000 000</span></td><td class="lawcell">1,073,741,824</td></tr><tr><td class="lawcell">&minus;1</td><td class="lawcell"><span class="bin">1 01111111 0000 0000 0000 0000 0000 000</span></td><td class="lawcell">3,212,836,864</td></tr><tr><td class="lawcell">&minus;2</td><td class="lawcell"><span class="bin">1 10000000 0000 0000 0000 0000 0000 000</span></td><td class="lawcell">3,221,225,472</td></tr></tbody></table></div>
+<p><strong>Among the positives it works.</strong>
+1&nbsp;&lt;&nbsp;2 as numbers, and 1,065,353,216&nbsp;&lt;&nbsp;1,073,741,824 as unsigned
+integers. The exponent field sits immediately below the sign bit and is biased, so a
+bigger number has a bigger field; where the fields tie, the mantissa decides, and it too
+is read in the right order. That is exactly what the bias was for.</p>
+<p><strong>Among the negatives it reverses.</strong>
+&minus;2&nbsp;&lt;&nbsp;&minus;1 as numbers, but
+3,221,225,472&nbsp;&gt;&nbsp;3,212,836,864 as unsigned integers &mdash; the comparison comes
+out backwards. The reason is the same one that makes the negation of Exercise 10.19
+cheap: the magnitude bits do not know about the sign. A larger magnitude is a larger
+unsigned reading whichever side of zero the number is on, so the ordering of the
+negatives is a mirror image of what it should be.</p>
+<p><strong>And every negative outranks every positive,</strong> since the sign bit is the
+most significant bit of the pattern: all four negative readings exceed all four positive
+ones. This is sign-and-magnitude behaving exactly as Set 8 warned sign-and-magnitude
+behaves, and it is precisely the defect two&rsquo;s complement was invented to cure.</p>
+<p><strong>What to do about it.</strong> The fields themselves are fine; only the sign
+needs repairing. The standard fix is two cases, each a handful of gates:</p>
+<ul>
+<li>sign bit <strong>0</strong> (positive): set the top bit to 1;</li>
+<li>sign bit <strong>1</strong> (negative): invert all 32 bits.</li>
+</ul>
+<p>After that transformation an ordinary unsigned comparison is correct across the whole
+range, negatives below positives and each group in the right order. Inverting is what
+undoes the mirror, and setting the top bit lifts the positives above the negatives.</p>
+<p>So the claim is better stated as: the bias makes the <em>magnitude</em> of a float
+compare as an unsigned integer, and the sign is handled separately &mdash; which is one
+more entry for the table in Exercise 10.19. The one case this still gets wrong is
+&minus;0, which has a different pattern from +0 but must compare equal to it; see
+Exercise 10.24.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 10.22">The mantissa field is 23 bits but the format is said to give 24 bits of precision. Explain. Which number cannot be normalised, and how does the format cope?</summary><div class="sol">
+<p><strong>The 24th bit.</strong> A normalised binary number is
+1.something &mdash; the digit before the point is always 1, because it cannot be 0
+(that is what normalised means) and binary has no other option. A value that never
+changes carries no information, so it is not stored: the 23 bits hold what comes
+<em>after</em> the point, and the leading 1 is supplied when the number is read.</p>
+<p>So the significand actually in play is 24 bits wide while only 23 are kept &mdash; one
+bit of precision for free, which doubles the number of distinct values at no cost in
+storage.</p>
+<p><strong>The number that cannot be normalised is zero.</strong> It has no leading 1 to
+slide the point in front of; no exponent makes 0 look like 1.something.</p>
+<p><strong>How the format copes:</strong> by reserving a pattern instead of computing
+one. An exponent field of all zeros with an all-zero mantissa <em>means</em> zero, by
+decree. This is why &sect;10.7 exists at all &mdash; the hidden bit is what makes the
+format efficient and also what makes zero a special case.</p>
+<p>The same reservation is what gives two zeros, +0 and &minus;0, since the sign bit is
+independent and both settings are legal. The standard requires them to compare equal
+despite having different bit patterns, which is the one place where comparing floats as
+integers goes wrong.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 10.23">Identify what each of these single-precision patterns represents.</summary><div class="sol">
+<div class="tablewrap"><table class="lawtab">
+<thead><tr><th></th><th>mantissa = 0</th><th>mantissa &ne; 0</th></tr></thead>
+<tbody><tr><td class="lawcell">exponent all 0s</td><td class="lawcell">&plusmn;0</td><td class="lawcell">subnormal (very close to 0)</td></tr><tr><td class="lawcell">exponent all 1s</td><td class="lawcell">&plusmn;&infin;</td><td class="lawcell">NaN</td></tr></tbody></table></div>
+<p>Reading each against that table:</p>
+<div class="tablewrap"><table class="lawtab">
+<thead><tr><th>pattern</th><th>exponent</th><th>mantissa</th><th>means</th></tr></thead>
+<tbody><tr><td class="lawcell"><span class="bin">0 00000000 00000000000000000000000</span></td><td class="lawcell">all 0s</td><td class="lawcell">zero</td><td class="lawcell">+0</td></tr><tr><td class="lawcell"><span class="bin">1 00000000 00000000000000000000000</span></td><td class="lawcell">all 0s</td><td class="lawcell">zero</td><td class="lawcell">&minus;0</td></tr><tr><td class="lawcell"><span class="bin">0 11111111 00000000000000000000000</span></td><td class="lawcell">all 1s</td><td class="lawcell">zero</td><td class="lawcell">+&infin;</td></tr><tr><td class="lawcell"><span class="bin">1 11111111 00000000000000000000000</span></td><td class="lawcell">all 1s</td><td class="lawcell">zero</td><td class="lawcell">&minus;&infin;</td></tr><tr><td class="lawcell"><span class="bin">0 00000000 00000000010000000000000</span></td><td class="lawcell">all 0s</td><td class="lawcell">non-zero</td><td class="lawcell">subnormal</td></tr><tr><td class="lawcell"><span class="bin">0 11111111 00000010000000000000000</span></td><td class="lawcell">all 1s</td><td class="lawcell">non-zero</td><td class="lawcell">NaN</td></tr></tbody></table></div>
+<p>The first two are the two zeros. The next two are the infinities &mdash; produced by
+overflow, or by dividing a non-zero number by zero, and they behave sensibly in
+arithmetic: 1&nbsp;&divide;&nbsp;&infin; is 0.</p>
+<p>The fifth has an all-zero exponent but a non-zero mantissa, so it is a
+<strong>subnormal</strong>: the hidden bit is taken as 0 rather than 1, giving a number
+much closer to zero than any normal value, at the cost of fewer significant bits.</p>
+<p>The last has an all-ones exponent with a non-zero mantissa, so it is
+<strong>NaN</strong>. NaN is what an operation returns when there is no right answer at
+all &mdash; 0&nbsp;&divide;&nbsp;0, &infin;&nbsp;&minus;&nbsp;&infin;, the square root
+of a negative number. Its defining property is that it compares <em>unequal to
+everything, including itself</em>, which is the standard trick for testing whether a
+value is NaN.</p>
+<p>The thing to take away is that the exponent field is checked first. All zeros and all
+ones are not exponents; they are flags, and only the 254 patterns between them describe
+ordinary numbers.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 10.24">Two of the patterns in Exercise 10.23 are zero. Why does the format have two zeros rather than one? Which operations produce the negative one, and how do the two behave?</summary><div class="sol">
+<p><strong>Why there are two.</strong> Zero is signalled by a reserved combination
+&mdash; exponent field all 0s with mantissa all 0s &mdash; and that reservation says
+nothing about the sign bit, which is a separate bit that is free to be either value. Both
+settings are legal patterns, so both exist:</p>
+<p style="text-align:center;font-size:1.05rem">
+<span class="bin">0 00000000 0000 0000 0000 0000 0000 000</span> = +0<br>
+<span class="bin">1 00000000 0000 0000 0000 0000 0000 000</span> = &minus;0</p>
+<p>This is the price of the cheap negation in Exercise 10.19. Sign-and-magnitude spends
+one pattern twice on zero; two&rsquo;s complement spends the spare pattern on an extra
+negative value instead, which is why Set 8&rsquo;s range is asymmetric and this one is
+not.</p>
+<p><strong>Where &minus;0 comes from.</strong> Negating zero, as Exercise 10.19 does
+&mdash; flip the sign bit of +0. Multiplying or dividing when exactly one operand is
+negative and the result is zero: &minus;1&nbsp;&times;&nbsp;0. And underflow: a negative
+result too small in magnitude for even a subnormal rounds to &minus;0, which preserves
+the information that the true answer was below zero.</p>
+<p><strong>How they behave.</strong> The standard requires
++0&nbsp;==&nbsp;&minus;0 to be <strong>true</strong>, so no comparison can tell them
+apart, even though the 32 bits differ. But they are not interchangeable:</p>
+<p style="text-align:center;font-size:1.05rem">
+1&nbsp;&divide;&nbsp;(+0) = +&infin; &nbsp;&nbsp;but&nbsp;&nbsp;
+1&nbsp;&divide;&nbsp;(&minus;0) = &minus;&infin;</p>
+<p>so a sign that compares equal can still flip the sign of a later result. That is the
+practical reason to care, and it is why the sign is kept rather than discarded.</p>
+<p>It is also the one place where the comparison trick of Exercise 10.21 breaks: the
+transformation there maps the two zeros to different values, so an unsigned compare
+calls them unequal while the standard calls them equal. Hardware comparators special-case
+it.</p>
+<div class="box note"><span class="bt">The other side of the same coin</span>
+<p>NaN compares <em>unequal</em> to everything including itself, and the zeros compare
+<em>equal</em> despite differing in their bits. Equality of floats and equality of bit
+patterns are two different relations, and only one of them is what a program usually
+means.</p></div></div></details>
+
+<details class="prob"><summary data-label="Exercise 10.25">What are the largest and the smallest positive <em>normal</em> single-precision values? Give the bit patterns and roughly their decimal size.</summary><div class="sol">
+<p><strong>The largest.</strong> Take the biggest usable exponent field, 11111110 =
+254, so the exponent is 127, and the biggest mantissa, all 1s:</p>
+<p style="text-align:center;font-size:1.05rem">
+<span class="bin">0 11111110 1111 1111 1111 1111 1111 111</span></p>
+<p>which is just under 2&nbsp;&times;&nbsp;2<sup>127</sup> = 2<sup>128</sup>, or about
+<strong>3.4&nbsp;&times;&nbsp;10<sup>38</sup></strong>. Anything larger overflows to
+infinity.</p>
+<p><strong>The smallest positive normal.</strong> Take the smallest usable exponent
+field, 00000001 = 1, so the exponent is &minus;126, and a zero mantissa, which means a
+significand of exactly 1:</p>
+<p style="text-align:center;font-size:1.05rem">
+<span class="bin">0 00000001 0000 0000 0000 0000 0000 000</span></p>
+<p>which is 2<sup>&minus;126</sup>, about
+<strong>1.2&nbsp;&times;&nbsp;10<sup>&minus;38</sup></strong>.</p>
+<p>Note that the exponent fields used are 254 and 1, not 255 and 0 &mdash; both extremes
+are reserved, as Exercise 10.20 established. Using them would give infinity and zero
+rather than very large and very small numbers.</p>
+<p>Below the smallest normal there are still the subnormals, which fill the gap down to
+about 10<sup>&minus;45</sup> with steadily fewer significant bits. Without them there
+would be a jump straight from 1.2&nbsp;&times;&nbsp;10<sup>&minus;38</sup> to zero,
+and the difference of two distinct numbers could come out as exactly 0.</p>
+</div></details>
+
+<details class="prob"><summary data-label="Exercise 10.26">What is the most negative single-precision value &mdash; the finite value furthest below zero? Give its bit pattern. Is the single-precision range asymmetric, as Set 8&rsquo;s was?</summary><div class="sol">
+<p><strong>The pattern.</strong> Take the largest finite value from Exercise 10.25 and
+set the sign bit:</p>
+<p style="text-align:center;font-size:1.05rem">
+<span class="bin">1 11111110 1111 1111 1111 1111 1111 111</span></p>
+<p>which is <strong>&minus;3.4&nbsp;&times;&nbsp;10<sup>38</sup></strong> &mdash; the same magnitude as the largest
+positive, carrying a minus sign. Anything further from zero overflows to
+&minus;&infin;, <span class="bin">1 11111111 0000 0000 0000 0000 0000 000</span>.</p>
+<p><strong>The range is symmetric.</strong> Every finite single-precision value has a
+finite negative counterpart with the identical exponent and mantissa, because negation
+touches only the sign bit (Exercise 10.19) and the magnitude bits have no idea it
+happened. There is no value that cannot be negated.</p>
+<p><strong>Contrast Set 8, and Exercise 10.10.</strong> In 8-bit two&rsquo;s complement
+the range is &minus;128 to 127: &minus;128 has no positive counterpart, and negating it
+silently returns itself. Fixed&lt;8,&nbsp;3&gt; inherits that exactly, scaled &mdash;
+&minus;16 to 15.875. Floating point simply does not have the problem.</p>
+<p><strong>What the symmetry cost.</strong> Count the patterns. Two&rsquo;s complement
+uses all 256 of its 8-bit patterns for 256 distinct values. Sign-and-magnitude spends two
+patterns on zero (Exercise 10.24), so it has one fewer distinct value than patterns
+&mdash; and that is where the extra negative value went. The two formats make opposite
+choices with the same spare pattern:</p>
+<div class="tablewrap"><table class="lawtab">
+<thead><tr><th>spare pattern spent on</th><th>result</th></tr></thead>
+<tbody><tr><td class="lawcell">an extra negative value (two&rsquo;s complement)</td><td class="lawcell">unique zero, asymmetric range, negation can fail</td></tr><tr><td class="lawcell">a second zero (IEEE 754)</td><td class="lawcell">symmetric range, negation never fails, two zeros to reason about</td></tr></tbody></table></div>
+<p>Neither is a mistake. Two&rsquo;s complement is built so that one adder serves both
+signs, which matters for integers; IEEE 754 is built so that magnitude and sign stay
+separate, which matters when the magnitude already has two fields of its own.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 10.27">Give the field widths, the bias and the precision of IEEE 754 double precision, and work out roughly how many decimal digits it is good for.</summary><div class="sol">
+<figure class="fig" style="--figmax:100%">
+<svg viewBox="0 0 620 120" role="img" aria-label="double precision: 64 bits">
+<rect class="blk" x="20.0" y="34" width="9.1" height="40" rx="3"/>
+<text class="blab" x="24.53125" y="94" text-anchor="middle">sign</text>
+<text class="bsub" x="24.53125" y="110" text-anchor="middle"></text>
+<rect class="blk" x="29.1" y="34" width="99.7" height="40" rx="3"/>
+<text class="blab" x="78.90625" y="94" text-anchor="middle">exponent</text>
+<text class="bsub" x="78.90625" y="110" text-anchor="middle">11 bits, bias 1023</text>
+<text class="klab" x="78.90625" y="24" text-anchor="middle">11 bits</text>
+<rect class="blk" x="128.8" y="34" width="471.2" height="40" rx="3"/>
+<text class="blab" x="364.375" y="94" text-anchor="middle">mantissa</text>
+<text class="bsub" x="364.375" y="110" text-anchor="middle">52 bits</text>
+<text class="klab" x="364.375" y="24" text-anchor="middle">52 bits</text>
+</svg>
+<figcaption>double precision: 64 bits</figcaption></figure>
+<p><strong>The fields:</strong> 1 sign bit, <strong>11</strong> exponent bits with a
+bias of <strong>1023</strong>, and <strong>52</strong> mantissa bits, for 64 in
+total.</p>
+<p><strong>The precision</strong> is <strong>53</strong> bits &mdash; the 52 stored plus
+the hidden 1, by the same argument as Exercise 10.22.</p>
+<p><strong>In decimal digits.</strong> Each decimal digit needs about
+log<sub>2</sub>&nbsp;10&nbsp;&asymp;&nbsp;3.32 bits, so</p>
+<p style="text-align:center;font-size:1.05rem">
+53 &divide; 3.32 &asymp; <strong>16 digits</strong></p>
+<p>which is why a double prints about 15 to 17 significant figures before it starts
+inventing. Single precision, with 24 bits, gives 24&nbsp;&divide;&nbsp;3.32 &asymp;
+<strong>7 digits</strong> &mdash; and that is the practical reason doubles are the
+default in most languages: seven digits is not many once a few operations have each
+rounded.</p>
+<p>The exponent range follows the same pattern as Exercise 10.20: field values 1 to
+2046, so exponents &minus;1022 to +1023, giving magnitudes up to about
+10<sup>308</sup>.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 10.28">Two consecutive single-precision numbers differ by one unit in the last place of the mantissa. How far apart are consecutive floats near 1, and near 1000? Why does this make floating point unlike fixed point?</summary><div class="sol">
+<p>Changing the last mantissa bit changes the significand by
+2<sup>&minus;23</sup>, and the whole value is the significand times
+2<sup><var>e</var></sup>, so <strong>the gap between neighbours is
+2<sup><var>e</var>&minus;23</sup></strong> &mdash; it depends on the exponent.</p>
+<p><strong>Near 1</strong> the exponent is 0, so the gap is 2<sup>&minus;23</sup>
+&asymp; <strong>1.2&nbsp;&times;&nbsp;10<sup>&minus;7</sup></strong>. That quantity is
+called the machine epsilon.</p>
+<p><strong>Near 1000</strong> the exponent is 9, since
+2<sup>9</sup>&nbsp;=&nbsp;512 and 2<sup>10</sup>&nbsp;=&nbsp;1024, so the gap is
+2<sup>&minus;14</sup> &asymp; <strong>6.1&nbsp;&times;&nbsp;10<sup>&minus;5</sup></strong>
+&mdash; about 500 times larger.</p>
+<p><strong>The contrast with fixed point.</strong> In Fixed&lt;8,&nbsp;4&gt; the step is
+<sup>1</sup>&frasl;<sub>16</sub> everywhere, near zero and at the top of the range alike.
+Floating point instead keeps a constant <em>relative</em> precision &mdash; about seven
+significant digits whatever the magnitude &mdash; by letting the absolute gap grow with
+the number.</p>
+<p>That is the right trade for scientific work, where what matters is the number of
+significant figures rather than the absolute error. It is the wrong trade for money,
+where an error of a cent matters just as much on a large balance as a small one &mdash;
+which is why financial software uses fixed point or decimal types rather than floats.</p>
+<p>It also explains a result that surprises people: adding a small number to a large one
+can change nothing at all. If the gap at that magnitude exceeds what you are adding, the
+exact answer rounds back to where it started.</p></div></details>
+
+<details class="prob"><summary data-label="Exercise 10.29">Challenge. In most programming languages <code>0.1 + 0.2</code> does not equal <code>0.3</code>. Explain exactly why, using everything in this set. Then say what a program should do instead of testing two floating-point values for equality.</summary><div class="sol">
+<p>Set 2 promised this one would come back. Here it is.</p>
+<p><strong>Neither operand is stored exactly.</strong> By Exercise 10.4,
+<sup>1</sup>&frasl;<sub>10</sub> has a repeating binary expansion, so 0.1 cannot be
+represented in any finite number of bits; neither can 0.2, nor 0.3. What gets stored in
+each case is the nearest representable double.</p>
+<p>The nearest double to 0.1 is not 0.1 but</p>
+<p style="text-align:center;font-size:1.02rem">0.1000000000000000055511151231257827021182</p>
+<p>and the nearest to 0.2 is exactly twice that, since doubling only changes the
+exponent. So the two stored values carry small errors in the same direction.</p>
+<p><strong>The sum is then rounded again.</strong> Adding the two stored values gives a
+number that itself needs rounding to the nearest double, and the result of that rounding
+is</p>
+<p style="text-align:center;font-size:1.02rem">0.3000000000000000444089209850062616169453</p>
+<p>whereas the nearest double to 0.3 is</p>
+<p style="text-align:center;font-size:1.02rem">0.2999999999999999888977697537484345957637</p>
+<p>Different values, differing in the last bit &mdash; so the comparison is false, and
+printing the sum with enough digits shows 0.30000000000000004.</p>
+<p><strong>Nothing here is a bug.</strong> Every step did the best it could: each
+rounding was to the nearest representable value, and the standard guarantees exactly
+that. The errors are tiny and they simply did not cancel.</p>
+<p><strong>What to do instead.</strong> Do not test floating-point values for equality.
+Test whether they are close enough:</p>
+<p style="text-align:center;font-size:1.02rem">
+<code>if (fabs(x - y) &lt; tolerance)</code></p>
+<p>with a tolerance chosen for the problem &mdash; and, by Exercise 10.28, a tolerance
+that is <em>relative</em> to the size of the numbers rather than absolute, since the gap
+between neighbouring floats grows with magnitude. A tolerance of 10<sup>&minus;9</sup>
+is strict near 1 and meaningless near 10<sup>12</sup>.</p>
+<div class="box extra"><span class="bt">Where this bites in practice</span>
+<p>Two places, both common. Accumulating money in floating point and finding the total
+off by a fraction of a cent &mdash; use fixed point, or integer counts of cents.
+And looping with a floating-point counter, <code>for (x = 0; x != 1.0; x += 0.1)</code>,
+which never terminates because the accumulated value steps straight over 1.0. Count with
+an integer and multiply.</p></div>
+</div></details>
+
+<div class="box extra"><span class="bt">Where this goes next</span>
+<p>That completes the number representations: whole, negative, and now fractional, with
+the circuits to add them. What remains is to put a processor around all of it &mdash;
+instructions that say which operation the ALU should perform, registers to hold the
+operands, and memory to hold the rest. That is MIPS assembly language, and it is the
+rest of the course.</p></div>
+
+    <nav class="pagenav">
+      <a class="prev" href="ex-alu.html"><span>Previous</span>Set 9. Multiplexers, decoders and the ALU</a>
+      <a class="next" href="setup-logisim.html"><span>Next</span>Installing Logisim-Evolution</a>
+    </nav>
+    <footer class="site">
+      <em>Computer Organization and Assembly Language</em> &middot; CSCI 240 / 640,
+      Queens College CUNY.
+    </footer>
+  </main>
+</div>
+</body>
+</html>
