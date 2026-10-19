@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Midterm review &mdash; CSCI 240</title>
+<style>
+/* Light-theme fallback for the diagrams; assets/style.css overrides it. */
+.fig svg{display:block;width:100%;max-width:var(--figmax,34rem);height:auto;margin:0 auto}
+.fig figcaption{font:400 .8rem/1.45 system-ui,sans-serif;color:#79828e;
+  margin-top:.45rem}
+.fig{margin:1.5rem 0;text-align:center}
+.fig .wire{fill:none;stroke:#1a1c1f;stroke-width:1.9;stroke-linecap:round;
+  stroke-linejoin:round}
+.fig .gate{fill:#ffffff;stroke:#1a1c1f;stroke-width:1.9;stroke-linejoin:round}
+.fig .gate.open{fill:none}
+.fig .dot{fill:#1a1c1f;stroke:none}
+.fig .lbl{fill:#1a1c1f;stroke:none;font:600 15px system-ui,sans-serif}
+.fig .ann{fill:#79828e;stroke:none;font:400 12.5px ui-monospace,monospace}
+.fig .kcell{fill:#ffffff;stroke:#cfcbc0;stroke-width:1.2}
+.fig .kval{fill:#1a1c1f;stroke:none;font:600 21px ui-monospace,monospace}
+.fig .kval.zero{fill:#79828e;font-weight:400}
+.fig .kval.dc{fill:#8c2d19;font-weight:700}
+.fig .kidx{fill:#79828e;stroke:none;font:400 11px ui-monospace,monospace}
+.fig .klab{fill:#4d5560;stroke:none;font:600 14px ui-monospace,monospace}
+.fig .kvar{fill:#8c2d19;stroke:none;font:700 13px system-ui,sans-serif}
+.fig .kslash{fill:none;stroke:#cfcbc0;stroke-width:1.2}
+.fig .kgrp{fill:none;stroke-width:2.6}
+.fig .grp0{stroke:#8c2d19}.fig .grp1{stroke:#1d6a4f}
+.fig .grp2{stroke:#2a4d8f}.fig .grp3{stroke:#7a5ea8}
+/* multiple-choice options inside a problem summary */
+.mco{display:block;margin:.55rem 0 .1rem}
+.mcopt{display:block;margin:.12rem 0;padding-left:2.1rem;text-indent:-2.1rem}
+.mcopt b{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-weight:600}
+.mcans{margin-top:.2rem}
+.mcans b{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+</style>
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/notes.js" defer></script>
+</head>
+<body>
+<header class="topbar"><div class="topbar-in">
+  <a class="brand" href="index.html">CSCI 240</a>
+  <span class="crumb">Midterm review</span>
+  <nav class="topnav">
+    <a href="ex-float.html">&larr; Prev</a>
+    <a href="index.html">Contents</a>
+    <a href="setup-logisim.html">Next &rarr;</a>
+    <button class="iconbtn" id="themebtn" type="button" title="Light / dark">&#9686;</button>
+  </nav>
+</div></header>
+<div class="wrap">
+  <aside class="toc"><p class="toc-title">On this page</p><ol>
+    <li><a href="#covers"><span class="t">R.1</span>What the midterm covers</a></li>
+    <li><a href="#shape"><span class="t">R.2</span>The shape of the paper</a></li>
+    <li><a href="#cold"><span class="t">R.3</span>What to be able to do cold</a></li>
+    <li><a href="#parta"><span class="t">R.4</span>Part A &mdash; multiple choice</a></li>
+    <li><a href="#partb"><span class="t">R.5</span>Part B &mdash; the eight shapes</a></li>
+    <li><a href="#traps"><span class="t">R.6</span>Ten things that cost marks</a></li>
+  </ol></aside>
+  <main>
+
+<div class="chhead">
+  <span class="chpart">Revision &middot; before the midterm</span>
+  <span class="chnum">Midterm review</span>
+  <h1>A practice paper, and how to use it</h1>
+  <p class="chsum">Forty-three problems built to the shape of the midterm and
+  overlapping none of it: nineteen multiple-choice questions and eight worked
+  problems, one for each kind of question the paper asks, every one with a full
+  solution hidden until you click.</p>
+</div>
+
+<p>Nothing on this page appears on the midterm, and nothing on it is taken from
+the exercise sets you have already worked, the slides or the quizzes. That is
+deliberate. A revision sheet made of problems you have seen measures your memory
+of the answers; this one measures whether you can do the thing.</p>
+
+<div class="box note"><span class="bt">How to use it</span>
+<p>Work it with the solutions closed, on paper, in one 75-minute sitting, with no
+calculator &mdash; the same conditions as the exam. <em>Then</em> open the
+solutions. Reading a worked answer you have not attempted feels like learning and
+is not: it builds recognition, and the exam asks for production.</p>
+<p>Printing the page &mdash; or saving it as a PDF &mdash; opens every solution
+and drops the navigation, which gives you a clean problem set with an answer key
+at the back.</p></div>
+
+
+<h2 id="covers"><span class="secnum">R.1</span>What the midterm covers</h2>
+
+<p>Everything from the first lecture up to floating point. In the order we did
+it:</p>
+
+<div class="tablewrap"><table>
+<thead><tr><th>Lecture</th><th>Topic</th><th>Where it shows up on the paper</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Codes; architecture vs organization; Morse</td><td>multiple choice</td></tr>
+<tr><td>2</td><td>Number bases and conversion; ASCII</td><td>multiple choice and a full problem</td></tr>
+<tr><td>3</td><td>Gates, Boolean algebra, circuit diagrams</td><td>multiple choice and a full problem</td></tr>
+<tr><td>4</td><td>Truth tables, SOP and POS, XOR</td><td>multiple choice and a full problem</td></tr>
+<tr><td>5</td><td>Canonical forms; NAND, NOR, functional completeness</td><td>multiple choice and a full problem</td></tr>
+<tr><td>6</td><td>Building blocks</td><td>multiple choice</td></tr>
+<tr><td>7&ndash;8</td><td>Karnaugh maps, prime implicants, don&rsquo;t-cares</td><td><strong>a full problem, guaranteed</strong></td></tr>
+<tr><td>9</td><td>Half and full adders; two&rsquo;s complement; subtraction</td><td>multiple choice and a full problem</td></tr>
+<tr><td>10</td><td>Multiplexers, decoders, the ALU</td><td>multiple choice</td></tr>
+<tr><td>11&ndash;12</td><td>Fixed point; IEEE 754 floating point</td><td><strong>a full problem, guaranteed</strong></td></tr>
+</tbody></table></div>
+
+<p>Nothing from MIPS is on it. Nothing we have not covered in class is on it.</p>
+
+<div class="box note"><span class="bt">Two promises from the slides</span>
+<p>The deck says outright that a Karnaugh map <em>with don&rsquo;t-cares</em>
+will be on the midterm, and that you may be asked to draw a circuit diagram.
+Both are true. If you ration your revision time, those two get the first
+hour.</p></div>
+
+
+<h2 id="shape"><span class="secnum">R.2</span>The shape of the paper</h2>
+
+<p>Eight problems, 100 points, 75 minutes, closed book. No calculator, no notes,
+no phone. Problem 1 is the multiple choice and is worth 30 points; Problems
+2&ndash;8 are worth 10 points each and take one topic apiece, in roughly the
+order of the table above.</p>
+
+<div class="box warn"><span class="bt">You may leave two blank</span>
+<p><strong>Problems 1, 5 and 8 are required</strong> &mdash; the multiple
+choice, the Karnaugh map and the fixed/floating-point problem. Of the remaining
+five you may leave up to <strong>two</strong> blank.</p>
+<p>Every problem you answer is counted, and then your highest-scoring problems
+are counted a second time &mdash; one extra for each problem you left blank. So
+Problems 2&ndash;8 always contribute 70 points however many you attempt:</p>
+<ul>
+<li>leave none blank &mdash; all seven count once;</li>
+<li>leave one blank &mdash; your best score is counted twice;</li>
+<li>leave two blank &mdash; your best two scores are each counted twice.</li>
+</ul>
+<p>A problem counts as blank if you write nothing, or if you cross out your work
+on it entirely.</p></div>
+
+<h3>What that means for how you sit the exam</h3>
+
+<p>The arithmetic is worth doing once, now, rather than under time pressure on
+the day. Suppose your two best worked problems earn 9 and 8.</p>
+
+<ul>
+<li><strong>Leave two blank.</strong> You hand in five scores &mdash; 9, 8 and
+three others &mdash; and the 9 and the 8 are <em>each</em> counted twice.</li>
+<li><strong>Attempt a sixth and score 2 on it.</strong> Now you hand in six
+scores and only the 9 is counted twice. You gained 2 points and lost the second
+count of the 8: a net loss of 6.</li>
+</ul>
+
+<p>So the rule is the reverse of the usual exam advice: <strong>an extra attempt
+is worth making only if you expect to score more on it than on a problem you
+are already good at.</strong> If a problem is going badly and you still have a
+blank in hand, cross your work out entirely and spend the time checking the
+problems you can do.</p>
+
+<p><strong>A workable 75 minutes:</strong> 15 minutes on the multiple choice,
+then the two required problems while you are fresh &mdash; the K-map and the
+floating point are the longest two on the paper &mdash; then the optional ones
+in whatever order suits you, then five minutes at the end to check. If you are
+attempting all seven, you have about eight minutes each and will need to keep
+moving.</p>
+
+<div class="box note"><span class="bt">Show your work</span>
+<p>From the syllabus, word for word: <em>writing down an answer alone &mdash;
+even a correct one &mdash; receives no credit.</em> On a K-map that means the
+circled groups. On a conversion it means the division chain. On a subtraction it
+means the negation step. An unsupported right answer and an unsupported wrong
+answer score the same.</p></div>
+
+
+<h2 id="cold"><span class="secnum">R.3</span>What to be able to do cold</h2>
+
+<p>Go down this list and mark the ones you could not do right now on blank paper
+without hesitating. Those are your revision list; the rest is reading you have
+already done.</p>
+
+<div class="grid2">
+<div class="card"><h3>Bases</h3><p>Decimal to any base by repeated division.
+Any base to decimal by place value. Binary to octal and hexadecimal by grouping
+<em>from the right</em>, with no arithmetic. How many digits a value needs in a
+given base, without converting.</p></div>
+
+<div class="card"><h3>Boolean algebra</h3><p>De Morgan in both directions,
+including over a bracket. The combining law AB + AB&prime; = A and its dual.
+Absorption, in both the plain form and the X + X&prime;Y form. Enough fluency to
+simplify a three-term expression and name the law at each step.</p></div>
+
+<div class="card"><h3>Truth tables and canonical forms</h3><p>Build a table one
+gate-column at a time. Read the canonical SOP off the 1-rows and the canonical
+POS off the 0-rows, getting the complementing the right way round. Move between
+an expression, a table, and &Sigma; / &Pi; shorthand in any direction.</p></div>
+
+<div class="card"><h3>Karnaugh maps</h3><p>Lay out a four-variable map with the
+columns in Gray order. Circle maximal groups, including the ones that wrap round
+the edges and the four corners. Name the prime implicants, say which are
+essential, and justify a cover. Group the 0s for a POS. Use don&rsquo;t-cares
+when they help and ignore them when they do not.</p></div>
+
+<div class="card"><h3>Circuits</h3><p>Draw a circuit from an expression working
+inside out, with one inverter per complemented literal and dots on the fan-out
+junctions. Read an expression back off a diagram. Convert a two-level
+AND&ndash;OR circuit to NAND only, and count the gates both ways.</p></div>
+
+<div class="card"><h3>Arithmetic</h3><p>Two&rsquo;s complement in any width:
+represent, negate, read back. Subtract by adding the negation. Say what the carry
+out means, and detect signed overflow from the signs. The range a width covers
+and why it is lopsided.</p></div>
+
+<div class="card"><h3>Fixed point</h3><p>Read Fixed&lang;<var>w</var>,&nbsp;
+<var>b</var>&rang; as a two&rsquo;s complement integer scaled by
+2<sup>&minus;<var>b</var></sup>, in both directions. The step size, the range,
+and which decimal values are representable at all.</p></div>
+
+<div class="card"><h3>IEEE 754</h3><p>Encode: normalise, bias the exponent by
+127, drop the hidden 1. Decode: split the fields, put the hidden 1 back, shift.
+The reserved patterns &mdash; zero, infinity, NaN &mdash; and why they are
+needed.</p></div>
+</div>
+
+<h2 id="parta"><span class="secnum">R.4</span>Part A &mdash; multiple choice</h2>
+<p>Nineteen questions, one right answer each. On the paper there are fifteen of these and they are worth two points apiece, so they are the best-paid minute of the exam &mdash; and the easiest place to lose marks by rushing. Give yourself twenty minutes for the set below.</p>
+<p>The solution to each one names the lecture it comes from, so a run of wrong answers in one area tells you what to re-read.</p>
+
+<details class="prob"><summary data-label="A1 &middot; Lecture 1">Morse is a variable-length code: E is one dit, Q is four elements. What lets a receiver tell where one letter ends and the next begins?<span class="mco"><span class="mcopt"><b>(A)</b> Every letter is padded out to the same number of elements.</span><span class="mcopt"><b>(B)</b> The gaps are part of the code &mdash; one unit between elements of a letter, three between letters, seven between words.</span><span class="mcopt"><b>(C)</b> Every letter ends with a dah.</span><span class="mcopt"><b>(D)</b> The sender transmits the length of the letter first.</span></span></summary><div class="sol">
+<p class="mcans"><b>(B)</b> The gaps are part of the code &mdash; one unit between elements of a letter, three between letters, seven between words.</p>
+<p>This is the point of the whole lecture: the silence carries information. Strip the gaps out and <span class="morseline">&middot;&minus;&nbsp;&middot;&middot;&middot;</span> and <span class="morseline">&middot;&nbsp;&minus;&middot;&middot;&nbsp;&middot;</span> become the same transmission. A variable-length code needs some way of marking boundaries, and Morse uses timing rather than a special symbol.</p>
+</div></details>
+<details class="prob"><summary data-label="A2 &middot; Lecture 2">A lab has 300 machines to label, and the labels are to be hexadecimal numbers starting at 0. How many hexadecimal digits does each label need?<span class="mco"><span class="mcopt"><b>(A)</b> 4</span><span class="mcopt"><b>(B)</b> It depends on how the numbers are assigned.</span><span class="mcopt"><b>(C)</b> 2</span><span class="mcopt"><b>(D)</b> 3</span></span></summary><div class="sol">
+<p class="mcans"><b>(D)</b> 3</p>
+<p>Two digits reach <span class="hex">0xFF</span> = 255, and 255 &lt; 299. Three digits reach <span class="hex">0xFFF</span> = 4095, which is plenty. The general rule: <var>d</var> digits in base <var>b</var> cover <var>b</var><sup><var>d</var></sup> values, so you need the smallest <var>d</var> with <var>b</var><sup><var>d</var></sup> &ge; <var>N</var>.</p><p>The trap is answering 2 because 300 is a three-digit number in decimal. Digit counts do not carry across bases.</p>
+</div></details>
+<details class="prob"><summary data-label="A3 &middot; Lecture 2">Write one fixed value in base 8 and again in base 16. The base-16 string is:<span class="mco"><span class="mcopt"><b>(A)</b> never longer</span><span class="mcopt"><b>(B)</b> always the same length</span><span class="mcopt"><b>(C)</b> shorter only when the value is a power of two</span><span class="mcopt"><b>(D)</b> always shorter</span></span></summary><div class="sol">
+<p class="mcans"><b>(A)</b> never longer</p>
+<p>The digit count is &lfloor;log<sub><var>b</var></sub><var>N</var>&rfloor;&nbsp;+&nbsp;1, which falls as the base rises &mdash; but it falls in steps, so it often stays put. 7 is <span class="bin">7</span><sub>8</sub> and <span class="hex">0x7</span>: one digit either way. 2907 is <span class="bin">5533</span><sub>8</sub> and <span class="hex">0xB5B</span>: four digits against three.</p><p>"Always shorter" is the tempting answer and it is wrong for every value below 8.</p>
+</div></details>
+<details class="prob"><summary data-label="A4 &middot; Lecture 2">A program sorts strings by comparing their ASCII bytes one at a time. It puts <code>Zoo</code> before <code>apple</code>. Why?<span class="mco"><span class="mcopt"><b>(A)</b> Byte sorting ignores case.</span><span class="mcopt"><b>(B)</b> Shorter strings always sort first.</span><span class="mcopt"><b>(C)</b> Every uppercase code is numerically smaller than every lowercase code.</span><span class="mcopt"><b>(D)</b> <code>Z</code> and <code>a</code> happen to be adjacent in the table.</span></span></summary><div class="sol">
+<p class="mcans"><b>(C)</b> Every uppercase code is numerically smaller than every lowercase code.</p>
+<p>Uppercase runs <span class="hex">0x41</span>&ndash;<span class="hex">0x5A</span> and lowercase runs <span class="hex">0x61</span>&ndash;<span class="hex">0x7A</span>, so the whole uppercase block sits below the whole lowercase block. <code>Z</code> is <span class="hex">0x5A</span>, <code>a</code> is <span class="hex">0x61</span>.</p><p>They are not adjacent: six punctuation codes sit between them. That gap is the reason the case bit trick &mdash; set bit 5 for lowercase &mdash; works for letters and nothing else.</p>
+</div></details>
+<details class="prob"><summary data-label="A5 &middot; Lecture 3">Of the sixteen rows of a four-variable truth table, how many have exactly two of the four inputs equal to 1?<span class="mco"><span class="mcopt"><b>(A)</b> 8</span><span class="mcopt"><b>(B)</b> 12</span><span class="mcopt"><b>(C)</b> 4</span><span class="mcopt"><b>(D)</b> 6</span></span></summary><div class="sol">
+<p class="mcans"><b>(D)</b> 6</p>
+<p>Choose which two of the four are 1: that is <sup>4</sup>C<sub>2</sub> = 6. The rows are 3, 5, 6, 9, 10 and 12 &mdash; the ones whose binary form has exactly two 1s.</p><p>Worth knowing because row counts by weight are how you sanity-check a map: on a four-variable K-map those six cells are exactly the ones two steps from cell 0.</p>
+</div></details>
+<details class="prob"><summary data-label="A6 &middot; Lecture 3">Three of these four expressions equal A. Which one does not?<span class="mco"><span class="mcopt"><b>(A)</b> A(A + B)</span><span class="mcopt"><b>(B)</b> A + A&prime;B</span><span class="mcopt"><b>(C)</b> A &middot; A</span><span class="mcopt"><b>(D)</b> A + AB</span></span></summary><div class="sol">
+<p class="mcans"><b>(B)</b> A + A&prime;B</p>
+<p><strong>A + A&prime;B = A + B</strong>, not A. The other three all collapse: A + AB = A(1 + B) = A and A(A + B) = A + AB = A, both by absorption, and A &middot; A = A by idempotence.</p><p>The one to watch is the pair A + AB and A + A&prime;B, which look alike and behave completely differently. A + AB throws the second term away; A + A&prime;B keeps it and drops the A&prime;. The reason is worth having in words rather than as a rule: in A + A&prime;B the second term can only fire when A is 0, so it adds the rows where B is 1 and A is not &mdash; which is exactly what is missing from A.</p>
+</div></details>
+<details class="prob"><summary data-label="A7 &middot; Lecture 3">Boolean algebra has no subtraction and no division. When you simplify an expression, the practical consequence is:<span class="mco"><span class="mcopt"><b>(A)</b> An expression can only shrink or stay the same &mdash; nothing is ever taken away to leave a negative term.</span><span class="mcopt"><b>(B)</b> You may divide both sides of an identity by a common variable.</span><span class="mcopt"><b>(C)</b> A + A must be written 2A.</span><span class="mcopt"><b>(D)</b> Terms cancel in pairs, as they do in ordinary algebra.</span></span></summary><div class="sol">
+<p class="mcans"><b>(A)</b> An expression can only shrink or stay the same &mdash; nothing is ever taken away to leave a negative term.</p>
+<p>A + A = A, not 2A; A &middot; A = A, not A&sup2;. There is no inverse operation to undo + or &middot;, so a simplification step either absorbs a term into another or leaves things as they were. If your working ever produces a &ldquo;&minus;AB&rdquo; you have left Boolean algebra.</p><p>This is also why you cannot cancel A from AB = AC to conclude B = C. Take A = 0: the equation holds for any B and C at all.</p>
+</div></details>
+<details class="prob"><summary data-label="A8 &middot; Lecture 4">A &oplus; B &oplus; A equals:<span class="mco"><span class="mcopt"><b>(A)</b> 0</span><span class="mcopt"><b>(B)</b> 1</span><span class="mcopt"><b>(C)</b> B</span><span class="mcopt"><b>(D)</b> B&prime;</span></span></summary><div class="sol">
+<p class="mcans"><b>(C)</b> B</p>
+<p>XOR is associative and commutative, so regroup as (A &oplus; A) &oplus; B = 0 &oplus; B = <strong>B</strong>.</p><p>The two facts doing the work are A &oplus; A = 0 and 0 &oplus; B = B. Together they say every value XORed in twice disappears, which is the whole basis of parity checking: XOR a parity bit in, XOR it in again, and you are back where you started.</p>
+</div></details>
+<details class="prob"><summary data-label="A9 &middot; Lecture 4">F(A, B, C) = &Sigma;(0, 1, 2, 3, 4, 5, 6, 7). F is:<span class="mco"><span class="mcopt"><b>(A)</b> A + B + C</span><span class="mcopt"><b>(B)</b> ABC</span><span class="mcopt"><b>(C)</b> the constant 1</span><span class="mcopt"><b>(D)</b> the constant 0</span></span></summary><div class="sol">
+<p class="mcans"><b>(C)</b> the constant 1</p>
+<p>All eight rows are 1, so the output never depends on the inputs at all. The canonical SOP has eight product terms and 24 literals; the minimal SOP is the single symbol <strong>1</strong>, and the circuit is a wire tied high.</p><p>A + B + C is wrong because it is 0 when A = B = C = 0, which is row 0 &mdash; and row 0 is in the list.</p>
+</div></details>
+<details class="prob"><summary data-label="A10 &middot; Lecture 7">On a four-variable K-map over A, B, C, D, a group covering cells 0, 2, 8 and 10 gives the product term:<span class="mco"><span class="mcopt"><b>(A)</b> B&prime;D&prime;</span><span class="mcopt"><b>(B)</b> A&prime;C&prime;</span><span class="mcopt"><b>(C)</b> B&prime;C&prime;</span><span class="mcopt"><b>(D)</b> A&prime;B&prime;</span></span></summary><div class="sol">
+<p class="mcans"><b>(A)</b> B&prime;D&prime;</p>
+<p>Write the four cells out: 0 = 0000, 2 = 0010, 8 = 1000, 10 = 1010. A takes both values and C takes both values, so both drop out. B is 0 throughout and D is 0 throughout, so they stay, complemented: <strong>B&prime;D&prime;</strong>.</p><p>These are the four corners of the map, and they are a legal group &mdash; the map wraps left to right and top to bottom. Four cells eliminate two variables, which is the check to run on any answer: a group of 2<sup><var>k</var></sup> cells always leaves 4&nbsp;&minus;&nbsp;<var>k</var> literals.</p>
+</div></details>
+<details class="prob"><summary data-label="A11 &middot; Lecture 8">Two students minimise the same function with don&rsquo;t-cares, use the X cells differently, and hand in different answers &mdash; both three terms and seven literals. This means:<span class="mco"><span class="mcopt"><b>(A)</b> The function has no minimal form.</span><span class="mcopt"><b>(B)</b> They must have labelled the map&rsquo;s axes differently.</span><span class="mcopt"><b>(C)</b> One of them has made a mistake.</span><span class="mcopt"><b>(D)</b> Both are correct: the minimum cost can be reached by more than one expression.</span></span></summary><div class="sol">
+<p class="mcans"><b>(D)</b> Both are correct: the minimum cost can be reached by more than one expression.</p>
+<p>Minimality is a property of the <em>cost</em>, not of the expression. When two covers tie, both are minimal and both earn full marks. It happens often with don&rsquo;t-cares, because each X you are free to use or ignore doubles the number of maps you are really minimising.</p><p>What is <em>not</em> allowed is a different cost. If one answer is three terms and the other four, the four-term one is wrong, however carefully it was drawn.</p>
+</div></details>
+<details class="prob"><summary data-label="A12 &middot; Lecture 5">A function has been minimised to a sum of three product terms. Built as a two-level NAND-only circuit, how many NAND gates does it need, not counting any used to make complemented inputs?<span class="mco"><span class="mcopt"><b>(A)</b> 3</span><span class="mcopt"><b>(B)</b> 4</span><span class="mcopt"><b>(C)</b> 6</span><span class="mcopt"><b>(D)</b> 7</span></span></summary><div class="sol">
+<p class="mcans"><b>(B)</b> 4</p>
+<p>One NAND per product term, one NAND to collect them: <strong>4</strong>, the same count as the AND&ndash;OR version. The conversion is free because the two bubbles added on each wire cancel &mdash; (XY)&prime; feeding a NAND that complements again gives back XY + ZW + &hellip;.</p><p>The gates you may still need are inverters for literals that appear complemented, and a NAND with both inputs tied together is the inverter.</p>
+</div></details>
+<details class="prob"><summary data-label="A13 &middot; Lecture 9">Two 4-bit unsigned numbers are added. The result needs at most how many bits?<span class="mco"><span class="mcopt"><b>(A)</b> 4</span><span class="mcopt"><b>(B)</b> 5</span><span class="mcopt"><b>(C)</b> 8</span><span class="mcopt"><b>(D)</b> 9</span></span></summary><div class="sol">
+<p class="mcans"><b>(B)</b> 5</p>
+<p>The largest case is 15 + 15 = 30, and 30 needs five bits (<span class="bin">11110</span>). In general adding two <var>n</var>-bit numbers gives at most <var>n</var>&nbsp;+&nbsp;1 bits &mdash; the carry out of the top stage is that extra bit.</p><p>8 is the answer to a different question: that is what <em>multiplying</em> two 4-bit numbers needs.</p>
+</div></details>
+<details class="prob"><summary data-label="A14 &middot; Lecture 9">Negate the 8-bit two&rsquo;s complement pattern <span class="bin">10000000</span> by flipping every bit and adding 1. The result is:<span class="mco"><span class="mcopt"><b>(A)</b> <span class="bin">00000000</span></span><span class="mcopt"><b>(B)</b> <span class="bin">10000001</span></span><span class="mcopt"><b>(C)</b> <span class="bin">01111111</span></span><span class="mcopt"><b>(D)</b> <span class="bin">10000000</span></span></span></summary><div class="sol">
+<p class="mcans"><b>(D)</b> <span class="bin">10000000</span></p>
+<p>Flip: <span class="bin">01111111</span>. Add 1: <span class="bin">10000000</span> &mdash; the pattern you started with.</p><p>That pattern is &minus;128, and +128 does not fit in eight bits. Two&rsquo;s complement covers &minus;128 to 127: one more negative value than positive, so the most negative number is the one value with no counterpart. It is the single case where negation overflows.</p>
+</div></details>
+<details class="prob"><summary data-label="A15 &middot; Lecture 9">You add a positive and a negative number in two&rsquo;s complement. The addition:<span class="mco"><span class="mcopt"><b>(A)</b> overflows exactly when the result is negative</span><span class="mcopt"><b>(B)</b> always overflows</span><span class="mcopt"><b>(C)</b> can never overflow</span><span class="mcopt"><b>(D)</b> overflows exactly when the carry out is 1</span></span></summary><div class="sol">
+<p class="mcans"><b>(C)</b> can never overflow</p>
+<p>The sum lies between the two operands, and both of them already fit, so the answer fits too. Overflow needs two operands of the <em>same</em> sign and a result of the other sign.</p><p>The carry out is a red herring here: 46 &minus; 25 produces a carry out of 1 and is perfectly correct, while 44 + 61 in seven bits produces a carry out of 0 and is wrong. The carry out tells you nothing about signed overflow.</p>
+</div></details>
+<details class="prob"><summary data-label="A16 &middot; Lecture 10">An 8:1 multiplexer has its three select lines driven by A, B and C, and every data input tied to a constant 0 or 1. How many different functions of A, B and C can it produce?<span class="mco"><span class="mcopt"><b>(A)</b> 256</span><span class="mcopt"><b>(B)</b> 512</span><span class="mcopt"><b>(C)</b> 8</span><span class="mcopt"><b>(D)</b> 64</span></span></summary><div class="sol">
+<p class="mcans"><b>(A)</b> 256</p>
+<p>Eight independent data inputs, two choices each: 2<sup>8</sup> = <strong>256</strong>. That is every function of three variables there is &mdash; a truth table with eight rows has 2<sup>8</sup> possible output columns, and the data inputs <em>are</em> that column.</p><p>This is the clean way to see why a multiplexer is universal: wire the variables to the selects and copy the truth table into the data inputs.</p>
+</div></details>
+<details class="prob"><summary data-label="A17 &middot; Lecture 10">In a 32-bit ALU built from 32 one-bit ALUs, signed overflow is detected:<span class="mco"><span class="mcopt"><b>(A)</b> at the most significant bit, from the carry into and the carry out of that one stage</span><span class="mcopt"><b>(B)</b> by the Zero output</span><span class="mcopt"><b>(C)</b> by the B-invert control line</span><span class="mcopt"><b>(D)</b> inside every 1-bit ALU</span></span></summary><div class="sol">
+<p class="mcans"><b>(A)</b> at the most significant bit, from the carry into and the carry out of that one stage</p>
+<p>Overflow is the top stage&rsquo;s business alone: it has occurred when the carry into bit 31 differs from the carry out of bit 31. Only that one ALU needs the extra gate, which is why the diagram in the textbook shows the top slice drawn differently from the other 31.</p><p>Zero is an OR over all 32 result bits, inverted &mdash; a different signal answering a different question.</p>
+</div></details>
+<details class="prob"><summary data-label="A18 &middot; Lecture 11">The smallest positive value Fixed&lang;12,&nbsp;5&rang; can represent is:<span class="mco"><span class="mcopt"><b>(A)</b> 1/5</span><span class="mcopt"><b>(B)</b> 1/32</span><span class="mcopt"><b>(C)</b> 1/12</span><span class="mcopt"><b>(D)</b> 1/4096</span></span></summary><div class="sol">
+<p class="mcans"><b>(B)</b> 1/32</p>
+<p>Five bits sit after the binary point, so the last one is worth 2<sup>&minus;5</sup> = <strong>1/32</strong>, and that is the step between neighbouring values everywhere in the range. The step depends on <var>b</var> alone; the width <var>w</var> sets how far the range reaches, not how fine it is.</p><p>1/4096 would be the answer if all twelve bits were fractional.</p>
+</div></details>
+<details class="prob"><summary data-label="A19 &middot; Lecture 12">How many IEEE 754 single-precision bit patterns represent zero?<span class="mco"><span class="mcopt"><b>(A)</b> none &mdash; zero is a special case handled outside the format</span><span class="mcopt"><b>(B)</b> one</span><span class="mcopt"><b>(C)</b> two</span><span class="mcopt"><b>(D)</b> 2<sup>23</sup></span></span></summary><div class="sol">
+<p class="mcans"><b>(C)</b> two</p>
+<p><span class="bin">0 00000000 0&hellip;0</span> is +0 and <span class="bin">1 00000000 0&hellip;0</span> is &minus;0. The format has a separate sign bit, so zero gets two encodings, and the standard requires them to compare equal.</p><p>Zero needs a reserved pattern at all because of the hidden 1: every ordinary number is 1.<var>fff</var> &times; 2<sup><var>e</var></sup>, which can never be zero. The all-zero exponent field is the escape hatch.</p>
+</div></details>
+
+<h2 id="partb"><span class="secnum">R.5</span>Part B &mdash; the eight shapes</h2>
+<p>One problem for each of Problems 2&ndash;8 on the paper, plus a problem on adders, multiplexers and the ALU, which the paper tests through the multiple choice. These are longer than the exam versions on purpose: each one pushes a little past what you will be asked, so that the real question feels like the easy case.</p>
+<p>Sixty minutes for all of them, on paper, solutions closed.</p>
+
+<details class="prob"><summary data-label="B1 (a) &middot; bases">Convert <strong>2907</strong> to binary by repeated division, showing the chain of remainders. From your binary &mdash; without dividing again &mdash; write 2907 in octal and in hexadecimal.</summary><div class="sol">
+<p><strong>Repeated division by 2.</strong> Read the remainders bottom to top.</p><div class="tablewrap"><table>
+<thead><tr><th>&divide;2</th><th>quotient</th><th>remainder</th></tr></thead>
+<tbody><tr><td>2907</td><td>1453</td><td><strong>1</strong></td></tr><tr><td>1453</td><td>726</td><td><strong>1</strong></td></tr><tr><td>726</td><td>363</td><td><strong>0</strong></td></tr><tr><td>363</td><td>181</td><td><strong>1</strong></td></tr><tr><td>181</td><td>90</td><td><strong>1</strong></td></tr><tr><td>90</td><td>45</td><td><strong>0</strong></td></tr><tr><td>45</td><td>22</td><td><strong>1</strong></td></tr><tr><td>22</td><td>11</td><td><strong>0</strong></td></tr><tr><td>11</td><td>5</td><td><strong>1</strong></td></tr><tr><td>5</td><td>2</td><td><strong>1</strong></td></tr><tr><td>2</td><td>1</td><td><strong>0</strong></td></tr><tr><td>1</td><td>0</td><td><strong>1</strong></td></tr></tbody></table></div><p>Bottom to top: <span class="bin">101101011011</span>, twelve bits. Check by place value: 2048 + 512 + 256 + 64 + 16 + 8 + 2 + 1 = 2907.</p><p><strong>Octal</strong> &mdash; group the bits in threes <em>from the right</em>:</p><p class="morseline">101 101 011 011 &rarr; <span class="bin">5533</span><sub>8</sub></p><p><strong>Hexadecimal</strong> &mdash; the same bits, grouped in fours from the right:</p><p class="morseline">1011 0101 1011 &rarr; <span class="hex">0xB5B</span></p><p>Check the hexadecimal independently: 11&times;256 + 5&times;16 + 11 = 2816 + 80 + 11 = <strong>2907</strong>. Agreed.</p><div class="box warn"><span class="bt">Where this goes wrong</span><p>Grouping from the left. <span class="bin">101101011011</span> has twelve bits so the two groupings happen to come out even here, but the habit will cost you the moment the bit count is not a multiple of three or four. Always pad on the <em>left</em> and group from the <em>right</em>.</p></div>
+</div></details>
+<details class="prob"><summary data-label="B1 (b) &middot; bases">Convert <span class="hex">0x5E3</span> to decimal, to binary and to octal. Do the octal from the binary, not from the decimal.</summary><div class="sol">
+<p><strong>Decimal.</strong> Place values 256, 16, 1; E is 14:</p><p class="morseline">5&times;256 + 14&times;16 + 3 = 1280 + 224 + 3 = <strong>1507</strong></p><p><strong>Binary.</strong> Four bits per hexadecimal digit &mdash; no arithmetic at all:</p><p class="morseline">5 &rarr; <span class="bin">0101</span>, E &rarr; <span class="bin">1110</span>, 3 &rarr; <span class="bin">0011</span></p><p class="morseline"><span class="bin">0101 1110 0011</span> = <span class="bin">10111100011</span> once the leading zero goes</p><p><strong>Octal.</strong> Regroup the same bits in threes from the right:</p><p class="morseline">010 111 100 011 &rarr; <span class="bin">2743</span><sub>8</sub></p><p>Check: 2&times;512 + 7&times;64 + 4&times;8 + 3 = 1024 + 448 + 32 + 3 = <strong>1507</strong>. Agreed.</p>
+</div></details>
+<details class="prob"><summary data-label="B1 (c) &middot; bases">Write <strong>1288</strong> in base 6, and check your answer by positional expansion. Then say, without converting, how many base-6 digits the decimal number 9999 needs.</summary><div class="sol">
+<p><strong>Repeated division by 6.</strong></p><div class="tablewrap"><table>
+<thead><tr><th>&divide;6</th><th>quotient</th><th>remainder</th></tr></thead>
+<tbody><tr><td>1288</td><td>214</td><td><strong>4</strong></td></tr><tr><td>214</td><td>35</td><td><strong>4</strong></td></tr><tr><td>35</td><td>5</td><td><strong>5</strong></td></tr><tr><td>5</td><td>0</td><td><strong>5</strong></td></tr></tbody></table></div><p>Bottom to top: <strong>5544<sub>6</sub></strong>.</p><p><strong>Check by expansion.</strong> Place values 216, 36, 6, 1:</p><p class="morseline">5&times;216 + 5&times;36 + 4&times;6 + 4 = 1080 + 180 + 24 + 4 = <strong>1288</strong></p><p><strong>9999 in base 6.</strong> No conversion needed &mdash; just find the first power of 6 that passes it. 6<sup>4</sup> = 1296 and 6<sup>5</sup> = 7776 and 6<sup>6</sup> = 46656, so 7776 &le; 9999 &lt; 46656 and the answer is <strong>six digits</strong>: the leading digit is the one worth 6<sup>5</sup>.</p><div class="box note"><span class="bt">The pattern</span><p>Powers of two have a shortcut between them because 8 = 2&sup3; and 16 = 2&#8308;; base 6 has no such relationship with base 2, so there is no regrouping trick and division is the only way across. That is the real content of the question.</p></div>
+</div></details>
+<details class="prob"><summary data-label="B2 (a) &middot; Boolean algebra">Simplify (A + B)(A + B&prime;) and then (A + B)(A&prime; + B). Name the law you use at each step, and say what the pair of answers tells you.</summary><div class="sol">
+<p><strong>First.</strong></p><p class="morseline">(A + B)(A + B&prime;)<br>= AA + AB&prime; + AB + BB&prime; &nbsp;&nbsp;(distributive)<br>= A + AB&prime; + AB + 0 &nbsp;&nbsp;(idempotent AA = A; complement BB&prime; = 0)<br>= A(1 + B&prime; + B) &nbsp;&nbsp;(distributive, backwards)<br>= A &middot; 1 = <strong>A</strong> &nbsp;&nbsp;(1 absorbs; identity)</p><p><strong>Second.</strong> The same five steps with the roles swapped give <strong>B</strong>.</p><p><strong>What the pair shows.</strong> In each product the variable that appears <em>uncomplemented in both brackets</em> is what survives. That is the dual of the combining law AB + AB&prime; = A: swap every + with &middot; and every &middot; with +, and a true identity turns into another true identity. Learning the laws in dual pairs halves the list.</p><div class="box note"><span class="bt">One-line version</span><p>(A + B)(A + B&prime;) = A + BB&prime; = A + 0 = A, using the distributive law in its Boolean-only form X + YZ = (X + Y)(X + Z). That form has no counterpart in ordinary algebra, which is why it is the one people forget.</p></div>
+</div></details>
+<details class="prob"><summary data-label="B2 (b) &middot; Boolean algebra">Remove the outer complement from ((W + X)Y)&prime; using De Morgan&rsquo;s laws, and simplify until no complement covers more than a single variable.</summary><div class="sol">
+<p><strong>Outer De Morgan</strong> &mdash; the complement of a product is the sum of the complements:</p><p class="morseline">((W + X)Y)&prime; = (W + X)&prime; + Y&prime;</p><p><strong>Inner De Morgan</strong> &mdash; the complement of a sum is the product of the complements:</p><p class="morseline">(W + X)&prime; = W&prime;X&prime;</p><p>So ((W + X)Y)&prime; = <strong>W&prime;X&prime; + Y&prime;</strong>.</p><p><strong>Check one row.</strong> W = 0, X = 1, Y = 1: the original is ((0+1)&middot;1)&prime; = 1&prime; = 0; the answer is 1&middot;0 + 0 = 0. Agreed. Checking a single well-chosen row catches most De Morgan slips in about ten seconds.</p><div class="box warn"><span class="bt">The classic error</span><p>Writing ((W + X)Y)&prime; = (W&prime; + X&prime;)Y&prime;. De Morgan does not just distribute the prime inwards &mdash; it <em>also</em> swaps every + with &middot; and every &middot; with +. Miss the swap and you have written down a different function.</p></div>
+</div></details>
+<details class="prob"><summary data-label="B2 (c) &middot; Boolean algebra">Simplify A&prime;BC&prime; + A&prime;BC + ABC&prime;, naming the law used at each step. Then confirm the answer with a &Sigma; list.</summary><div class="sol">
+<p><strong>Group the first two</strong> &mdash; they differ only in C:</p><p class="morseline">A&prime;BC&prime; + A&prime;BC = A&prime;B(C&prime; + C) &nbsp;&nbsp;(distributive)<br>= A&prime;B &middot; 1 = A&prime;B &nbsp;&nbsp;(complement; identity)</p><p><strong>That leaves</strong> A&prime;B + ABC&prime;. Factor B out:</p><p class="morseline">A&prime;B + ABC&prime; = B(A&prime; + AC&prime;) &nbsp;&nbsp;(distributive)<br>= B(A&prime; + C&prime;) &nbsp;&nbsp;(absorption with a complement: X + X&prime;Y = X + Y)<br>= <strong>A&prime;B + BC&prime;</strong> &nbsp;&nbsp;(distributive)</p><p><strong>Confirm with &Sigma;.</strong> The three starting terms are rows 2, 3 and 6, so F = &Sigma;(2, 3, 6). The answer: A&prime;B is rows 2 and 3, BC&prime; is rows 2 and 6 &mdash; together {2,&nbsp;3,&nbsp;6}. Same function, three terms down to two, nine literals down to four.</p><div class="box note"><span class="bt">Why the overlap is fine</span><p>Row 2 is covered twice, by both terms. In Boolean algebra that costs nothing &mdash; 1 + 1 = 1 &mdash; which is exactly why overlapping groups on a K-map are allowed and often necessary.</p></div>
+</div></details>
+<details class="prob"><summary data-label="B3 &middot; truth tables and canonical forms">F = (A&prime; + B)C&prime;.<br>(a) Build the full truth table, one column per gate as well as a column for F.<br>(b) Give F in &Sigma; shorthand and in &Pi; shorthand.<br>(c) Write the canonical sum of products and the canonical product of sums.<br>(d) Give the minimal sum of products, and say what you notice.<br>(e) Write F&prime; in &Sigma; shorthand.</summary><div class="sol">
+<p><strong>(a) The table.</strong> Fill the inverter columns first, then the OR, then the AND. One column per gate is not busywork: it is where the partial credit lives.</p><div class="tablewrap"><table class="tt">
+<thead><tr><th>A</th><th>B</th><th>C</th><th>A&prime;</th><th>A&prime; + B</th><th>C&prime;</th><th>F</th></tr></thead>
+<tbody><tr><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td><td class="one">1</td></tr><tr><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td><td>0</td><td>0</td></tr><tr><td>0</td><td>1</td><td>0</td><td>1</td><td>1</td><td>1</td><td class="one">1</td></tr><tr><td>0</td><td>1</td><td>1</td><td>1</td><td>1</td><td>0</td><td>0</td></tr><tr><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td></tr><tr><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td></tr><tr><td>1</td><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td><td class="one">1</td></tr><tr><td>1</td><td>1</td><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td></tr></tbody></table></div><p><strong>(b) Shorthand.</strong> The 1-rows are 0, 2 and 6; the 0-rows are everything else.</p><p class="morseline">F = &Sigma;(0, 2, 6) = &Pi;(1, 3, 4, 5, 7)</p><p>Both describe the same function. &Sigma; lists where it is 1, &Pi; lists where it is 0, and the two lists always partition 0&ndash;7.</p><p><strong>(c) Canonical forms.</strong> One product per 1-row, complementing the variables that are <em>0</em>:</p><p class="morseline">F = A&prime;B&prime;C&prime; + A&prime;BC&prime; + ABC&prime;</p><p>One sum per 0-row, complementing the variables that are <em>1</em>:</p><p class="morseline">F = (A + B + C&prime;)(A + B&prime; + C&prime;)(A&prime; + B + C)(A&prime; + B + C&prime;)(A&prime; + B&prime; + C&prime;)</p><p>Rederive that flip rather than memorising it. A product fires when all its literals are 1, so to make it fire on row 010 you need A&prime;, B, C&prime;. A sum fails when all its literals are 0, so to make it fail on row 001 you need (A + B + C&prime;).</p><p><strong>(d) Minimal SOP.</strong> A&prime;C&prime; covers rows 0 and 2; BC&prime; covers rows 2 and 6:</p><p class="morseline">F = <strong>A&prime;C&prime; + BC&prime;</strong></p><p>And here is the thing to notice: factor it and you get C&prime;(A&prime; + B) &mdash; the expression you were handed. The circuit in the question was already minimal. Three canonical products of three literals each collapsed to two products of two, which is the whole argument for not building circuits straight from a truth table.</p><p><strong>(e) The complement.</strong> F&prime; is 1 exactly where F is 0:</p><p class="morseline">F&prime; = &Sigma;(1, 3, 4, 5, 7)</p><p>Complementing is free in &Sigma; notation &mdash; swap the list for its complement in 0&ndash;7. It is not free in algebra, where you would need De Morgan twice.</p>
+</div></details>
+<details class="prob"><summary data-label="B4 (a) &middot; Karnaugh maps">F(A, B, C, D) = &Sigma;(0, 2, 8, 9, 10, 11, 15).<br>(a) Fill in the map.<br>(b) List every prime implicant, say which are essential, and justify each one in a sentence.<br>(c) Give the minimal sum of products.<br>(d) Now group the 0s instead and give the minimal product of sums.<br>(e) Which of the two circuits is cheaper, and by how many literals?</summary><div class="sol">
+<p><strong>Prime implicants:</strong> B&prime;D&prime;, AB&prime;, ACD.<br><strong>Essential:</strong> all three of them.</p><p>Each one is forced. B&prime;D&prime; is the only group covering cell 0; AB&prime; is the only group covering cell 9; ACD is the only group covering cell 15. Once every prime implicant is essential there is nothing left to choose and the answer is unique.</p><figure class="fig" style="--figmax:18rem">
+<svg viewBox="0 0 312 302" role="img" aria-label="Karnaugh map for the minimal sum of products">
+<text class="kvar" x="66" y="18" text-anchor="start">CD</text>
+<text class="kvar" x="46" y="40" text-anchor="end">AB</text>
+<path class="kslash" d="M18 4L60 26"/>
+<text class="klab" x="91" y="38" text-anchor="middle">00</text>
+<text class="klab" x="149" y="38" text-anchor="middle">01</text>
+<text class="klab" x="207" y="38" text-anchor="middle">11</text>
+<text class="klab" x="265" y="38" text-anchor="middle">10</text>
+<text class="klab" x="50" y="84" text-anchor="end">00</text>
+<text class="klab" x="50" y="142" text-anchor="end">01</text>
+<text class="klab" x="50" y="200" text-anchor="end">11</text>
+<text class="klab" x="50" y="258" text-anchor="end">10</text>
+<rect class="kcell" x="62" y="50" width="58" height="58" rx="3"/>
+<text class="kval" x="91" y="87" text-anchor="middle">1</text>
+<text class="kidx" x="67" y="64" text-anchor="start">0</text>
+<rect class="kcell" x="120" y="50" width="58" height="58" rx="3"/>
+<text class="kval zero" x="149" y="87" text-anchor="middle">0</text>
+<text class="kidx" x="125" y="64" text-anchor="start">1</text>
+<rect class="kcell" x="178" y="50" width="58" height="58" rx="3"/>
+<text class="kval zero" x="207" y="87" text-anchor="middle">0</text>
+<text class="kidx" x="183" y="64" text-anchor="start">3</text>
+<rect class="kcell" x="236" y="50" width="58" height="58" rx="3"/>
+<text class="kval" x="265" y="87" text-anchor="middle">1</text>
+<text class="kidx" x="241" y="64" text-anchor="start">2</text>
+<rect class="kcell" x="62" y="108" width="58" height="58" rx="3"/>
+<text class="kval zero" x="91" y="145" text-anchor="middle">0</text>
+<text class="kidx" x="67" y="122" text-anchor="start">4</text>
+<rect class="kcell" x="120" y="108" width="58" height="58" rx="3"/>
+<text class="kval zero" x="149" y="145" text-anchor="middle">0</text>
+<text class="kidx" x="125" y="122" text-anchor="start">5</text>
+<rect class="kcell" x="178" y="108" width="58" height="58" rx="3"/>
+<text class="kval zero" x="207" y="145" text-anchor="middle">0</text>
+<text class="kidx" x="183" y="122" text-anchor="start">7</text>
+<rect class="kcell" x="236" y="108" width="58" height="58" rx="3"/>
+<text class="kval zero" x="265" y="145" text-anchor="middle">0</text>
+<text class="kidx" x="241" y="122" text-anchor="start">6</text>
+<rect class="kcell" x="62" y="166" width="58" height="58" rx="3"/>
+<text class="kval zero" x="91" y="203" text-anchor="middle">0</text>
+<text class="kidx" x="67" y="180" text-anchor="start">12</text>
+<rect class="kcell" x="120" y="166" width="58" height="58" rx="3"/>
+<text class="kval zero" x="149" y="203" text-anchor="middle">0</text>
+<text class="kidx" x="125" y="180" text-anchor="start">13</text>
+<rect class="kcell" x="178" y="166" width="58" height="58" rx="3"/>
+<text class="kval" x="207" y="203" text-anchor="middle">1</text>
+<text class="kidx" x="183" y="180" text-anchor="start">15</text>
+<rect class="kcell" x="236" y="166" width="58" height="58" rx="3"/>
+<text class="kval zero" x="265" y="203" text-anchor="middle">0</text>
+<text class="kidx" x="241" y="180" text-anchor="start">14</text>
+<rect class="kcell" x="62" y="224" width="58" height="58" rx="3"/>
+<text class="kval" x="91" y="261" text-anchor="middle">1</text>
+<text class="kidx" x="67" y="238" text-anchor="start">8</text>
+<rect class="kcell" x="120" y="224" width="58" height="58" rx="3"/>
+<text class="kval" x="149" y="261" text-anchor="middle">1</text>
+<text class="kidx" x="125" y="238" text-anchor="start">9</text>
+<rect class="kcell" x="178" y="224" width="58" height="58" rx="3"/>
+<text class="kval" x="207" y="261" text-anchor="middle">1</text>
+<text class="kidx" x="183" y="238" text-anchor="start">11</text>
+<rect class="kcell" x="236" y="224" width="58" height="58" rx="3"/>
+<text class="kval" x="265" y="261" text-anchor="middle">1</text>
+<text class="kidx" x="241" y="238" text-anchor="start">10</text>
+<rect class="kgrp grp0" x="67" y="55" width="48" height="48" rx="10"/>
+<rect class="kgrp grp0" x="241" y="55" width="48" height="48" rx="10"/>
+<rect class="kgrp grp0" x="67" y="229" width="48" height="48" rx="10"/>
+<rect class="kgrp grp0" x="241" y="229" width="48" height="48" rx="10"/>
+<rect class="kgrp grp1" x="71" y="233" width="214" height="40" rx="10"/>
+<rect class="kgrp grp2" x="191" y="179" width="32" height="90" rx="10"/>
+</svg>
+<figcaption>The minimal cover: B&prime;D&prime; + AB&prime; + ACD</figcaption></figure><p class="morseline">Minimal SOP: <strong>B&prime;D&prime; + AB&prime; + ACD</strong> &nbsp;&mdash; 3 terms, 7 literals</p><p>B&prime;D&prime; is the four corners of the map. They are adjacent because the map wraps in both directions, and missing that group is the most expensive single mistake available on this question.</p><p><strong>Minimal POS.</strong> Group the <em>0</em>s &mdash; cells 1, 3, 4, 5, 6, 7, 12, 13, 14 &mdash; and complement each literal as you read the group off:</p><p class="morseline"><strong>(A + D&prime;)(B&prime; + D)(B&prime; + C)</strong> &nbsp;&mdash; 3 terms, 6 literals</p><p><strong>(e)</strong> Six literals against seven, so for this function the OR&ndash;AND circuit is cheaper &mdash; by one literal, which is one gate input. Neither form is cheaper in general; you only know which by minimising both, and that is why a question that asks for both usually wants the comparison said out loud.</p>
+</div></details>
+<details class="prob"><summary data-label="B4 (b) &middot; Karnaugh maps with don&rsquo;t-cares">F(A, B, C, D) = &Sigma;(0, 6, 8, 9, 10, 13, 15) + d(2, 3, 5, 11).<br>Give the minimal sum of products and the minimal product of sums. Then say how much the don&rsquo;t-cares were worth, by working out what the answer would have been with every X forced to 0.</summary><div class="sol">
+<figure class="fig" style="--figmax:18rem">
+<svg viewBox="0 0 312 302" role="img" aria-label="Karnaugh map with don’t-cares">
+<text class="kvar" x="66" y="18" text-anchor="start">CD</text>
+<text class="kvar" x="46" y="40" text-anchor="end">AB</text>
+<path class="kslash" d="M18 4L60 26"/>
+<text class="klab" x="91" y="38" text-anchor="middle">00</text>
+<text class="klab" x="149" y="38" text-anchor="middle">01</text>
+<text class="klab" x="207" y="38" text-anchor="middle">11</text>
+<text class="klab" x="265" y="38" text-anchor="middle">10</text>
+<text class="klab" x="50" y="84" text-anchor="end">00</text>
+<text class="klab" x="50" y="142" text-anchor="end">01</text>
+<text class="klab" x="50" y="200" text-anchor="end">11</text>
+<text class="klab" x="50" y="258" text-anchor="end">10</text>
+<rect class="kcell" x="62" y="50" width="58" height="58" rx="3"/>
+<text class="kval" x="91" y="87" text-anchor="middle">1</text>
+<text class="kidx" x="67" y="64" text-anchor="start">0</text>
+<rect class="kcell" x="120" y="50" width="58" height="58" rx="3"/>
+<text class="kval zero" x="149" y="87" text-anchor="middle">0</text>
+<text class="kidx" x="125" y="64" text-anchor="start">1</text>
+<rect class="kcell" x="178" y="50" width="58" height="58" rx="3"/>
+<text class="kval dc" x="207" y="87" text-anchor="middle">X</text>
+<text class="kidx" x="183" y="64" text-anchor="start">3</text>
+<rect class="kcell" x="236" y="50" width="58" height="58" rx="3"/>
+<text class="kval dc" x="265" y="87" text-anchor="middle">X</text>
+<text class="kidx" x="241" y="64" text-anchor="start">2</text>
+<rect class="kcell" x="62" y="108" width="58" height="58" rx="3"/>
+<text class="kval zero" x="91" y="145" text-anchor="middle">0</text>
+<text class="kidx" x="67" y="122" text-anchor="start">4</text>
+<rect class="kcell" x="120" y="108" width="58" height="58" rx="3"/>
+<text class="kval dc" x="149" y="145" text-anchor="middle">X</text>
+<text class="kidx" x="125" y="122" text-anchor="start">5</text>
+<rect class="kcell" x="178" y="108" width="58" height="58" rx="3"/>
+<text class="kval zero" x="207" y="145" text-anchor="middle">0</text>
+<text class="kidx" x="183" y="122" text-anchor="start">7</text>
+<rect class="kcell" x="236" y="108" width="58" height="58" rx="3"/>
+<text class="kval" x="265" y="145" text-anchor="middle">1</text>
+<text class="kidx" x="241" y="122" text-anchor="start">6</text>
+<rect class="kcell" x="62" y="166" width="58" height="58" rx="3"/>
+<text class="kval zero" x="91" y="203" text-anchor="middle">0</text>
+<text class="kidx" x="67" y="180" text-anchor="start">12</text>
+<rect class="kcell" x="120" y="166" width="58" height="58" rx="3"/>
+<text class="kval" x="149" y="203" text-anchor="middle">1</text>
+<text class="kidx" x="125" y="180" text-anchor="start">13</text>
+<rect class="kcell" x="178" y="166" width="58" height="58" rx="3"/>
+<text class="kval" x="207" y="203" text-anchor="middle">1</text>
+<text class="kidx" x="183" y="180" text-anchor="start">15</text>
+<rect class="kcell" x="236" y="166" width="58" height="58" rx="3"/>
+<text class="kval zero" x="265" y="203" text-anchor="middle">0</text>
+<text class="kidx" x="241" y="180" text-anchor="start">14</text>
+<rect class="kcell" x="62" y="224" width="58" height="58" rx="3"/>
+<text class="kval" x="91" y="261" text-anchor="middle">1</text>
+<text class="kidx" x="67" y="238" text-anchor="start">8</text>
+<rect class="kcell" x="120" y="224" width="58" height="58" rx="3"/>
+<text class="kval" x="149" y="261" text-anchor="middle">1</text>
+<text class="kidx" x="125" y="238" text-anchor="start">9</text>
+<rect class="kcell" x="178" y="224" width="58" height="58" rx="3"/>
+<text class="kval dc" x="207" y="261" text-anchor="middle">X</text>
+<text class="kidx" x="183" y="238" text-anchor="start">11</text>
+<rect class="kcell" x="236" y="224" width="58" height="58" rx="3"/>
+<text class="kval" x="265" y="261" text-anchor="middle">1</text>
+<text class="kidx" x="241" y="238" text-anchor="start">10</text>
+<rect class="kgrp grp0" x="67" y="55" width="48" height="48" rx="10"/>
+<rect class="kgrp grp0" x="241" y="55" width="48" height="48" rx="10"/>
+<rect class="kgrp grp0" x="67" y="229" width="48" height="48" rx="10"/>
+<rect class="kgrp grp0" x="241" y="229" width="48" height="48" rx="10"/>
+<rect class="kgrp grp1" x="245" y="59" width="40" height="98" rx="10"/>
+<rect class="kgrp grp2" x="133" y="179" width="90" height="90" rx="10"/>
+</svg>
+<figcaption>X marks a don’t-care. Two of the four are swallowed by groups; cells 3 and 5 are left outside, which costs nothing.</figcaption></figure><p class="morseline">Minimal SOP: <strong>B&prime;D&prime; + A&prime;CD&prime; + AD</strong> &nbsp;&mdash; 3 terms, 7 literals</p><p>Cells 2 and 11 were taken into groups because they made the groups bigger &mdash; 2 turns the pair {0,&nbsp;8} into the four corners, 11 lets AD be a block of four. Cells 3 and 5 were left alone because nothing they could join would have helped. You are never obliged to cover an X, and you are never penalised for covering one.</p><p><strong>Minimal POS</strong> &mdash; group the 0s at 1, 4, 7, 12, 14, using the same X cells freely:</p><p class="morseline"><strong>(A + D&prime;)(B&prime; + C + D)(A&prime; + B&prime; + D)</strong></p><p>This one has a tie: <strong>(A + D&prime;)(A + B&prime; + C)(A&prime; + B&prime; + D)</strong> is also three terms and eight literals. Both are minimal and both are right.</p><div class="box worked"><span class="bt">What the X cells bought</span><p>Force every X to 0 and the same function minimises to</p><p class="morseline">B&prime;C&prime;D&prime; + A&prime;BCD&prime; + AB&prime;D&prime; + AB&prime;C&prime; + ABD &nbsp;&mdash; 5 terms, 16 literals</p><p>against 3 terms and 7 literals. The don&rsquo;t-cares more than halved the circuit. This is why the deck says they are free simplification <em>if you use them</em> &mdash; a student who treats every X as 0 loses nothing in correctness and everything in cost.</p></div>
+</div></details>
+<details class="prob"><summary data-label="B5 (a) &middot; circuits">Draw the gate circuit for F = A(B&prime; + C) + A&prime;C&prime;, using two-input gates only. Count the gates, and say which input has the largest fan-out.</summary><div class="sol">
+<p>Work <em>inside out</em>: the inverters first, then the inner bracket, then the two products, then the final sum.</p><figure class="fig" style="--figmax:560px">
+<svg viewBox="0 0 578 368" role="img" aria-label="F = A(B&prime;+C) + A&prime;C&prime;">
+<path class="gate" d="M104 37L140 49L104 61Z"/>
+<circle class="gate" cx="144" cy="49" r="4"/>
+<path class="gate" d="M220 112Q229 97 220 82C241.16 82 254.96 88.6 266 97C254.96 105.4 241.16 112 220 112Z"/>
+<path class="gate" d="M336 130H367A15 15 0 0 1 367 160H336Z"/>
+<path class="gate" d="M452 208Q461 193 452 178C473.16 178 486.96 184.6 498 193C486.96 201.4 473.16 208 452 208Z"/>
+<path class="gate" d="M104 229L140 241L104 253Z"/>
+<circle class="gate" cx="144" cy="241" r="4"/>
+<path class="gate" d="M220 274H251A15 15 0 0 1 251 304H220Z"/>
+<path class="gate" d="M104 325L140 337L104 349Z"/>
+<circle class="gate" cx="144" cy="337" r="4"/>
+<path class="wire" d="M48 49H104"/>
+<path class="wire" d="M148 49H185.2V88.6H220"/>
+<path class="wire" d="M66 105.4H220"/>
+<path class="wire" d="M30 136.6H336"/>
+<path class="wire" d="M266 97H301.2V153.4H336"/>
+<path class="wire" d="M382 145H417.2V184.6H452"/>
+<path class="wire" d="M266 289H417.2V201.4H452"/>
+<path class="wire" d="M30 241H104"/>
+<path class="wire" d="M148 241H185.2V280.6H220"/>
+<path class="wire" d="M148 337H185.2V297.4H220"/>
+<path class="wire" d="M66 337H104"/>
+<path class="wire" d="M30 28V241"/>
+<text class="lbl" x="30" y="23" text-anchor="middle">A</text>
+<circle class="dot" cx="30" cy="136.6" r="3.2"/>
+<path class="wire" d="M48 28V49"/>
+<text class="lbl" x="48" y="23" text-anchor="middle">B</text>
+<path class="wire" d="M66 28V337"/>
+<text class="lbl" x="66" y="23" text-anchor="middle">C</text>
+<circle class="dot" cx="66" cy="105.4" r="3.2"/>
+<path class="wire" d="M498 193H544"/>
+<text class="lbl" x="550" y="198" text-anchor="start">F</text>
+</svg>
+<figcaption>One way to draw it. Any drawing with the same gates and the same connections is the same answer.</figcaption></figure><p><strong>Gate count:</strong> three inverters (B&prime;, A&prime;, C&prime;), one OR for the bracket, two ANDs for the two products, one OR to collect them &mdash; <strong>seven gates</strong>. The longest path is four gates deep, B &rarr; inverter &rarr; OR &rarr; AND &rarr; OR, and it is that depth rather than the gate count that sets how long the circuit takes to settle.</p><p><strong>Fan-out.</strong> A drives the top AND and the inverter that makes A&prime;; C drives the inner OR and the inverter that makes C&prime;. Both have fan-out 2, and B has fan-out 1. Mark those junctions with a dot &mdash; a crossing without a dot is two wires passing, not a connection, and that convention is worth marks.</p><div class="box note"><span class="bt">One inverter per literal</span><p>C&prime; is needed once and C is needed once, so one inverter does. If an expression used C&prime; in three places you would still draw <em>one</em> inverter and fan its output out three ways. Drawing a fresh inverter each time is a gate-count error, not a drawing style.</p></div>
+</div></details>
+<details class="prob"><summary data-label="B5 (b) &middot; circuits">Write down the Boolean expression this circuit computes, then build its truth table and give G in &Sigma; shorthand.<figure class="fig" style="--figmax:485px">
+<svg viewBox="0 0 462 272" role="img" aria-label="A circuit to read">
+<path class="gate" d="M104 37L140 49L104 61Z"/>
+<circle class="gate" cx="144" cy="49" r="4"/>
+<path class="gate" d="M220 82H251A15 15 0 0 1 251 112H220Z"/>
+<path class="gate" d="M336 160Q345 145 336 130C357.16 130 370.96 136.6 382 145C370.96 153.4 357.16 160 336 160Z"/>
+<path class="gate" d="M104 181L140 193L104 205Z"/>
+<circle class="gate" cx="144" cy="193" r="4"/>
+<path class="gate" d="M220 226H251A15 15 0 0 1 251 256H220Z"/>
+<path class="wire" d="M30 49H104"/>
+<path class="wire" d="M148 49H185.2V88.6H220"/>
+<path class="wire" d="M48 97H220"/>
+<path class="wire" d="M66 105.4H220"/>
+<path class="wire" d="M266 97H301.2V136.6H336"/>
+<path class="wire" d="M266 241H301.2V153.4H336"/>
+<path class="wire" d="M66 193H104"/>
+<path class="wire" d="M30 232.6H220"/>
+<path class="wire" d="M148 193H185.2V249.4H220"/>
+<path class="wire" d="M30 28V232.6"/>
+<text class="lbl" x="30" y="23" text-anchor="middle">A</text>
+<circle class="dot" cx="30" cy="49" r="3.2"/>
+<path class="wire" d="M48 28V97"/>
+<text class="lbl" x="48" y="23" text-anchor="middle">B</text>
+<path class="wire" d="M66 28V193"/>
+<text class="lbl" x="66" y="23" text-anchor="middle">C</text>
+<circle class="dot" cx="66" cy="105.4" r="3.2"/>
+<path class="wire" d="M382 145H428"/>
+<text class="lbl" x="434" y="150" text-anchor="start">G</text>
+</svg>
+</figure></summary><div class="sol">
+<p><strong>Read it inside out.</strong> Two inverters produce A&prime; and C&prime;. The three-input path A&prime;, B, C meets at an AND; A and C&prime; meet at a second AND; the OR collects them.</p><p class="morseline">G = <strong>A&prime;BC + AC&prime;</strong></p><div class="tablewrap"><table class="tt">
+<thead><tr><th>A</th><th>B</th><th>C</th><th>G</th></tr></thead>
+<tbody><tr><td>0</td><td>0</td><td>0</td><td>0</td></tr><tr><td>0</td><td>0</td><td>1</td><td>0</td></tr><tr><td>0</td><td>1</td><td>0</td><td>0</td></tr><tr><td>0</td><td>1</td><td>1</td><td class="one">1</td></tr><tr><td>1</td><td>0</td><td>0</td><td class="one">1</td></tr><tr><td>1</td><td>0</td><td>1</td><td>0</td></tr><tr><td>1</td><td>1</td><td>0</td><td class="one">1</td></tr><tr><td>1</td><td>1</td><td>1</td><td>0</td></tr></tbody></table></div><p class="morseline">G = &Sigma;(3, 4, 6)</p><p>Check the two terms against the table: A&prime;BC is row 3 on its own, AC&prime; is rows 4 and 6. Three 1-rows, three literals in one term and two in the other, and no simplification available &mdash; the circuit as drawn is already minimal.</p><div class="box note"><span class="bt">Reading order</span><p>Start at the inputs and label every wire as you go, writing the expression for each gate output on the drawing itself. People who try to read a circuit backwards from F almost always lose a complement somewhere in the middle.</p></div>
+</div></details>
+<details class="prob"><summary data-label="B5 (c) &middot; circuits">F = A&prime;B + BC&prime;.<br>(a) Draw the two-level AND&ndash;OR circuit and count the gates.<br>(b) Convert it to a circuit using NAND gates only. Draw that and count again.<br>The symbol &uarr; is used below for NAND: X&nbsp;&uarr;&nbsp;Y means (XY)&prime;.</summary><div class="sol">
+<p><strong>(a) AND&ndash;OR.</strong> Two inverters, two ANDs, one OR &mdash; <strong>five gates</strong>. B feeds both ANDs, so it has fan-out 2.</p><figure class="fig" style="--figmax:485px">
+<svg viewBox="0 0 462 272" role="img" aria-label="F = A&prime;B + BC&prime;">
+<path class="gate" d="M104 37L140 49L104 61Z"/>
+<circle class="gate" cx="144" cy="49" r="4"/>
+<path class="gate" d="M220 82H251A15 15 0 0 1 251 112H220Z"/>
+<path class="gate" d="M336 160Q345 145 336 130C357.16 130 370.96 136.6 382 145C370.96 153.4 357.16 160 336 160Z"/>
+<path class="gate" d="M104 181L140 193L104 205Z"/>
+<circle class="gate" cx="144" cy="193" r="4"/>
+<path class="gate" d="M220 226H251A15 15 0 0 1 251 256H220Z"/>
+<path class="wire" d="M30 49H104"/>
+<path class="wire" d="M148 49H185.2V88.6H220"/>
+<path class="wire" d="M48 105.4H220"/>
+<path class="wire" d="M266 97H301.2V136.6H336"/>
+<path class="wire" d="M266 241H301.2V153.4H336"/>
+<path class="wire" d="M66 193H104"/>
+<path class="wire" d="M48 232.6H220"/>
+<path class="wire" d="M148 193H185.2V249.4H220"/>
+<path class="wire" d="M30 28V49"/>
+<text class="lbl" x="30" y="23" text-anchor="middle">A</text>
+<path class="wire" d="M48 28V232.6"/>
+<text class="lbl" x="48" y="23" text-anchor="middle">B</text>
+<circle class="dot" cx="48" cy="105.4" r="3.2"/>
+<path class="wire" d="M66 28V193"/>
+<text class="lbl" x="66" y="23" text-anchor="middle">C</text>
+<path class="wire" d="M382 145H428"/>
+<text class="lbl" x="434" y="150" text-anchor="start">F</text>
+</svg>
+<figcaption>The AND–OR form: two levels of gates after the inverters.</figcaption></figure><p><strong>(b) The conversion.</strong> Push a pair of bubbles onto every wire between the two levels. Two complements in a row cancel, so the function is untouched, but each AND-with-a-bubble is a NAND and the OR-with-bubbles-on-its-inputs is a NAND as well, by De Morgan:</p><p class="morseline">F = A&prime;B + BC&prime; = ((A&prime;B)&prime; (BC&prime;)&prime;)&prime; = (A&prime;&nbsp;&uarr;&nbsp;B) &uarr; (B&nbsp;&uarr;&nbsp;C&prime;)</p><figure class="fig" style="--figmax:485px">
+<svg viewBox="0 0 462 272" role="img" aria-label="F = ((A&prime;B)&prime;(BC&prime;)&prime;)&prime;">
+<path class="gate" d="M104 37L140 49L104 61Z"/>
+<circle class="gate" cx="144" cy="49" r="4"/>
+<path class="gate" d="M220 82H251A15 15 0 0 1 251 112H220Z"/>
+<circle class="gate" cx="270" cy="97" r="4"/>
+<path class="gate" d="M336 130H367A15 15 0 0 1 367 160H336Z"/>
+<circle class="gate" cx="386" cy="145" r="4"/>
+<path class="gate" d="M104 181L140 193L104 205Z"/>
+<circle class="gate" cx="144" cy="193" r="4"/>
+<path class="gate" d="M220 226H251A15 15 0 0 1 251 256H220Z"/>
+<circle class="gate" cx="270" cy="241" r="4"/>
+<path class="wire" d="M30 49H104"/>
+<path class="wire" d="M148 49H185.2V88.6H220"/>
+<path class="wire" d="M48 105.4H220"/>
+<path class="wire" d="M274 97H301.2V136.6H336"/>
+<path class="wire" d="M274 241H301.2V153.4H336"/>
+<path class="wire" d="M66 193H104"/>
+<path class="wire" d="M48 232.6H220"/>
+<path class="wire" d="M148 193H185.2V249.4H220"/>
+<path class="wire" d="M30 28V49"/>
+<text class="lbl" x="30" y="23" text-anchor="middle">A</text>
+<path class="wire" d="M48 28V232.6"/>
+<text class="lbl" x="48" y="23" text-anchor="middle">B</text>
+<circle class="dot" cx="48" cy="105.4" r="3.2"/>
+<path class="wire" d="M66 28V193"/>
+<text class="lbl" x="66" y="23" text-anchor="middle">C</text>
+<path class="wire" d="M390 145H428"/>
+<text class="lbl" x="434" y="150" text-anchor="start">F</text>
+</svg>
+<figcaption>The same function in NAND gates. Every gate in the drawing is an AND followed by an inverter — that pair is what a NAND is.</figcaption></figure><p><strong>Count.</strong> Three NANDs for the two-level part, plus two more used as inverters to make A&prime; and C&prime; &mdash; <strong>five gates</strong>, the same as the AND&ndash;OR version. The two-level part converts one-for-one; only the literals that need complementing cost anything extra.</p><div class="box note"><span class="bt">NAND as an inverter</span><p>Tie both inputs of a NAND together: A&nbsp;&uarr;&nbsp;A = (AA)&prime; = A&prime;. That one trick is why {NAND} on its own is functionally complete &mdash; with NOT and AND available you can reach everything.</p></div>
+</div></details>
+<details class="prob"><summary data-label="B6 (a) &middot; adders">A 4-bit ripple-carry adder is given <span class="bin">1001</span> on one input and <span class="bin">0111</span> on the other.<br>(a) Fill in the carry into and out of every stage, and give the result.<br>(b) One programmer looks at the output and calls it a bug; another looks at the same output and calls it correct. Explain how both can be right.</summary><div class="sol">
+<div class="tablewrap"><table>
+<thead><tr><th>stage</th><th>A<sub>i</sub></th><th>B<sub>i</sub></th><th>C<sub>in</sub></th><th>Sum<sub>i</sub></th><th>C<sub>out</sub></th></tr></thead>
+<tbody><tr><td>3</td><td>1</td><td>0</td><td>1</td><td><strong>0</strong></td><td>1</td></tr><tr><td>2</td><td>0</td><td>1</td><td>1</td><td><strong>0</strong></td><td>1</td></tr><tr><td>1</td><td>0</td><td>1</td><td>1</td><td><strong>0</strong></td><td>1</td></tr><tr><td>0</td><td>1</td><td>1</td><td>0</td><td><strong>0</strong></td><td>1</td></tr></tbody></table></div><p class="morseline">Result <span class="bin">0000</span>, carry out of the top stage <strong>1</strong></p><p><strong>As unsigned.</strong> 9 + 7 = 16, and 16 does not fit in four bits (0&ndash;15). The carry out is the missing fifth bit, and dropping it leaves 0. <em>Wrong</em> &mdash; and the carry out is exactly the flag that says so.</p><p><strong>As two&rsquo;s complement.</strong> <span class="bin">1001</span> is &minus;7 and <span class="bin">0111</span> is +7, so the sum should be 0 &mdash; and <span class="bin">0000</span> is what came out. <em>Right.</em> The carry out is discarded and means nothing here.</p><div class="box worked"><span class="bt">The same bits, two answers</span><p>Nothing about the adder changed. The hardware added two bit patterns; <em>you</em> decided what they meant. This is the single most important idea in the arithmetic unit: unsigned overflow is read off the carry out, signed overflow is read off the signs, and the circuit computes both flags and lets the program pick.</p></div>
+</div></details>
+<details class="prob"><summary data-label="B6 (b) &middot; multiplexers">You have one 4:1 multiplexer and no gates except inverters, and you want it to compute F(A, B, C) = &Sigma;(2, 4, 5, 7).<br>(a) Put A and B on the select lines. What goes on each of the four data inputs?<br>(b) Do it again with B and C on the selects instead, and compare the two answers.</summary><div class="sol">
+<p><strong>(a)</strong> Split the truth table into four pairs of rows, one pair per select combination, and ask what F does across the pair as the leftover variable goes 0&nbsp;&rarr;&nbsp;1.</p><div class="tablewrap"><table>
+<thead><tr><th>A B (selects)</th><th>rows</th><th>F on those rows</th><th>data input</th></tr></thead>
+<tbody><tr><td>00</td><td>0, 1</td><td>0, 0</td><td><strong>0</strong></td></tr><tr><td>01</td><td>2, 3</td><td>1, 0</td><td><strong>C&prime;</strong></td></tr><tr><td>10</td><td>4, 5</td><td>1, 1</td><td><strong>1</strong></td></tr><tr><td>11</td><td>6, 7</td><td>0, 1</td><td><strong>C</strong></td></tr></tbody></table></div><p>So wire <strong>D<sub>0</sub> = 0, D<sub>1</sub> = C&prime;, D<sub>2</sub> = 1, D<sub>3</sub> = C</strong>.</p><p>All four possibilities turn up in this one problem, which is why it is worth doing. The rule is mechanical: <em>00</em> gives 0, <em>11</em> gives 1, <em>01</em> gives C, <em>10</em> gives C&prime; &mdash; reading the pair in row order.</p><p><strong>Check row 5.</strong> A = 1, B = 0, C = 1 selects D<sub>2</sub> = 1, and 5 is in the list. Row 6: A = 1, B = 1, C = 0 selects D<sub>3</sub> = C = 0, and 6 is not in the list. Agreed.</p><p><strong>(b) With B and C on the selects</strong> the pairs are different: each one now holds the two rows that share B and C and differ in A, which are eight apart in the table rather than adjacent.</p><div class="tablewrap"><table>
+<thead><tr><th>B C (selects)</th><th>rows</th><th>F on those rows</th><th>data input</th></tr></thead>
+<tbody><tr><td>00</td><td>0, 4</td><td>0, 1</td><td><strong>A</strong></td></tr><tr><td>01</td><td>1, 5</td><td>0, 1</td><td><strong>A</strong></td></tr><tr><td>10</td><td>2, 6</td><td>1, 0</td><td><strong>A&prime;</strong></td></tr><tr><td>11</td><td>3, 7</td><td>0, 1</td><td><strong>A</strong></td></tr></tbody></table></div><p>So <strong>D<sub>0</sub> = A, D<sub>1</sub> = A, D<sub>2</sub> = A&prime;, D<sub>3</sub> = A</strong> &mdash; one inverter and three wires carrying A.</p><p><strong>The comparison.</strong> Both work; the function does not care which variables you chose. But the second wiring needs only one inverter and no constants, while the first needs both constants and an inverter. When a question lets you choose, it is worth a few seconds to see which variable left on the data inputs gives the tidier answer.</p><div class="box note"><span class="bt">Why this works at all</span><p>A multiplexer is a one-hot selector: exactly one data input reaches the output, chosen by the selects. Put <var>k</var> of the variables on the selects and you have split the function into 2<sup><var>k</var></sup> smaller functions of the rest &mdash; and with one variable left over, those smaller functions can only be 0, 1, C or C&prime;.</p></div>
+</div></details>
+<details class="prob"><summary data-label="B6 (c) &middot; the ALU">For the 1-bit ALU that computes AND, OR and add, give the control settings &mdash; B-invert, the carry in to the least significant bit, and the 2-bit operation code &mdash; for each of AND, OR, add and subtract. Then say why subtract is not an operation code of its own.</summary><div class="sol">
+<div class="tablewrap"><table>
+<thead><tr><th>operation</th><th>B-invert</th><th>C<sub>in</sub> of bit 0</th><th>operation code</th><th>what the multiplexer passes</th></tr></thead>
+<tbody><tr><td>AND</td><td>0</td><td>0</td><td>00</td><td>the AND gate&rsquo;s output</td></tr><tr><td>OR</td><td>0</td><td>0</td><td>01</td><td>the OR gate&rsquo;s output</td></tr><tr><td>add</td><td>0</td><td>0</td><td>10</td><td>the adder&rsquo;s Sum output</td></tr><tr><td>subtract</td><td><strong>1</strong></td><td><strong>1</strong></td><td>10</td><td>the adder&rsquo;s Sum output &mdash; the same wire as add</td></tr></tbody></table></div><p><strong>Why subtract has no code of its own.</strong> A &minus; B is A + (&minus;B), and in two&rsquo;s complement &minus;B is B flipped plus 1. B-invert does the flipping; the carry in of 1 at the bottom stage does the adding of 1. So subtraction reuses the adder unchanged, and the multiplexer is still being told to pass Sum. One adder, two operations, no subtractor anywhere on the chip.</p><p>Note that B-invert has to reach <em>every</em> one of the 32 slices &mdash; all the bits of B need flipping &mdash; while the carry in of 1 goes to the bottom slice only.</p><div class="box note"><span class="bt">Everything at once</span><p>The AND gate, the OR gate and the adder all run on every operation. The ALU does not decide what to compute and then compute it; it computes all three and throws two away. Selecting is one gate delay, and deciding first would cost more than it saved.</p></div>
+</div></details>
+<details class="prob"><summary data-label="B7 (a) &middot; two&rsquo;s complement">Write &minus;37 and +37 in 8-bit two&rsquo;s complement. State the range 8 bits covers and say why it is not symmetric.</summary><div class="sol">
+<p><strong>+37</strong> first: 32 + 4 + 1, so <span class="bin">00100101</span>.</p><p><strong>&minus;37</strong>: flip every bit and add 1.</p><p class="morseline">flip <span class="bin">00100101</span> &rarr; <span class="bin">11011010</span>, add 1 &rarr; <strong><span class="bin">11011011</span></strong></p><p><strong>Check.</strong> Add the two patterns: they should give zero with a carry out. <span class="bin">00100101</span> + <span class="bin">11011011</span> = <span class="bin">1 00000000</span> &mdash; eight zeros and a carry out of 1, which is discarded. Agreed.</p><p><strong>Range.</strong> 8 bits give 256 patterns, covering &minus;128 to +127. It is not symmetric because <span class="bin">00000000</span> is spent on zero: that leaves 255 patterns for the non-zero values, and the odd one out goes to the negative side. The consequence is that &minus;128 has no positive counterpart, so negating it overflows.</p>
+</div></details>
+<details class="prob"><summary data-label="B7 (b) &middot; two&rsquo;s complement">A 7-bit machine is asked to evaluate <strong>46 &minus; 25</strong>. It has an adder and no subtractor.<br>(a) Write down the two bit patterns that actually arrive at the adder&rsquo;s inputs.<br>(b) Do the addition and give the 7-bit result.<br>(c) The carry-out flag comes up 1. Should the programmer treat that as an error? Say exactly what it does mean.</summary><div class="sol">
+<p class="morseline">+46 = <span class="bin">0101110</span>&nbsp;&nbsp;&nbsp;+25 = <span class="bin">0011001</span></p><p><strong>(a) What the adder sees.</strong> The machine never subtracts; it negates and adds. Flip 25 &rarr; <span class="bin">1100110</span>, add 1 &rarr; <span class="bin">1100111</span> = &minus;25. So the adder&rsquo;s two inputs are <span class="bin">0101110</span> and <span class="bin">1100111</span>.</p><pre><code>  0101110
++ 1100111
+----------
+ 10010101     carry out 1, discarded</code></pre><p>The low seven bits are <span class="bin">0010101</span> = <strong>21</strong>, and 46 &minus; 25 = 21. Agreed.</p><p><strong>(c) The carry out is not an error.</strong> For signed arithmetic it carries no information at all, and here it is thrown away &mdash; which is not a fudge. Working in 7 bits is arithmetic modulo 128; adding &minus;25 as the pattern for 103 gives an answer 128 too big, and dropping the eighth bit subtracts exactly 128 again. The two errors cancel by construction, which is the whole reason two&rsquo;s complement is the representation everyone uses.</p><p>What the flag <em>does</em> mean is this: had the programmer meant these patterns as unsigned numbers, 46 + 103 = 149 would not have fit in seven bits, and the carry out is the warning. Signed or unsigned is the programmer&rsquo;s decision, not the adder&rsquo;s, so the hardware raises both flags and lets the program read whichever one applies. Here the signed reading is the intended one, 21 sits comfortably inside &minus;64&hellip;63, and the carry out is ignored.</p>
+</div></details>
+<details class="prob"><summary data-label="B7 (c) &middot; two&rsquo;s complement">On the same 7-bit machine, <strong>44 + 61</strong> produces a result the programmer did not expect.<br>(a) Do the addition and give the 7-bit result.<br>(b) Say what went wrong, and why the carry-out flag did not catch it.<br>(c) Give a rule that does catch it, stated two ways: once in terms of the signs, and once in terms of the carries.</summary><div class="sol">
+<p class="morseline">+44 = <span class="bin">0101100</span>&nbsp;&nbsp;&nbsp;+61 = <span class="bin">0111101</span></p><pre><code>  0101100
++ 0111101
+----------
+ 01101001     carry out 0</code></pre><p>The result reads <span class="bin">1101001</span> = <strong>&minus;23</strong>, and 44 + 61 = 105. Seven bits reach only 63, so 105 was never representable and the sum has wrapped round into the negatives.</p><p><strong>Why the carry out missed it.</strong> It is 0 here, because nothing fell off the left-hand end: the <em>unsigned</em> sum 105 fits in seven bits perfectly well. The carry-out flag answers the unsigned question, and the unsigned answer is right. It is the signed reading that has broken.</p><p><strong>The rule.</strong> Signed overflow has occurred when the two operands have the <em>same</em> sign and the result has the <em>other</em> one. Here 0&hellip; + 0&hellip; gave 1&hellip;, so overflow. Equivalently, and this is the version the hardware uses: overflow is the carry into the top bit XOR the carry out of it. Into bit 6 here the carry is 1 and out of it the carry is 0, so 1 &oplus; 0 = 1.</p><div class="box warn"><span class="bt">Carry out is not overflow</span><p>In part (b) the carry out was 1 and the answer was right. Here the carry out is 0 and the answer is wrong. The carry out answers the <em>unsigned</em> question; the sign rule answers the signed one. Confusing the two is the single most common error on this topic.</p></div>
+</div></details>
+<details class="prob"><summary data-label="B7 (d) &middot; two&rsquo;s complement">Here are two 7-bit patterns: <span class="bin">1010110</span> and <span class="bin">0101010</span>.<br>(a) Which is larger if the machine is reading them as unsigned?<br>(b) Which is larger if it is reading them as two&rsquo;s complement?<br>(c) Give both signed values, showing the step that tells you, and name the one bit that decided your answer to (b).</summary><div class="sol">
+<p><strong>(a) Unsigned.</strong> Place values straight off: <span class="bin">1010110</span> = 64 + 16 + 4 + 2 = 86, and <span class="bin">0101010</span> = 32 + 8 + 2 = 42. The first is larger.</p><p><strong>(c) The signed values.</strong> The second pattern starts with 0, so it is positive and reads the same way: <strong>+42</strong>. The first starts with 1, so it is negative; negate it to find the magnitude:</p><p class="morseline">flip <span class="bin">1010110</span> &rarr; <span class="bin">0101001</span>, add 1 &rarr; <span class="bin">0101010</span> = 32 + 8 + 2 = 42</p><p>So <span class="bin">1010110</span> = <strong>&minus;42</strong>. The two patterns are negations of one another, which is why the same 42 turns up twice.</p><p><strong>(b) Signed.</strong> &minus;42 &lt; 42, so now the <em>second</em> pattern is larger &mdash; the opposite of the unsigned answer. The bit that decided it is the leading bit: in a signed reading it carries weight &minus;64 instead of +64, a swing of 128, and nothing else in the pattern can outweigh it.</p><p><strong>A faster route to (c).</strong> Read the pattern as unsigned &mdash; 86 &mdash; then subtract 2<sup>7</sup> = 128: 86 &minus; 128 = &minus;42. Same answer, and it is really the definition: in <var>w</var>-bit two&rsquo;s complement the top bit carries weight &minus;2<sup><var>w</var>&minus;1</sup> while every other bit carries its usual positive weight.</p><div class="box note"><span class="bt">Why machines keep both</span><p>This is exactly why a processor has separate signed and unsigned comparison instructions. The bits do not say which you meant.</p></div>
+</div></details>
+<details class="prob"><summary data-label="B8 (a) &middot; fixed point">Read the single pattern <span class="bin">11001001</span> three ways:<br>(a) as an 8-bit two&rsquo;s complement integer;<br>(b) as Fixed&lang;8,&nbsp;4&rang;;<br>(c) as Fixed&lang;8,&nbsp;2&rang;.<br>Then say in one sentence what the three answers have in common.</summary><div class="sol">
+<p>Fixed&lang;8,&nbsp;<var>b</var>&rang; is eight bits with <var>b</var> of them after the binary point, and the whole thing is one two&rsquo;s complement integer scaled by 2<sup>&minus;<var>b</var></sup>. So all three readings share a single piece of arithmetic.</p><p><strong>Read the integer.</strong> The top bit is 1, so negate to find the magnitude: flip <span class="bin">11001001</span> &rarr; <span class="bin">00110110</span>, add 1 &rarr; <span class="bin">00110111</span> = 55. So <strong>(a) the integer is &minus;55</strong>.</p><p><strong>Scale it.</strong> (b) &minus;55 / 2<sup>4</sup> = &minus;55 / 16 = <strong>&minus;3.4375</strong>. (c) &minus;55 / 2<sup>2</sup> = &minus;55 / 4 = <strong>&minus;13.75</strong>.</p><p><strong>What they have in common:</strong> the same integer every time. The bits carry no record of where the binary point is &mdash; <var>b</var> is something you are told, not something you can read off, and changing it by one doubles or halves the value.</p><p><strong>Check (b) the other way.</strong> Put the point in: <span class="bin">1100.1001</span>. Negate the whole pattern to get <span class="bin">0011.0111</span> = 2 + 1 + &frac14; + &frac18; + 1/16 = 3.4375, and the sign bit says it is negative. Agreed.</p><div class="box warn"><span class="bt">The trap</span><p>Reading <span class="bin">1100.1001</span> as &ldquo;&minus;something&rdquo; by taking <span class="bin">100.1001</span> as the magnitude. The sign bit is not a separate flag here &mdash; the representation is two&rsquo;s complement across all eight bits, so you must negate the <em>whole</em> pattern.</p></div>
+</div></details>
+<details class="prob"><summary data-label="B8 (b) &middot; fixed point">Encode <strong>&minus;6.125</strong> as Fixed&lang;8,&nbsp;3&rang;. Give the eight bits, and state the step size and range of the format.</summary><div class="sol">
+<p><strong>Scale first, then negate</strong> &mdash; that order keeps you out of trouble.</p><p class="morseline">6.125 &times; 2<sup>3</sup> = 49</p><p>49 in eight bits is <span class="bin">00110001</span>. Negate: flip &rarr; <span class="bin">11001110</span>, add 1 &rarr; <strong><span class="bin">11001111</span></strong>.</p><p><strong>Check.</strong> Put the point three from the right: <span class="bin">11001.111</span>. Negating gives <span class="bin">00110.001</span> = 6 + &frac18; = 6.125, negative. Agreed.</p><p><strong>Step and range.</strong> The last bit is worth 2<sup>&minus;3</sup> = &frac18;, so the step is 0.125 everywhere. The integer runs &minus;128&hellip;127, so the value runs &minus;16 to 15.875.</p><div class="box note"><span class="bt">Why 6.125 is exact</span><p>6.125 = 6 + &frac18;, and &frac18; is a power of two, so the binary expansion <span class="bin">110.001</span> terminates. A value like 6.1 would not terminate, would not fit any Fixed&lang;<var>w</var>,&nbsp;<var>b</var>&rang;, and would have to be rounded. Fixed point is exact for the dyadic fractions and for nothing else.</p></div>
+</div></details>
+<details class="prob"><summary data-label="B8 (c) &middot; floating point">(a) Convert <strong>45.75</strong> to IEEE 754 single precision; give all 32 bits.<br>(b) How many of the 32 bits change if the value is negated? Write the pattern for <strong>&minus;45.75</strong>.<br>(c) Again without redoing the work, write the encoding of <strong>91.5</strong>.</summary><div class="sol">
+<p><strong>(a) Magnitude in binary.</strong> 45 = <span class="bin">101101</span> and 0.75 = &frac12; + &frac14; = <span class="bin">.11</span>, so 45.75 = <span class="bin">101101.11</span>.</p><p><strong>Normalise.</strong> Move the point five places left: 1.0110111 &times; 2<sup>5</sup>.</p><p><strong>Sign.</strong> Positive, so <strong>0</strong>.</p><p><strong>Exponent.</strong> 5 + 127 = 132 = <span class="bin">10000100</span>.</p><p><strong>Mantissa.</strong> The bits after the leading 1 &mdash; 0110111 &mdash; padded with zeros to 23.</p><p class="morseline"><strong><span class="bin">0 10000100 0110 1110 0000 0000 0000 000</span></strong></p><p>The leading 1 of 1.0110111 appears nowhere in the stored pattern. It does not need to: every normalised number has one, so the standard leaves it out and gets a 24th bit of precision for free.</p><p><strong>(b) Exactly one bit changes.</strong> Flip the sign bit and leave the other 31 alone:</p><p class="morseline"><span class="bin">1 10000100 0110 1110 0000 0000 0000 000</span></p><p>Floating point is sign-and-magnitude, so negating is a single bit &mdash; unlike two&rsquo;s complement, where you would flip everything and add 1.</p><p><strong>(c) 91.5.</strong> 91.5 is exactly 2 &times; 45.75, so the significand is unchanged and the exponent goes up by one: 132 &rarr; 133 = <span class="bin">10000101</span>.</p><p class="morseline"><span class="bin">0 10000101 0110 1110 0000 0000 0000 000</span></p><p>Multiplying by any power of two only ever moves the exponent field. That is the whole reason the format stores a binary exponent rather than a decimal one.</p><div class="box warn"><span class="bt">Two places to lose marks</span><p>Storing the leading 1 in the mantissa field, and forgetting the bias. The exponent field is never the exponent &mdash; it is the exponent plus 127, so that negative exponents can be stored without a second sign bit.</p></div>
+</div></details>
+<details class="prob"><summary data-label="B8 (d) &middot; floating point">(a) Decode this single-precision pattern:<p class="morseline"><span class="bin">1 10000011 0010 1100 0000 0000 0000 000</span></p>(b) Then, without recomputing anything, write down the pattern for half that value.</summary><div class="sol">
+<p><strong>Split the fields.</strong> Sign 1; exponent field <span class="bin">10000011</span>; mantissa field <span class="bin">0010 1100 0000 0000 0000 000</span>.</p><p><strong>Sign.</strong> 1, so the number is negative.</p><p><strong>Exponent.</strong> <span class="bin">10000011</span> = 131, and 131 &minus; 127 = <strong>4</strong>.</p><p><strong>Significand.</strong> Put the hidden 1 back: 1.00101100&hellip; = 1 + 2<sup>&minus;3</sup> + 2<sup>&minus;5</sup> + 2<sup>&minus;6</sup> = 1 + 0.125 + 0.03125 + 0.015625 = 1.171875.</p><p><strong>Put it together.</strong> &minus;1.171875 &times; 2<sup>4</sup> = <strong>&minus;18.75</strong>.</p><p><strong>Check by going back.</strong> 18.75 = <span class="bin">10010.11</span> = 1.001011 &times; 2<sup>4</sup>; exponent field 4 + 127 = 131 = <span class="bin">10000011</span>; mantissa 001011 padded out. Agreed.</p><p>Shifting the binary point four places right is usually quicker than the arithmetic: 1.00101100 with the point moved four right is <span class="bin">10010.1100</span> = 16 + 2 + &frac12; + &frac14; = 18.75.</p><p><strong>(b) Half of it.</strong> Halving divides by 2<sup>1</sup>, so the significand is untouched and the exponent drops by one: 131 &rarr; 130 = <span class="bin">10000010</span>.</p><p class="morseline"><span class="bin">1 10000010 0010 1100 0000 0000 0000 000</span></p><p>That is &minus;9.375, and only the exponent field moved. Halving a fixed-point number is a shift of every bit; halving a floating-point number is a subtraction of 1 from one field, which is why scaling is cheap in this format and why the exponent is stored separately in the first place.</p>
+</div></details>
+<details class="prob"><summary data-label="B8 (e) &middot; floating point">A student stores 0.1 in a single-precision variable, adds it to itself ten times, and finds the result is not 1. Explain, in terms of the format, exactly what has happened. Would Fixed&lang;32,&nbsp;16&rang; do any better?</summary><div class="sol">
+<p><strong>0.1 is not a dyadic fraction.</strong> In binary it is 0.0001100110011&hellip;, repeating for ever, exactly as 1/3 repeats in decimal. A format with a finite mantissa has to cut it off, so what gets stored is the nearest representable number &mdash; about 0.100000001490116119384765625, a touch too big.</p><p>Ten of those added up miss 1 by a little, and the intermediate rounding at each addition moves the answer again. The error is not a bug in the hardware; it is the exact arithmetic of the numbers that are actually in the registers.</p><p><strong>Fixed point does not rescue it.</strong> Fixed&lang;32,&nbsp;16&rang; can represent exactly the multiples of 2<sup>&minus;16</sup>, and 0.1 is not one of them either. Any binary format &mdash; fixed or floating, however wide &mdash; represents exactly the fractions whose denominators are powers of two, and 1/10 is not among them.</p><div class="box note"><span class="bt">What does fix it</span><p>Work in integer cents rather than floating-point dollars, or use a decimal format whose base is 10. The lesson for this course is narrower and worth saying plainly: a floating-point value is an <em>approximation with a known size of error</em>, and comparing two of them with = is almost always the wrong thing to write.</p></div>
+</div></details>
+
+<h2 id="traps"><span class="secnum">R.6</span>Ten things that cost marks</h2>
+
+<p>These are the errors that turn up again and again. None of them is a failure
+of understanding; all of them are cheap to stop making.</p>
+
+<ol>
+<li><strong>Grouping bits from the left.</strong> Pad on the left, group from the
+right. <span class="bin">10110110 1</span> is not
+<span class="hex">0xB6?</span>.</li>
+
+<li><strong>Confusing the carry out with signed overflow.</strong> They are
+different flags answering different questions, and each is routinely 1 when the
+other is 0. The carry out is the unsigned story; the signs of the operands and
+the result are the signed one.</li>
+
+<li><strong>Missing the wrap-around groups on a K-map.</strong> The left edge is
+adjacent to the right edge, the top to the bottom, and the four corners form a
+legal group of four. A map drawn without that in mind produces an answer that is
+correct and not minimal &mdash; which is the wrong answer to the question that
+was asked.</li>
+
+<li><strong>A group of three cells.</strong> Groups are 1, 2, 4, 8, 16 cells and
+nothing else. A group of three is not a product term; it is two groups or a
+mistake.</li>
+
+<li><strong>Treating every don&rsquo;t-care as 0.</strong> Legal, and it will
+usually cost you several terms. X cells are free to use. Equally: nobody makes
+you cover one.</li>
+
+<li><strong>De Morgan without the swap.</strong> (X + Y)&prime; = X&prime;Y&prime;,
+not X&prime; + Y&prime;. The prime moves in <em>and</em> the operator flips. If
+only one of those happened, you have changed the function.</li>
+
+<li><strong>Drawing a new inverter every time a literal appears
+complemented.</strong> One inverter per literal, fanned out. Anything else
+inflates the gate count, and the gate count is usually part of the marks.</li>
+
+<li><strong>Keeping the leading 1 in the mantissa field.</strong> It is hidden;
+that is the whole point. And the exponent field is never the exponent &mdash; it
+is the exponent plus 127.</li>
+
+<li><strong>Reading a fixed-point pattern as sign-and-magnitude.</strong>
+Fixed&lang;<var>w</var>,&nbsp;<var>b</var>&rang; is two&rsquo;s complement
+across the whole width. To find the magnitude of a negative one you negate the
+entire pattern, not just the bits after the sign.</li>
+
+<li><strong>Writing the answer and nothing else.</strong> It scores zero even
+when it is right. Division chains, circled groups, the negation step, the
+gate-by-gate columns &mdash; that is what is being marked.</li>
+</ol>
+
+
+    <nav class="pagenav">
+      <a class="prev" href="ex-float.html"><span>Previous</span>Set 10. Fixed-point and floating-point</a>
+      <a class="next" href="setup-logisim.html"><span>Next</span>A. Installing Logisim-Evolution</a>
+    </nav>
+    <footer class="site">
+      <em>Computer Organization and Assembly Language</em> &middot; CSCI 240 / 640,
+      Queens College CUNY.
+    </footer>
+  </main>
+</div>
+</body>
+</html>
