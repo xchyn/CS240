@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Installing MARS</title>
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/notes.js" defer></script>
+</head>
+<body>
+<header class="topbar"><div class="topbar-in">
+  <a class="brand" href="index.html">CSCI 240</a>
+  <span class="crumb">Setup &middot; MARS</span>
+  <nav class="topnav">
+    <a href="setup-logisim.html">&larr; Prev</a>
+    <a href="index.html">Contents</a>
+    <a href="tools.html">Next &rarr;</a>
+    <button class="iconbtn" id="themebtn" type="button" title="Light / dark">&#9686;</button>
+  </nav>
+</div></header>
+<div class="wrap">
+  <aside class="toc"><p class="toc-title">On this page</p><ol>
+    <li><a href="#which"><span class="t">B.1</span>Which program</a></li>
+    <li><a href="#java"><span class="t">B.2</span>Java first</a></li>
+    <li><a href="#download"><span class="t">B.3</span>Getting the file</a></li>
+    <li><a href="#mac"><span class="t">B.4</span>macOS</a></li>
+    <li><a href="#win"><span class="t">B.5</span>Windows</a></li>
+    <li><a href="#linux"><span class="t">B.6</span>Linux and Chromebooks</a></li>
+    <li><a href="#settings"><span class="t">B.7</span>Four settings to check</a></li>
+    <li><a href="#check"><span class="t">B.8</span>Check it works</a></li>
+    <li><a href="#trouble"><span class="t">B.9</span>Troubleshooting</a></li>
+  </ol></aside>
+  <main>
+
+<div class="chhead">
+  <span class="chpart">Software setup &middot; do this before Lecture 15</span>
+  <span class="chnum">Appendix B</span>
+  <h1>Installing MARS</h1>
+  <p class="chsum">MARS is the MIPS simulator we use for the whole assembly-language
+  half of the course: assemble a program, run it one instruction at a time, and watch
+  the registers and memory change as it goes. It is a single Java file, so there is
+  nothing to install &mdash; which makes it both the easiest and the most confusing
+  of the two tools, because there is no installer to double-click.</p>
+</div>
+
+<h2 id="which"><span class="secnum">B.1</span>Which program</h2>
+
+<p>Search for "MIPS simulator" and you will find two. We use <strong>MARS</strong>.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th></th><th>MARS</th><th>SPIM / QtSPIM</th></tr></thead>
+<tbody>
+<tr><td>written by</td><td>Pete Sanderson &amp; Ken Vollmar, Missouri State</td><td>James Larus</td></tr>
+<tr><td>what it is</td><td>a Java program &mdash; one <code>.jar</code> file</td><td>a native application, one installer per platform</td></tr>
+<tr><td>use in this course</td><td><strong>yes</strong></td><td><strong>no</strong></td></tr>
+</tbody></table>
+</div>
+
+<p>The two accept almost the same assembly language, so a program written for one
+usually runs on the other. They differ in the parts you will actually be looking at:
+the register display, the memory viewer, the single-step controls and the set of
+system calls. Lectures, examples and anything handed out assume MARS, so install
+MARS even if you already have QtSPIM from another course.</p>
+
+<div class="box note"><span class="bt">MARS has two homes</span>
+<p>The original project page is hosted by Missouri State, and one of the two
+original authors keeps a maintained build on GitHub. Either is fine &mdash; the
+maintained one simply runs more happily on current versions of Java. Both are linked
+in &sect;B.3.</p></div>
+
+<h2 id="java"><span class="secnum">B.2</span>Java first</h2>
+
+<p>MARS is written in Java and is distributed as a <code>.jar</code>, which is a
+program that only runs if Java is already on your machine. So Java comes
+first.</p>
+
+<p>Open a terminal (macOS, Linux) or Command Prompt (Windows) and type:</p>
+
+<pre>java -version</pre>
+
+<p>Two things can happen.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>what you see</th><th>what to do</th></tr></thead>
+<tbody>
+<tr><td>a version number &mdash; almost any version number</td><td>nothing. You are
+ready, and you can go straight to &sect;B.3</td></tr>
+<tr><td><code>command not found</code>, or
+<em>'java' is not recognized</em></td><td>install Java, below</td></tr>
+</tbody></table>
+</div>
+
+<p>MARS asks very little of Java. It is an old program and runs on
+<strong>Java 8 or anything newer</strong>, so if your machine already has a Java on
+it at all &mdash; and most do, once you have installed anything written in it
+&mdash; you are almost certainly done here. Upgrading a working Java buys you
+nothing.</p>
+
+<p>If you have none, download the <strong>Temurin JDK</strong> for your operating
+system from
+<a href="https://adoptium.net/temurin/releases/">adoptium.net/temurin/releases</a>
+and run the installer with its default options. Take the most recent version
+offered; there is no reason to hunt for an old one. Close and reopen your terminal
+afterwards, then run <code>java -version</code> again &mdash; a terminal that was
+already open will not see a newly installed Java.</p>
+
+<h2 id="download"><span class="secnum">B.3</span>Getting the file</h2>
+
+<p>Download MARS from either of these:</p>
+
+<p style="text-align:center;font-size:1.05rem"><a
+href="https://computerscience.missouristate.edu/mars-mips-simulator.htm">computerscience.missouristate.edu/mars-mips-simulator.htm</a><br>
+<a href="https://dpetersanderson.github.io/">dpetersanderson.github.io</a></p>
+
+<p>What you want in both cases is the single <strong><code>.jar</code>
+file</strong> &mdash; the download link is usually the version number itself, and
+the file that arrives will be called something like <code>Mars.jar</code> with a
+version in the name. There is no installer, no <code>.dmg</code> and no
+<code>.msi</code>; that one file <em>is</em> the program.</p>
+
+<p><strong>Put it somewhere permanent before you run it.</strong> Make a folder you
+will keep &mdash; <code>Documents/CSCI240/</code> is a good choice &mdash; and move
+the <code>.jar</code> into it. Running it out of your Downloads folder works right
+up until the day you tidy your Downloads folder.</p>
+
+<div class="box warn"><span class="bt">Download from these two places only</span>
+<p>"MIPS simulator download" turns up sites that wrap the jar in an installer of
+their own. You do not want what they are adding. The two links above are the project
+itself.</p></div>
+
+<h2 id="mac"><span class="secnum">B.4</span>macOS</h2>
+
+<p>The reliable way to start MARS on a Mac is from the Terminal. Open Terminal, change
+to the folder you put the jar in, and run it:</p>
+
+<pre>cd ~/Documents/CSCI240
+java -jar Mars.jar</pre>
+
+<p>Use the real filename &mdash; it will have a version number in it. The easy way to
+get it exactly right: type <code>java -jar </code> (with the trailing space), then
+drag the jar from the Finder into the Terminal window, which pastes its full path for
+you, and press <kbd>Return</kbd>.</p>
+
+<div class="box warn"><span class="bt">Double-clicking often does not work</span>
+<p>Depending on what else is installed, double-clicking a <code>.jar</code> on macOS
+may do nothing at all, or may unpack it into a folder of files with Archive Utility.
+Neither means the download is broken. macOS may also refuse it outright with
+<em>"Mars.jar cannot be opened because it is from an unidentified developer"</em>, or
+call it damaged.</p>
+<p><strong>The fix, once:</strong> in Terminal, in the folder with the jar, run</p>
+<pre>xattr -d com.apple.quarantine Mars.jar</pre>
+<p>That removes the "downloaded from the internet" flag macOS attached to the file.
+Then Control-click the jar in the Finder, choose <strong>Open With &rarr; Jar
+Launcher</strong>, and from then on a double-click will start it.</p>
+<p>If you would rather not bother, the <code>java -jar</code> command above works
+without any of this.</p></div>
+
+<h3>A one-click launcher, if you want one</h3>
+<p>Typing the command every time gets old. Make a file called <code>mars.command</code>
+next to the jar containing these two lines:</p>
+
+<pre>#!/bin/sh
+cd "$(dirname "$0")" &amp;&amp; java -jar Mars.jar</pre>
+
+<p>then make it runnable, once:</p>
+
+<pre>chmod +x mars.command</pre>
+
+<p>Double-clicking <code>mars.command</code> now opens a Terminal window and starts
+MARS. Leave that window open while you work; closing it quits the simulator.</p>
+
+<h2 id="win"><span class="secnum">B.5</span>Windows</h2>
+
+<p>On Windows a double-click usually just works, because installing the JDK normally
+registers <code>.jar</code> files with Java. Try it first.</p>
+
+<p>If double-clicking opens WinRAR, 7-Zip or File Explorer instead, the association
+has been taken by an archiver &mdash; a <code>.jar</code> really is a zip file, so
+they are not wrong, just unhelpful. Two ways out:</p>
+
+<ol>
+<li><strong>Run it from the command line.</strong> Open Command Prompt, then
+<pre>cd %USERPROFILE%\Documents\CSCI240
+java -jar Mars.jar</pre></li>
+<li><strong>Fix the association.</strong> Right-click the jar &rarr;
+<strong>Open with</strong> &rarr; <strong>Choose another app</strong> &rarr;
+<strong>Look for another app on this PC</strong>, and point it at
+<code>javaw.exe</code> inside your Java installation (it is in the
+<code>bin</code> folder, typically under
+<code>C:\Program Files\Eclipse Adoptium\jdk-21&hellip;\bin\</code>). Tick
+<em>Always use this app</em>.</li>
+</ol>
+
+<div class="box note"><span class="bt">A shortcut that always works</span>
+<p>Make a file called <code>mars.bat</code> next to the jar with one line in it:</p>
+<pre>java -jar Mars.jar</pre>
+<p>Double-click that instead. If the window flashes and vanishes, add
+<code>pause</code> as a second line and run it again &mdash; the error message will
+stay on screen long enough to read.</p></div>
+
+<p>Windows SmartScreen may object to the download before you get this far. Click
+<strong>More info</strong>, then <strong>Run anyway</strong>; in the browser's
+download list, <strong>Keep</strong>, then <strong>Keep anyway</strong>. It objects
+because an academic project does not buy a commercial signing certificate, not
+because it has found anything wrong with the file.</p>
+
+<h2 id="linux"><span class="secnum">B.6</span>Linux and Chromebooks</h2>
+
+<p>Install a JDK from your package manager, then run the jar:</p>
+
+<pre># Debian, Ubuntu, Mint
+sudo apt install default-jdk
+
+# Fedora, RHEL, CentOS
+sudo dnf install java-latest-openjdk
+
+# then, in the folder with the file
+java -jar Mars.jar</pre>
+
+<p>A Chromebook needs the Linux development environment switched on first:
+<strong>Settings &rarr; About ChromeOS &rarr; Developers &rarr; Linux development
+environment</strong>, then turn it on and accept the defaults. It installs a Debian
+container and gives you a Terminal app. After that, treat the machine as Debian and
+use the commands above.</p>
+
+<p>To get it into your applications menu, create a desktop entry. The file goes
+here:</p>
+
+<pre>~/.local/share/applications/mars.desktop</pre>
+
+<p>and contains:</p>
+
+<pre>[Desktop Entry]
+Type=Application
+Name=MARS
+Exec=java -jar /home/YOURNAME/CSCI240/Mars.jar
+Terminal=false
+Categories=Development;</pre>
+
+<h2 id="settings"><span class="secnum">B.7</span>Four settings to check</h2>
+
+<p>Open the <strong>Settings</strong> menu once, before you write anything, and make
+sure these four are as described. The wording moves around slightly between versions,
+so match the sense rather than the exact words. The defaults are usually right &mdash;
+this is a thirty-second check that saves an hour of confusion later.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>setting</th><th>want</th><th>why</th></tr></thead>
+<tbody>
+<tr><td>Delayed branching</td><td><strong>off</strong></td><td>With it on, the
+instruction <em>after</em> a branch executes even when the branch is taken. Real MIPS
+hardware does this; everything in our lectures assumes it does not. This is the
+setting most likely to make a correct program behave bizarrely.</td></tr>
+<tr><td>Permit extended (pseudo) instructions</td><td><strong>on</strong></td><td>Lets
+you write <code>li</code>, <code>la</code>, <code>move</code> and <code>blt</code>,
+which the assembler expands into real instructions. We use them from the first
+program onwards.</td></tr>
+<tr><td>Initialize program counter to global <code>main</code></td><td><strong>on</strong></td><td>Starts
+execution at the label <code>main</code> rather than at the first instruction in the
+file, so your <code>.data</code> section can sit wherever you like.</td></tr>
+<tr><td>Assemble all files in directory</td><td><strong>off</strong></td><td>With it
+on, MARS tries to assemble every <code>.asm</code> in the folder at once and reports
+errors from files you are not working on.</td></tr>
+</tbody></table>
+</div>
+
+<h2 id="check"><span class="secnum">B.8</span>Check it works</h2>
+
+<p>Do this now, not the night before the first assembly program is due. Five
+minutes.</p>
+
+<ol>
+<li>Start MARS. You get a window with an <strong>Edit</strong> tab and an
+<strong>Execute</strong> tab across the top, a large panel of registers down the
+right, and a message area at the bottom.</li>
+<li>On the <strong>Edit</strong> tab, choose <strong>File &rarr; New</strong> and type
+the program below. Type it rather than pasting it &mdash; you want to see what the
+editor does with the tabs and the comments.</li>
+</ol>
+
+<pre>        .text
+main:   li      $t0, 6
+        li      $t1, 7
+        add     $t2, $t0, $t1       # $t2 should end up holding 13
+
+        li      $v0, 4              # service 4: print a string
+        la      $a0, msg
+        syscall
+
+        li      $v0, 1              # service 1: print an integer
+        move    $a0, $t2
+        syscall
+
+        li      $v0, 10             # service 10: stop
+        syscall
+
+        .data
+msg:    .asciiz "MARS is working: 6 + 7 = "</pre>
+
+<ol start="3">
+<li><strong>Save it</strong> as <code>check.asm</code>, in the folder with the jar.
+The <code>.asm</code> extension matters &mdash; MARS will not assemble a file without
+it.</li>
+<li><strong>Assemble</strong> it: <strong>Run &rarr; Assemble</strong>, or
+<kbd>F3</kbd>. The bottom panel should say the assemble succeeded, and the window
+should switch to the <strong>Execute</strong> tab showing your instructions laid out
+with their addresses and machine code.</li>
+<li><strong>Run</strong> it: <strong>Run &rarr; Go</strong>, or <kbd>F5</kbd>. In the
+<strong>Run I/O</strong> box at the bottom you should see</li>
+</ol>
+
+<pre>MARS is working: 6 + 7 = 13</pre>
+
+<ol start="6">
+<li>Now the part worth the five minutes. Choose <strong>Run &rarr; Reset</strong>
+(<kbd>F12</kbd>), then step through one instruction at a time with
+<strong>Run &rarr; Step</strong> (<kbd>F7</kbd>), watching the register panel on the
+right. After the third step, <code>$t2</code> turns from 0 to 13 and the value is
+highlighted. That highlight &mdash; one register changing per instruction &mdash; is
+the whole reason we use a simulator instead of real hardware.</li>
+</ol>
+
+<p>If you saw 13 in the output and 13 in <code>$t2</code>, you are set up. Keep
+<code>check.asm</code>: when something stops working later in the semester, running
+it again tells you in ten seconds whether the problem is MARS or your program.</p>
+
+<div class="box note"><span class="bt">What you just wrote</span>
+<p>Nothing here needs to make sense yet. Lecture 15 builds a program up from nothing
+and explains every line of it &mdash; the two sections, the registers with the dollar
+signs, and what a <code>syscall</code> actually is. This one is only a smoke
+test.</p></div>
+
+<h2 id="trouble"><span class="secnum">B.9</span>Troubleshooting</h2>
+
+<details class="prob"><summary data-label="Problem">Double-clicking the jar unpacks it into a folder of files, or does nothing at all.</summary><div class="sol">
+<p>The <code>.jar</code> extension is associated with an archiver (macOS Archive
+Utility, or WinRAR / 7-Zip on Windows) rather than with Java. A jar genuinely is a
+zip file, so the archiver is doing what it was asked &mdash; it was just asked the
+wrong thing.</p>
+<p>Delete whatever folder it unpacked, keep the original jar, and start it with
+<code>java -jar</code> from a terminal instead (&sect;B.4, &sect;B.5). If you want
+double-clicking to work, fix the file association as described there.</p>
+</div></details>
+
+<details class="prob"><summary data-label="Problem">"java: command not found", or Windows says 'java' is not recognized.</summary><div class="sol">
+<p>Java is either not installed or not on your <code>PATH</code>. Install the Temurin
+JDK from &sect;B.2, then <strong>close and reopen the terminal</strong> &mdash; a
+window that was already open keeps the old environment and will keep saying this
+after a perfectly good installation.</p>
+<p>On Windows, if it still fails after reopening, the installer's "Set JAVA_HOME" and
+"Add to PATH" options were probably left unticked. Run the installer again and tick
+them.</p>
+</div></details>
+
+<details class="prob"><summary data-label="Problem">"UnsupportedClassVersionError", or "Unsupported class file major version".</summary><div class="sol">
+<p>The jar was built for a newer Java than the one running it. This is unusual with
+MARS, which asks for very little, so it normally means a genuinely ancient Java
+&mdash; check with <code>java -version</code> and install a current Temurin from
+<a href="https://adoptium.net/temurin/releases/">adoptium.net</a>.</p>
+<p>If you have several versions installed, the one first on your <code>PATH</code> is
+the one being used, which may not be the one you just installed. Either reorder the
+<code>PATH</code> or give the full path to the <code>java</code> you want.</p>
+</div></details>
+
+<details class="prob"><summary data-label="Problem">"no main manifest attribute in Mars.jar".</summary><div class="sol">
+<p>The file you downloaded is not the runnable jar &mdash; usually the source archive
+rather than the program. Go back to the download page in &sect;B.3 and take the link
+that is plainly the program itself.</p>
+<p>A half-finished download can produce the same message. Check the file size: the
+real jar is a few megabytes. A file of a few kilobytes is an error page your browser
+saved.</p>
+</div></details>
+
+<details class="prob"><summary data-label="Problem">macOS says the file is damaged and should be moved to the Trash.</summary><div class="sol">
+<p>It is not damaged. macOS attaches a quarantine flag to anything downloaded from a
+browser, and for an unsigned jar it words the refusal unhelpfully. Remove the flag
+from a terminal, in the folder holding the file:</p>
+<pre>xattr -d com.apple.quarantine Mars.jar</pre>
+<p>Then start it with <code>java -jar</code> as usual. If <code>xattr</code> reports
+that there is no such attribute, the quarantine was not the problem &mdash; check
+your Java version instead.</p>
+</div></details>
+
+<details class="prob"><summary data-label="Problem">MARS says it cannot find my file, or will not assemble it.</summary><div class="sol">
+<p>Three usual causes, in order of likelihood.</p>
+<p><strong>The file is not saved.</strong> MARS assembles what is on disk, not what is
+in the editor. An unsaved tab shows an asterisk or a modified marker in its title.
+Save first, then assemble.</p>
+<p><strong>The extension is wrong.</strong> It must be <code>.asm</code>. A text
+editor that helpfully added <code>.txt</code> gives you
+<code>check.asm.txt</code>, which MARS will not touch.</p>
+<p><strong>Assemble-all is on.</strong> If the error names a file you are not working
+on, turn off <em>Assemble all files in directory</em> in Settings (&sect;B.7).</p>
+</div></details>
+
+<details class="prob"><summary data-label="Problem">The program assembles and runs, but nothing is printed.</summary><div class="sol">
+<p>Look in the <strong>Run I/O</strong> box at the bottom of the Execute tab, not the
+<strong>Mars Messages</strong> box next to it. Messages carries the assembler's own
+output; Run I/O carries your program's.</p>
+<p>If Run I/O really is empty, check that <code>$v0</code> is loaded
+<em>before</em> the <code>syscall</code> that uses it. A <code>syscall</code> reads
+<code>$v0</code> at the moment it executes, so the order of those two lines is the
+whole thing.</p>
+</div></details>
+
+<details class="prob"><summary data-label="Problem">The program runs past the end and throws an error about an invalid instruction address.</summary><div class="sol">
+<p>It ran off the bottom of your code and kept going into whatever was next. Every
+program needs to stop itself explicitly:</p>
+<pre>li   $v0, 10
+syscall</pre>
+<p>as its last two instructions. There is no implicit end &mdash; the processor has no
+idea your program is over.</p>
+</div></details>
+
+<details class="prob"><summary data-label="Problem">A correct-looking program branches the wrong way, or executes one instruction too many.</summary><div class="sol">
+<p>Almost certainly <em>delayed branching</em> is switched on in Settings. With it on,
+the instruction after a branch runs even when the branch is taken, which is what real
+MIPS hardware does and is not what our lectures assume. Turn it off (&sect;B.7) and
+reassemble.</p>
+</div></details>
+
+<details class="prob"><summary data-label="Problem">The window is tiny, or the text is unreadable on a high-resolution screen.</summary><div class="sol">
+<p>MARS predates high-density displays and does not scale itself. Drag the window
+larger &mdash; it remembers the size &mdash; and set the font under
+<strong>Settings &rarr; Editor</strong>.</p>
+<p>If the whole interface is still minuscule on Windows, right-click the Java
+executable (<code>javaw.exe</code>) &rarr; Properties &rarr; Compatibility &rarr;
+<strong>Change high DPI settings</strong>, and tick <em>Override high DPI scaling
+behaviour</em>, set to <em>System</em>.</p>
+</div></details>
+
+<details class="prob"><summary data-label="Problem">My laptop will not let me install anything.</summary><div class="sol">
+<p>MARS does not need installing &mdash; it is one file that runs from wherever you
+put it, including a USB stick. The only thing that might need installing is Java, and
+the Temurin JDK can be unpacked into your own home folder without administrator
+rights.</p>
+<p>If Java is blocked outright, come and see me; the lab machines have it.</p>
+</div></details>
+
+    <nav class="pagenav">
+      <a class="prev" href="setup-logisim.html"><span>Previous</span>A. Installing Logisim-Evolution</a>
+      <a class="next" href="tools.html"><span>Next</span>Textbooks, tools and links</a>
+    </nav>
+    <footer class="site">
+      <em>Computer Organization and Assembly Language</em> &middot; CSCI 240 / 640,
+      Queens College CUNY.
+    </footer>
+  </main>
+</div>
+</body>
+</html>
